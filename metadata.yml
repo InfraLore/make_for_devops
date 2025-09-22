@@ -14,9 +14,9 @@ abstract: |
   demonstrates how Make can bridge the gap between complex infrastructure code and human 
   understanding, creating DevOps workflows that are not only powerful but also transparent, 
   maintainable, and accessible to every team member.
-mainfont: Catrinity
+mainfont: Open Sans
 monofont: JetBrainsMono Nerd Font Mono
-sansfont: Catrinity
+sansfont: Open Sans
 fontsize: 10pt
 papersize: letter
 # Filter preferences:
