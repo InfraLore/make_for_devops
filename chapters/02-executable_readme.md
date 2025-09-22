@@ -240,7 +240,7 @@ setup: ##   Set up development environment
 	@$(MAKE) init-database
 	@echo "  Setup complete! Run 'make dev' to start development."
 
-dev: ## ‍ Start development environment
+dev: ##  Start development environment
 	@echo "Starting $(APP_NAME) development environment..."
 	@trap 'echo "\nShutting down..."; kill %1 %2; exit' INT; \
 	$(MAKE) start-services & \
@@ -353,7 +353,7 @@ help: ##   Show available commands
 	@echo "  Getting Started:"
 	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo
-	@echo "‍ Development:"
+	@echo " Development:"
 	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo
 	@echo "  Deployment:"
@@ -599,7 +599,7 @@ setup-linux:
 
 ##@ Development
 
-dev: ## ‍ Start development environment
+dev: ##  Start development environment
 	@echo "Starting LegacyApp development environment..."
 	@$(MAKE) ensure-database-running
 	@trap 'echo "Shutting down..."; kill %1 %2 %3; exit' INT; \

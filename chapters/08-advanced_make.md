@@ -751,7 +751,7 @@ ci-pipeline-adaptive: ## Adaptive CI pipeline
 		echo "  CI environment detected"; \
 		$(MAKE) ci-pipeline-optimized; \
 	else \
-		echo "‍ Local environment detected"; \
+		echo " Local environment detected"; \
 		$(MAKE) ci-pipeline-local; \
 	fi
 

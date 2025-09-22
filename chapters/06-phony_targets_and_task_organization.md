@@ -154,7 +154,7 @@ Organize targets around the standard DevOps lifecycle:
 
 # Setup and Development
 setup:          ##   Set up development environment
-dev:            ## ‍ Start development environment  
+dev:            ##  Start development environment  
 dev-stop:       ##  Stop development environment
 
 # Build and Package
@@ -196,7 +196,7 @@ For complex systems, organize by component:
 frontend-build: ##   Build frontend assets
 frontend-test:  ##   Run frontend tests
 frontend-deploy: ##   Deploy frontend
-frontend-dev:   ## ‍ Start frontend development server
+frontend-dev:   ##  Start frontend development server
 
 # =============================================================================
 # Backend API Operations  
@@ -206,7 +206,7 @@ frontend-dev:   ## ‍ Start frontend development server
 api-build:      ##   Build API server
 api-test:       ##   Run API tests
 api-deploy:     ##   Deploy API server
-api-dev:        ## ‍ Start API development server
+api-dev:        ##  Start API development server
 
 # =============================================================================
 # Database Operations
@@ -239,7 +239,7 @@ Organize by how often targets are used:
 # =============================================================================
 .PHONY: dev test build
 
-dev:            ## ‍ Start development (most common)
+dev:            ##  Start development (most common)
 test:           ##   Run tests (very common)
 build:          ##   Build application (common)
 
@@ -470,7 +470,7 @@ help: ##   Show available commands
 	@echo "  Getting Started:"
 	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "‍ Development:"
+	@echo " Development:"
 	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "  Deployment:"
@@ -627,7 +627,7 @@ setup: ##   Set up development environment
 	@$(MAKE) setup-config
 	@echo "  Setup complete! Run 'make dev' to start development"
 
-dev: ## ‍ Start development environment
+dev: ##  Start development environment
 	@echo "Starting $(APP_NAME) development environment..."
 	@trap 'echo "\n Shutting down..."; $(MAKE) dev-stop; exit' INT; \
 	docker-compose up --build
@@ -925,7 +925,7 @@ what-next: ##   Suggest next actions based on current state
 		echo ""; \
 	elif ! docker ps | grep -q $(APP_NAME) 2>/dev/null; then \
 		echo ""; \
-		echo "‍ Ready to start development!"; \
+		echo " Ready to start development!"; \
 		echo "   Next step: make dev"; \
 		echo ""; \
 	elif [ -n "$(git status --porcelain 2>/dev/null)" ]; then \
