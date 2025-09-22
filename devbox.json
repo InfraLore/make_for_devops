@@ -1,0 +1,31 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.12.0/.schema/devbox.schema.json",
+  "packages": [
+    "texlive.combined.scheme-full@latest",
+    "gnumake@latest",
+    "pandoc@latest",
+    "texlivePackages.xelatex-dev@latest",
+    "python310Full@latest",
+    "python310Packages.pip@latest",
+    "poppler_utils@latest"
+  ],
+  "env": {
+    "VENV_DIR": ".venv"
+  },
+  "shell": {
+    "init_hook": ". $VENV_DIR/bin/activate",
+    "scripts": {
+      "test": [
+        "echo \"Error: no test specified\" && exit 1"
+      ],
+      "pdf": [
+        "make clean",
+        "make pdf"
+      ],
+      "final": [
+        "make clean",
+        "make final"
+      ]
+    }
+  }
+}

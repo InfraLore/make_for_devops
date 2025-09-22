@@ -1,16 +1,27 @@
 ---
-title: My book title
-author: Daniel Herzog
+title: Make for Devops
+author: Claude.ai v4
 rights: MIT License
 lang: en-US
 mainlang: english
 otherlang: english
 tags: [pandoc, book, my-book, etc]
 abstract: |
-  Your summary.
-mainfont: DejaVu Sans
+  _Make for DevOps_ reveals how Make can serve as the universal "glue" that transforms your project 
+  into a self-documenting, discoverable system where every automation task, dependency, and 
+  workflow step becomes immediately visible and executable through simple, standardized commands. 
+  By treating the Makefile as an executable README and comprehensive workflow registry, this book 
+  demonstrates how Make can bridge the gap between complex infrastructure code and human 
+  understanding, creating DevOps workflows that are not only powerful but also transparent, 
+  maintainable, and accessible to every team member.
+mainfont: Catrinity
+monofont: JetBrainsMono Nerd Font Mono
+sansfont: Catrinity
+fontsize: 10pt
+papersize: letter
 # Filter preferences:
 # - pandoc-crossref
 linkReferences: true
+geometry: twoside
 ---
 
