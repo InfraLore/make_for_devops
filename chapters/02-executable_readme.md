@@ -240,7 +240,7 @@ setup: ##   Set up development environment
 	@$(MAKE) init-database
 	@echo "  Setup complete! Run 'make dev' to start development."
 
-dev: ## 👨‍💻 Start development environment
+dev: ## ‍ Start development environment
 	@echo "Starting $(APP_NAME) development environment..."
 	@trap 'echo "\nShutting down..."; kill %1 %2; exit' INT; \
 	$(MAKE) start-services & \
@@ -353,7 +353,7 @@ help: ##   Show available commands
 	@echo "  Getting Started:"
 	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo
-	@echo "👨‍💻 Development:"
+	@echo "‍ Development:"
 	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo
 	@echo "  Deployment:"
@@ -599,7 +599,7 @@ setup-linux:
 
 ##@ Development
 
-dev: ## 👨‍💻 Start development environment
+dev: ## ‍ Start development environment
 	@echo "Starting LegacyApp development environment..."
 	@$(MAKE) ensure-database-running
 	@trap 'echo "Shutting down..."; kill %1 %2 %3; exit' INT; \
@@ -615,10 +615,10 @@ test: ##   Run all tests
 	@$(MAKE) test-frontend
 	@echo "  All tests passed!"
 
-test-backend: ## 🐍 Run Python tests
+test-backend: ##  Run Python tests
 	pytest -v
 
-test-frontend: ## ⚛  Run JavaScript tests
+test-frontend: ##   Run JavaScript tests
 	npm test
 
 ##@ Build & Deploy
@@ -646,7 +646,7 @@ check-system-requirements: ##   Verify system requirements
 	@command -v docker >/dev/null || (echo "  Docker required. Please install Docker." && exit 1)
 	@echo "  All system requirements met"
 
-create-env-file: ## 📝 Create .env configuration file
+create-env-file: ##  Create .env configuration file
 	@if [ ! -f .env ]; then \
 		echo "Creating .env file..."; \
 		echo "DATABASE_URL=$(DATABASE_URL)" > .env; \

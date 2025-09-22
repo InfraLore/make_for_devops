@@ -18,7 +18,7 @@ This script has several problems: it runs every step regardless of whether it's 
 
 In this chapter, we'll explore how to model complex DevOps workflows using Make's dependency system, creating orchestration that's both more reliable and more efficient than traditional scripting approaches.
 
-> **⚡ Start Simple: Basic Dependency Patterns**
+> ** Start Simple: Basic Dependency Patterns**
 > 
 > Master these fundamental dependency patterns before exploring advanced orchestration:
 > 
@@ -175,7 +175,7 @@ deploy-staging: lint build test security-scan push update-k8s
 
 # Production: maximum validation and safety checks
 deploy-production: validate-production-readiness backup-production lint build test security-scan push update-k8s-production
-	@echo "🚨 Deploying to PRODUCTION"
+	@echo " Deploying to PRODUCTION"
 	kubectl apply -f k8s/production/
 	$(MAKE) verify-production-deployment
 
@@ -622,7 +622,7 @@ deploy-protected: check-circuit-breaker deploy-with-monitoring
 
 check-circuit-breaker:
 	@if [ -f .circuit-breaker-open ]; then \
-		echo "🚨 Circuit breaker is open due to recent failures"; \
+		echo " Circuit breaker is open due to recent failures"; \
 		echo "  Last opened: $$(stat -c %y .circuit-breaker-open)"; \
 		echo "  Run 'make reset-circuit-breaker' to manually reset"; \
 		exit 1; \
@@ -650,7 +650,7 @@ increment-failure-count:
 check-failure-threshold:
 	@COUNT=$$(cat .deploy-failure-count 2>/dev/null || echo 0); \
 	if [ $$COUNT -ge 3 ]; then \
-		echo "🚨 Failure threshold reached, opening circuit breaker"; \
+		echo " Failure threshold reached, opening circuit breaker"; \
 		touch .circuit-breaker-open; \
 		echo "  Circuit breaker opened at $$(date)"; \
 	fi

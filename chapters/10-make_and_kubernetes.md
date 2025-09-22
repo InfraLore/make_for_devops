@@ -73,8 +73,8 @@ OVERLAYS_DIR = k8s/overlays
 .PHONY: generate-manifests validate-manifests clean-manifests
 
 # Generate manifests from templates
-generate-manifests: ## 📝 Generate Kubernetes manifests
-	@echo "📝 Generating Kubernetes manifests for $(ENVIRONMENT)..."
+generate-manifests: ##  Generate Kubernetes manifests
+	@echo " Generating Kubernetes manifests for $(ENVIRONMENT)..."
 	@mkdir -p $(MANIFESTS_DIR)
 	@$(MAKE) generate-deployment
 	@$(MAKE) generate-service  
@@ -220,7 +220,7 @@ validate-cluster-access: ##   Validate cluster access
 
 validate-namespace-exists: ##   Ensure namespace exists
 	@kubectl get namespace $(NAMESPACE) >/dev/null 2>&1 || \
-		(echo "📝 Creating namespace $(NAMESPACE)" && kubectl create namespace $(NAMESPACE))
+		(echo " Creating namespace $(NAMESPACE)" && kubectl create namespace $(NAMESPACE))
 
 validate-secrets-available: ##   Validate required secrets exist
 	@if [ "$(ENVIRONMENT)" != "development" ]; then \
@@ -246,7 +246,7 @@ deploy-staging: build push generate-manifests validate-manifests ##   Staging de
 	@echo "  Staging deployment completed"
 
 deploy-production: build push generate-manifests validate-manifests ##   Production deployment (maximum safety)
-	@echo "🚨 Production deployment..."
+	@echo " Production deployment..."
 	@$(MAKE) pre-production-checks
 	@$(MAKE) backup-current-state
 	@echo "   Deploy to PRODUCTION? [y/N]" && read ans && [ $$ans = y ]
@@ -386,13 +386,13 @@ HELM_VALUES_FILE ?= helm/values-$(ENVIRONMENT).yaml
 .PHONY: helm-lint helm-template helm-install helm-upgrade helm-uninstall
 
 # Helm chart operations
-helm-lint: ## 📝 Lint Helm chart
-	@echo "📝 Linting Helm chart..."
+helm-lint: ##  Lint Helm chart
+	@echo " Linting Helm chart..."
 	@helm lint $(HELM_CHART)
 	@echo "  Helm chart is valid"
 
-helm-template: ## 📝 Generate templates from Helm chart
-	@echo "📝 Generating templates from Helm chart..."
+helm-template: ##  Generate templates from Helm chart
+	@echo " Generating templates from Helm chart..."
 	@mkdir -p $(MANIFESTS_DIR)
 	@helm template $(HELM_RELEASE_NAME) $(HELM_CHART) \
 		--values $(HELM_VALUES_FILE) \
@@ -460,15 +460,15 @@ istio-install: ##    Install Istio
 	@kubectl label namespace $(NAMESPACE) istio-injection=enabled --overwrite
 	@echo "  Istio installed and namespace labeled"
 
-istio-enable: ## 🔗 Enable Istio for application
-	@echo "🔗 Enabling Istio for $(APP_NAME)..."
+istio-enable: ##  Enable Istio for application
+	@echo " Enabling Istio for $(APP_NAME)..."
 	@$(MAKE) generate-istio-manifests
 	@kubectl apply -f k8s/istio/ -n $(NAMESPACE)
 	@echo "  Istio enabled for $(APP_NAME)"
 
 # Generate Istio configuration
-generate-istio-manifests: ## 📝 Generate Istio manifests
-	@echo "📝 Generating Istio manifests..."
+generate-istio-manifests: ##  Generate Istio manifests
+	@echo " Generating Istio manifests..."
 	@mkdir -p k8s/istio
 	@$(MAKE) generate-gateway
 	@$(MAKE) generate-virtual-service
@@ -552,8 +552,8 @@ monitoring-install: ##   Install monitoring stack
 	@echo "  Monitoring stack installed"
 
 # Configure monitoring for application
-monitoring-configure: ## ⚙  Configure monitoring for application
-	@echo "⚙  Configuring monitoring for $(APP_NAME)..."
+monitoring-configure: ##   Configure monitoring for application
+	@echo "  Configuring monitoring for $(APP_NAME)..."
 	@$(MAKE) create-service-monitor
 	@$(MAKE) create-alerts
 	@echo "  Monitoring configured"
@@ -611,8 +611,8 @@ spec:
 EOF
 	@kubectl apply -f k8s/monitoring/alerts.yaml
 
-monitoring-access: ## 🔗 Access monitoring UIs
-	@echo "🔗 Setting up access to monitoring UIs..."
+monitoring-access: ##  Access monitoring UIs
+	@echo " Setting up access to monitoring UIs..."
 	@kubectl port-forward -n $(MONITORING_NAMESPACE) svc/$(PROMETHEUS_RELEASE)-grafana 3000:80 > /dev/null 2>&1 &
 	@kubectl port-forward -n $(MONITORING_NAMESPACE) svc/$(PROMETHEUS_RELEASE)-kube-prom-prometheus 9090:9090 > /dev/null 2>&1 &
 	@sleep 2
@@ -759,8 +759,8 @@ pre-deploy-validation: ##   Comprehensive pre-deployment validation
 	@echo "  Pre-deployment validation passed"
 
 # Prepare deployment artifacts
-prepare-deployment: ## 📝 Prepare deployment artifacts
-	@echo "📝 Preparing deployment artifacts..."
+prepare-deployment: ##  Prepare deployment artifacts
+	@echo " Preparing deployment artifacts..."
 ifeq ($(USE_HELM),true)
 	@$(MAKE) helm-template
 else
@@ -794,8 +794,8 @@ post-deploy-verification: ##   Post-deployment verification
 	@echo "  Post-deployment verification passed"
 
 # Post-deployment setup
-post-deploy-setup: ## ⚙  Post-deployment setup
-	@echo "⚙  Running post-deployment setup..."
+post-deploy-setup: ##   Post-deployment setup
+	@echo "  Running post-deployment setup..."
 ifeq ($(USE_ISTIO),true)
 	@$(MAKE) istio-enable
 endif
@@ -818,9 +818,9 @@ create-environment: ##    Create new environment
 	@$(MAKE) setup-monitoring-namespace
 	@echo "  Environment $(ENVIRONMENT) created"
 
-destroy-environment: ## 💥 Destroy environment
+destroy-environment: ##  Destroy environment
 	@echo "   This will destroy the $(ENVIRONMENT) environment. Continue? [y/N]" && read ans && [ $ans = y ]
-	@echo "💥 Destroying environment: $(ENVIRONMENT)"
+	@echo " Destroying environment: $(ENVIRONMENT)"
 	@kubectl delete namespace $(NAMESPACE) --wait=true
 	@echo "  Environment $(ENVIRONMENT) destroyed"
 
@@ -910,9 +910,9 @@ clean: ##   Clean up development resources
 	@$(MAKE) clean-manifests
 	@echo "  Cleanup completed"
 
-uninstall: ## 🗑  Uninstall application
+uninstall: ##   Uninstall application
 	@echo "   This will uninstall $(APP_NAME) from $(ENVIRONMENT). Continue? [y/N]" && read ans && [ $ans = y ]
-	@echo "🗑  Uninstalling application..."
+	@echo "  Uninstalling application..."
 ifeq ($(USE_HELM),true)
 	@$(MAKE) helm-uninstall
 else
@@ -1007,8 +1007,8 @@ OVERLAYS_DIR = k8s/overlays
 .PHONY: generate-manifests validate-manifests clean-manifests
 
 # Generate manifests from templates
-generate-manifests: ## 📝 Generate Kubernetes manifests
-	@echo "📝 Generating Kubernetes manifests for $(ENVIRONMENT)..."
+generate-manifests: ##  Generate Kubernetes manifests
+	@echo " Generating Kubernetes manifests for $(ENVIRONMENT)..."
 	@mkdir -p $(MANIFESTS_DIR)
 	@$(MAKE) generate-deployment
 	@$(MAKE) generate-service  
@@ -1134,8 +1134,8 @@ makefile
 # =============================================================================
 
 # Generate Kustomize overlays
-generate-kustomize-overlay: ## 📝 Generate Kustomize overlay
-	@echo "📝 Generating Kustomize overlay for $(ENVIRONMENT)..."
+generate-kustomize-overlay: ##  Generate Kustomize overlay
+	@echo " Generating Kustomize overlay for $(ENVIRONMENT)..."
 	@mkdir -p $(OVERLAYS_DIR)/$(ENVIRONMENT)
 	@cat > $(OVERLAYS_DIR)/$(ENVIRONMENT)/kustomization.yaml << EOF
 apiVersion: kustomize.config.k8s.io/v1beta1
@@ -1216,7 +1216,7 @@ validate-cluster-access: ##   Validate cluster access
 
 validate-namespace-exists: ##   Ensure namespace exists
 	@kubectl get namespace $(NAMESPACE) >/dev/null 2>&1 || \
-		(echo "📝 Creating namespace $(NAMESPACE)" && kubectl create namespace $(NAMESPACE))
+		(echo " Creating namespace $(NAMESPACE)" && kubectl create namespace $(NAMESPACE))
 
 validate-secrets-available: ##   Validate required secrets exist
 	@if [ "$(ENVIRONMENT)" != "development" ]; then \
@@ -1242,7 +1242,7 @@ deploy-staging: build push generate-manifests validate-manifests ##   Staging de
 	@echo "  Staging deployment completed"
 
 deploy-production: build push generate-manifests validate-manifests ##   Production deployment (maximum safety)
-	@echo "🚨 Production deployment..."
+	@echo " Production deployment..."
 	@$(MAKE) pre-production-checks
 	@$(MAKE) backup-current-state
 	@echo "   Deploy to PRODUCTION? [y/N]" && read ans && [ $$ans = y ]
@@ -1465,13 +1465,13 @@ HELM_VALUES_FILE ?= helm/values-$(ENVIRONMENT).yaml
 .PHONY: helm-lint helm-template helm-install helm-upgrade helm-uninstall
 
 # Helm chart operations
-helm-lint: ## 📝 Lint Helm chart
-	@echo "📝 Linting Helm chart..."
+helm-lint: ##  Lint Helm chart
+	@echo " Linting Helm chart..."
 	@helm lint $(HELM_CHART)
 	@echo "  Helm chart is valid"
 
-helm-template: ## 📝 Generate templates from Helm chart
-	@echo "📝 Generating templates from Helm chart..."
+helm-template: ##  Generate templates from Helm chart
+	@echo " Generating templates from Helm chart..."
 	@mkdir -p $(MANIFESTS_DIR)
 	@helm template $(HELM_RELEASE_NAME) $(HELM_CHART) \
 		--values $(HELM_VALUES_FILE) \
@@ -1513,7 +1513,7 @@ helm-upgrade: build push ##   Upgrade with Helm
 	@$(MAKE) verify-helm-deployment
 	@echo "  Helm upgrade completed"
 
-helm-uninstall: ## 🗑  Uninstall Helm release
+helm-uninstall: ##   Uninstall Helm release
 	@echo "   This will uninstall $(HELM_RELEASE_NAME). Continue? [y/N]" && read ans && [ $$ans = y ]
 	@helm uninstall $(HELM_RELEASE_NAME) -n $(NAMESPACE)
 	@echo "  Helm release uninstalled"

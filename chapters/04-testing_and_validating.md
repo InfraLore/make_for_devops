@@ -840,7 +840,7 @@ test: ## Run standard test suite
 
 # Comprehensive test suite
 test-all: ## Run comprehensive test suite
-	@echo "🔬 Running comprehensive test suite..."
+	@echo " Running comprehensive test suite..."
 	@$(MAKE) test-syntax
 	@$(MAKE) test-lint
 	@$(MAKE) test-variables
@@ -854,7 +854,7 @@ test-all: ## Run comprehensive test suite
 
 # Fast smoke test for development
 test-quick: ## Quick smoke test
-	@echo "⚡ Running quick tests..."
+	@echo " Running quick tests..."
 	@$(MAKE) test-syntax
 	@$(MAKE) test-lint
 	@echo "  Quick tests passed!"
@@ -900,7 +900,7 @@ test-report: ## Generate comprehensive test report
 
 # Watch for changes and re-test
 test-watch: ## Watch for Makefile changes and re-test
-	@echo "👀 Watching for Makefile changes..."
+	@echo " Watching for Makefile changes..."
 	@while true; do \
 		inotifywait -q -e modify Makefile 2>/dev/null || sleep 1; \
 		echo "  Makefile changed, running tests..."; \

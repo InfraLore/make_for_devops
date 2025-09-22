@@ -7,7 +7,7 @@ Make provides the perfect orchestration layer for Docker workflows. Instead of r
 
 This chapter demonstrates how to create discoverable, maintainable Docker workflows using Make. We'll explore patterns for development environments, multi-stage builds, registry management, security scanning, and local development with docker-compose. By the end, your Docker workflows will be as reliable and discoverable as any other aspect of your DevOps infrastructure.
 
-> **🐳 Start Simple: Essential Docker + Make Patterns**
+> ** Start Simple: Essential Docker + Make Patterns**
 > 
 > Master these fundamental patterns before exploring advanced container orchestration:
 > 
@@ -368,8 +368,8 @@ build-with-secrets: ##   Build with secrets (for private dependencies)
 		.
 
 # Parallel multi-stage builds
-build-parallel: ## ⚡ Build multiple stages in parallel
-	@echo "⚡ Building stages in parallel..."
+build-parallel: ##  Build multiple stages in parallel
+	@echo " Building stages in parallel..."
 	@$(MAKE) -j3 build-dev build-test build-stage-docs
 
 build-stage-docs: ##   Build documentation stage
@@ -444,7 +444,7 @@ push-with-metadata: tag-all login ##   Push with build metadata
 	@echo "  Pushing with build metadata..."
 	@docker push $(PROD_TAG)
 	@docker push $(LATEST_TAG)
-	@echo "📝 Recording build metadata..."
+	@echo " Recording build metadata..."
 	@echo "version=$(VERSION)" > build-metadata.txt
 	@echo "commit=$(GIT_COMMIT)" >> build-metadata.txt
 	@echo "build_date=$(BUILD_DATE)" >> build-metadata.txt
@@ -514,7 +514,7 @@ release-minor: release-check ##    Create minor release
 	@echo "  Minor release $(NEXT_MINOR) created and pushed"
 
 release-major: release-check ##    Create major release
-	@echo "🚨 Creating MAJOR release: $(NEXT_MAJOR)"
+	@echo " Creating MAJOR release: $(NEXT_MAJOR)"
 	@echo "   This is a major version bump. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@git tag $(NEXT_MAJOR)
 	@$(MAKE) build-prod VERSION=$(NEXT_MAJOR)
@@ -688,8 +688,8 @@ Enable efficient development workflows with hot reloading and file watching:
 # =============================================================================
 
 # Development modes
-dev-watch: ## 👁  Start development with file watching
-	@echo "👁  Starting development with file watching..."
+dev-watch: ##   Start development with file watching
+	@echo "  Starting development with file watching..."
 	@$(MAKE) dev-services-up
 	@docker-compose -f $(COMPOSE_FILE_DEV) -f docker-compose.watch.yml up --build
 	@echo "  File watching active - changes will trigger rebuilds"
@@ -762,8 +762,8 @@ security-scan: build-prod ##   Run comprehensive security scan
 	@echo "  Security scan completed - check $(SECURITY_REPORTS_DIR)/"
 
 # Vulnerability scanning with Trivy
-scan-vulnerabilities: ## 🕳  Scan for vulnerabilities
-	@echo "🕳  Scanning for vulnerabilities..."
+scan-vulnerabilities: ##   Scan for vulnerabilities
+	@echo "  Scanning for vulnerabilities..."
 	@mkdir -p $(TRIVY_CACHE_DIR) $(SECURITY_REPORTS_DIR)
 	@docker run --rm \
 		-v $(TRIVY_CACHE_DIR):/root/.cache/ \
@@ -780,8 +780,8 @@ scan-vulnerabilities: ## 🕳  Scan for vulnerabilities
 		$(APP_NAME):$(VERSION)
 
 # Secrets scanning
-scan-secrets: ## 🕵  Scan for secrets in image
-	@echo "🕵  Scanning for secrets..."
+scan-secrets: ##   Scan for secrets in image
+	@echo "  Scanning for secrets..."
 	@docker run --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		trufflesecurity/trufflehog docker \
@@ -789,8 +789,8 @@ scan-secrets: ## 🕵  Scan for secrets in image
 		--json > $(SECURITY_REPORTS_DIR)/secrets.json || true
 
 # Configuration scanning
-scan-configuration: ## ⚙  Scan container configuration
-	@echo "⚙  Scanning container configuration..."
+scan-configuration: ##   Scan container configuration
+	@echo "  Scanning container configuration..."
 	@docker run --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aquasec/trivy config \
@@ -821,8 +821,8 @@ security-report: ##   Generate comprehensive security report
 	@echo "  Security report generated: $(SECURITY_REPORTS_DIR)/security-report.html"
 
 # Security gates for CI/CD
-security-gate: ## 🚪 Security gate for CI/CD pipeline
-	@echo "🚪 Running security gate..."
+security-gate: ##  Security gate for CI/CD pipeline
+	@echo " Running security gate..."
 	@$(MAKE) scan-vulnerabilities
 	@CRITICAL_VULNS=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' $(SECURITY_REPORTS_DIR)/vulnerabilities.json); \
 	HIGH_VULNS=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH")] | length' $(SECURITY_REPORTS_DIR)/vulnerabilities.json); \
@@ -866,8 +866,8 @@ Implement Dockerfile linting and security best practices:
 # =============================================================================
 
 # Dockerfile linting and security
-dockerfile-lint: ## 📝 Lint Dockerfile for best practices
-	@echo "📝 Linting Dockerfile..."
+dockerfile-lint: ##  Lint Dockerfile for best practices
+	@echo " Linting Dockerfile..."
 	@docker run --rm -i hadolint/hadolint < Dockerfile || true
 
 dockerfile-security: ##   Check Dockerfile security
@@ -879,8 +879,8 @@ dockerfile-security: ##   Check Dockerfile security
 		/workspace/Dockerfile
 
 # Generate secure Dockerfile template
-generate-secure-dockerfile: ## 📝 Generate secure Dockerfile template
-	@echo "📝 Generating secure Dockerfile template..."
+generate-secure-dockerfile: ##  Generate secure Dockerfile template
+	@echo " Generating secure Dockerfile template..."
 	@cat > Dockerfile.secure << 'EOF'
 # Use specific version tags, not latest
 FROM node:18.17.0-alpine3.18 AS base
@@ -1090,8 +1090,8 @@ ci-pipeline: ##   Complete CI pipeline
 	@echo "  CI pipeline completed successfully"
 
 # Parallel CI pipeline
-ci-pipeline-parallel: ## ⚡ Parallel CI pipeline
-	@echo "⚡ Starting parallel CI pipeline..."
+ci-pipeline-parallel: ##  Parallel CI pipeline
+	@echo " Starting parallel CI pipeline..."
 	@$(MAKE) -j4 dockerfile-lint validate-dockerfile-security build-test build-prod
 	@$(MAKE) security-gate
 	@$(MAKE) push-prod
@@ -1124,8 +1124,8 @@ ci-pull-request: ##   CI pipeline for pull requests
 	@$(MAKE) security-scan
 
 # Cache management for CI
-ci-cache-pull: ## 📥 Pull build cache in CI
-	@echo "📥 Pulling build cache..."
+ci-cache-pull: ##  Pull build cache in CI
+	@echo " Pulling build cache..."
 	@docker pull $(REGISTRY_NAMESPACE):buildcache || true
 	@docker pull $(REGISTRY_NAMESPACE):base || true
 	@docker pull $(REGISTRY_NAMESPACE):deps || true
@@ -1273,7 +1273,7 @@ security-scan: build-prod ##   Run security scan
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aquasec/trivy image $(APP_NAME):$(VERSION)
 
-dockerfile-lint: ## 📝 Lint Dockerfile
+dockerfile-lint: ##  Lint Dockerfile
 	@docker run --rm -i hadolint/hadolint < $(DOCKERFILE)
 
 # =============================================================================

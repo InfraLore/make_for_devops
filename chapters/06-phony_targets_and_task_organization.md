@@ -7,7 +7,7 @@ A poorly organized Makefile is like a toolbox where all the tools are thrown in 
 
 This chapter will teach you how to design and organize phony targets that create natural, discoverable workflows. Instead of team members needing to remember complex command sequences or hunt through documentation, they'll find exactly what they need through intuitive target names and logical organization.
 
-> **⚡ Start Simple: Essential Phony Target Patterns**
+> ** Start Simple: Essential Phony Target Patterns**
 > 
 > Before diving into advanced organization strategies, establish these fundamental phony target patterns:
 > 
@@ -154,8 +154,8 @@ Organize targets around the standard DevOps lifecycle:
 
 # Setup and Development
 setup:          ##   Set up development environment
-dev:            ## 👨‍💻 Start development environment  
-dev-stop:       ## 🛑 Stop development environment
+dev:            ## ‍ Start development environment  
+dev-stop:       ##  Stop development environment
 
 # Build and Package
 build:          ##   Build application
@@ -196,17 +196,17 @@ For complex systems, organize by component:
 frontend-build: ##   Build frontend assets
 frontend-test:  ##   Run frontend tests
 frontend-deploy: ##   Deploy frontend
-frontend-dev:   ## 👨‍💻 Start frontend development server
+frontend-dev:   ## ‍ Start frontend development server
 
 # =============================================================================
 # Backend API Operations  
 # =============================================================================
 .PHONY: api-build api-test api-deploy api-dev
 
-api-build:      ## ⚙  Build API server
+api-build:      ##   Build API server
 api-test:       ##   Run API tests
 api-deploy:     ##   Deploy API server
-api-dev:        ## 👨‍💻 Start API development server
+api-dev:        ## ‍ Start API development server
 
 # =============================================================================
 # Database Operations
@@ -214,7 +214,7 @@ api-dev:        ## 👨‍💻 Start API development server
 .PHONY: db-start db-stop db-migrate db-backup db-restore
 
 db-start:       ##    Start database server
-db-stop:        ## 🛑 Stop database server
+db-stop:        ##  Stop database server
 db-migrate:     ##   Run database migrations
 db-backup:      ##   Create database backup
 db-restore:     ##   Restore database from backup
@@ -226,7 +226,7 @@ db-restore:     ##   Restore database from backup
 
 infra-plan:     ##   Plan infrastructure changes
 infra-apply:    ##    Apply infrastructure changes
-infra-destroy:  ## 💥 Destroy infrastructure
+infra-destroy:  ##  Destroy infrastructure
 ```
 
 ### Frequency-Based Organization
@@ -239,7 +239,7 @@ Organize by how often targets are used:
 # =============================================================================
 .PHONY: dev test build
 
-dev:            ## 👨‍💻 Start development (most common)
+dev:            ## ‍ Start development (most common)
 test:           ##   Run tests (very common)
 build:          ##   Build application (common)
 
@@ -287,8 +287,8 @@ update-k8s:     ## Update Kubernetes deployment
 deploy-full: build-image run-tests push-image update-k8s ##   Full deployment pipeline
 	@echo "  Full deployment completed successfully"
 
-quick-deploy: build-image push-image update-k8s ## ⚡ Quick deployment (skip tests)
-	@echo "⚡ Quick deployment completed"
+quick-deploy: build-image push-image update-k8s ##  Quick deployment (skip tests)
+	@echo " Quick deployment completed"
 
 ci-pipeline: build-image run-tests ##   CI pipeline (build and test only)
 	@echo "  CI pipeline completed"
@@ -331,7 +331,7 @@ Create workflows that adapt based on conditions:
 # Environment-aware deployment
 deploy: ##   Deploy to configured environment
 ifeq ($(ENVIRONMENT),production)
-	@echo "🚨 Production deployment requires additional validation"
+	@echo " Production deployment requires additional validation"
 	@$(MAKE) validate-production-readiness
 	@$(MAKE) create-deployment-backup
 	@$(MAKE) deploy-with-rollback-plan
@@ -412,7 +412,7 @@ deploy: validate-environment validate-secrets validate-tools build test ##   Dep
 	kubectl apply -f k8s/
 
 # Quick deployment for development (fewer validations)
-deploy-dev: validate-tools build ## ⚡ Quick development deployment
+deploy-dev: validate-tools build ##  Quick development deployment
 	@echo "Development deployment..."
 	kubectl apply -f k8s/
 ```
@@ -470,7 +470,7 @@ help: ##   Show available commands
 	@echo "  Getting Started:"
 	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "👨‍💻 Development:"
+	@echo "‍ Development:"
 	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "  Deployment:"
@@ -500,7 +500,7 @@ deploy: ## Deploy to configured environment
 	kubectl apply -f k8s/
 
 deploy-prod: ## Deploy to production (requires confirmation)
-	@echo "🚨 Deploying to PRODUCTION. Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo " Deploying to PRODUCTION. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@$(MAKE) deploy ENVIRONMENT=production
 
 ##@ Operations
@@ -627,12 +627,12 @@ setup: ##   Set up development environment
 	@$(MAKE) setup-config
 	@echo "  Setup complete! Run 'make dev' to start development"
 
-dev: ## 👨‍💻 Start development environment
+dev: ## ‍ Start development environment
 	@echo "Starting $(APP_NAME) development environment..."
-	@trap 'echo "\n🛑 Shutting down..."; $(MAKE) dev-stop; exit' INT; \
+	@trap 'echo "\n Shutting down..."; $(MAKE) dev-stop; exit' INT; \
 	docker-compose up --build
 
-dev-stop: ## 🛑 Stop development environment
+dev-stop: ##  Stop development environment
 	@echo "Stopping development environment..."
 	@docker-compose down
 	@echo "  Development environment stopped"
@@ -735,7 +735,7 @@ deploy-staging: ##   Deploy to staging
 	@$(MAKE) smoke-test ENVIRONMENT=staging
 
 deploy-prod: ##   Deploy to production (requires confirmation)
-	@echo "🚨 PRODUCTION DEPLOYMENT"
+	@echo " PRODUCTION DEPLOYMENT"
 	@echo "Version: $(VERSION)"
 	@echo "Image: $(IMAGE_TAG)"
 	@echo ""
@@ -850,11 +850,11 @@ setup-database: ##    Set up development database
 	@docker-compose exec -T database psql -U postgres -c "CREATE DATABASE IF NOT EXISTS $(APP_NAME);"
 	@echo "  Database ready"
 
-setup-config: ## ⚙  Set up configuration files
+setup-config: ##   Set up configuration files
 	@echo "Setting up configuration..."
 	@if [ ! -f ".env" ]; then \
 		cp .env.example .env; \
-		echo "📝 Please edit .env with your configuration"; \
+		echo " Please edit .env with your configuration"; \
 	fi
 	@echo "  Configuration setup complete"
 
@@ -920,12 +920,12 @@ what-next: ##   Suggest next actions based on current state
 		echo ""; \
 	elif [ ! -f ".env" ]; then \
 		echo ""; \
-		echo "⚙   Project needs configuration setup."; \
+		echo "   Project needs configuration setup."; \
 		echo "   Next step: make setup"; \
 		echo ""; \
 	elif ! docker ps | grep -q $(APP_NAME) 2>/dev/null; then \
 		echo ""; \
-		echo "👨‍💻 Ready to start development!"; \
+		echo "‍ Ready to start development!"; \
 		echo "   Next step: make dev"; \
 		echo ""; \
 	elif [ -n "$(git status --porcelain 2>/dev/null)" ]; then \
@@ -947,8 +947,8 @@ what-next: ##   Suggest next actions based on current state
 
 .PHONY: quick-start fresh-start ci-pipeline release
 
-quick-start: ## ⚡ Quick start for experienced developers
-	@echo "⚡ Quick start sequence..."
+quick-start: ##  Quick start for experienced developers
+	@echo " Quick start sequence..."
 	@$(MAKE) setup
 	@$(MAKE) dev
 
@@ -1051,7 +1051,7 @@ deploy-staging: ##   Staging deployment (full validation)
 	@$(MAKE) smoke-test
 
 deploy-production: ##   Production deployment (maximum safety)
-	@echo "🚨 Production deployment..."
+	@echo " Production deployment..."
 	@$(MAKE) validate-production-readiness
 	@$(MAKE) backup-production
 	@$(MAKE) ci-pipeline

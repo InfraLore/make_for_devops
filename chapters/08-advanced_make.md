@@ -7,7 +7,7 @@ Think of the difference between a basic toolbox and a professional workshop. The
 
 This chapter explores Make's sophisticated features: pattern rules that eliminate repetitive target definitions, recursive Make for coordinating multiple projects, external tool integration patterns, conditional execution based on system state, and techniques for creating extensible workflow frameworks that grow with your organization's needs.
 
-> **🛤  The Glide Path: Evolving to Advanced Features**
+> **  The Glide Path: Evolving to Advanced Features**
 > 
 > Don't jump straight to advanced features—evolve into them naturally as your needs grow:
 > 
@@ -43,7 +43,7 @@ This chapter explores Make's sophisticated features: pattern rules that eliminat
 > 
 > The key is solving today's problems with today's complexity level, not building for imaginary future requirements.
 
-> **⚡ Start Simple: When to Reach for Advanced Features**
+> ** Start Simple: When to Reach for Advanced Features**
 > 
 > Advanced Make features solve specific problems. Use them when:
 > 
@@ -107,7 +107,7 @@ validate-staging: validate-development ## Enhanced validation for staging
 	@$(MAKE) validate-staging-data
 
 validate-production: validate-staging ## Maximum validation for production
-	@echo "🚨 Production validation (maximum security)"
+	@echo " Production validation (maximum security)"
 	@$(MAKE) security-audit
 	@$(MAKE) backup-production-data
 	@$(MAKE) validate-production-readiness
@@ -199,7 +199,7 @@ migrate-%-up: backup-%-db ## Run migrations up for specified database
 	@echo "  $* database migrated up"
 
 migrate-%-down: backup-%-db ## Run migrations down for specified database  
-	@echo "📉 Migrating $* database down..."
+	@echo " Migrating $* database down..."
 	@echo "   This will roll back the last migration. Continue? [y/N]" && read ans && [ $$ans = y ]
 	kubectl exec deployment/$*-db -- /app/migrate -database $(DATABASE_$*_URL) -path /migrations down 1
 	@echo "  $* database migrated down"
@@ -463,7 +463,7 @@ notify-deployment-success: ## Notify deployment success
 
 # Get configuration from API
 fetch-config-from-api: ## Fetch configuration from API
-	@echo "📥 Fetching configuration from API..."
+	@echo " Fetching configuration from API..."
 	@curl -s -H "Authorization: Bearer $(API_TOKEN)" \
 		$(CONFIG_API_URL)/config/$(APP_NAME)/$(ENVIRONMENT) \
 		| jq -r 'to_entries[] | "\(.key)=\(.value)"' > .env.api
@@ -576,12 +576,12 @@ dependency-scan: ## Scan dependencies for vulnerabilities
 	@npm audit --json > npm-audit.json || true
 
 container-scan: build ## Scan container for vulnerabilities
-	@echo "🐳 Scanning container..."
+	@echo " Scanning container..."
 	@trivy image --format json --output trivy.json $(IMAGE_TAG) || true
 	@grype $(IMAGE_TAG) -o json > grype.json || true
 
 secrets-scan: ## Scan for secrets in code
-	@echo "🕵  Scanning for secrets..."
+	@echo "  Scanning for secrets..."
 	@gitleaks detect --source . --format json --report-path gitleaks.json || true
 
 compliance-check: ## Check compliance requirements
@@ -671,7 +671,7 @@ Execute different workflows based on Git state:
 # Detect Git branch and execute appropriate workflow
 deploy-by-branch: ## Deploy based on current Git branch
 	@BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
-	echo "🌿 Current branch: $$BRANCH"; \
+	echo " Current branch: $$BRANCH"; \
 	case $$BRANCH in \
 		main|master) $(MAKE) deploy-production ;; \
 		develop) $(MAKE) deploy-staging ;; \
@@ -738,7 +738,7 @@ build-adaptive: ## Build with adaptive parallelism
 		echo "  High-resource build (parallel)"; \
 		$(MAKE) -j$$CPU build-parallel; \
 	elif [ $$CPU -ge 4 ] && [ $$MEMORY -ge 8 ]; then \
-		echo "⚡ Medium-resource build"; \
+		echo " Medium-resource build"; \
 		$(MAKE) -j4 build-standard; \
 	else \
 		echo "  Low-resource build (sequential)"; \
@@ -751,7 +751,7 @@ ci-pipeline-adaptive: ## Adaptive CI pipeline
 		echo "  CI environment detected"; \
 		$(MAKE) ci-pipeline-optimized; \
 	else \
-		echo "👨‍💻 Local environment detected"; \
+		echo "‍ Local environment detected"; \
 		$(MAKE) ci-pipeline-local; \
 	fi
 
@@ -950,7 +950,7 @@ load-workflow-config: ## Load workflow configuration
 
 # Dynamic target generation based on configuration
 generate-dynamic-targets: load-workflow-config ## Generate targets from configuration
-	@echo "🎯 Generating dynamic targets..."
+	@echo " Generating dynamic targets..."
 	@if [ -n "$(WORKFLOW_CONFIG)" ]; then \
 		echo '$(WORKFLOW_CONFIG)' | jq -r '.environments[]' | while read env; do \
 			echo "deploy-$env: validate-$env build test push-$env" >> .dynamic-targets.mk; \
@@ -967,7 +967,7 @@ generate-dynamic-targets: load-workflow-config ## Generate targets from configur
 
 # Workflow execution based on configuration
 execute-workflow: load-workflow-config ## Execute workflow based on configuration
-	@echo "⚙  Executing configured workflow..."
+	@echo "  Executing configured workflow..."
 	@WORKFLOW=$(echo '$(WORKFLOW_CONFIG)' | jq -r '.workflow.type // "standard"'); \
 	case $WORKFLOW in \
 		standard) $(MAKE) workflow-standard ;; \
@@ -1032,7 +1032,7 @@ coordinate-teams: ## Coordinate deployment across teams
 	@$(MAKE) notify-teams-complete
 
 deploy-team-backend: ## Deploy backend team components
-	@echo "⚙  Deploying backend team components..."
+	@echo "  Deploying backend team components..."
 	@$(MAKE) -C teams/backend deploy
 	@$(MAKE) register-deployment TEAM=backend
 
@@ -1048,7 +1048,7 @@ deploy-team-infrastructure: ## Deploy infrastructure team components
 
 # Deployment registry for coordination
 register-deployment: ## Register team deployment
-	@echo "📝 Registering deployment for $(TEAM) team..."
+	@echo " Registering deployment for $(TEAM) team..."
 	@mkdir -p .deployment-registry
 	@echo "$(TEAM):$(shell date -Iseconds):$(VERSION)" >> .deployment-registry/deployments.log
 	@touch .deployment-registry/$(TEAM)-deployed
@@ -1075,7 +1075,7 @@ wait-for-all-teams: ## Wait for all teams to complete deployment
 
 # Cross-team integration tests
 integration-tests-cross-team: wait-for-all-teams ## Run cross-team integration tests
-	@echo "🔗 Running cross-team integration tests..."
+	@echo " Running cross-team integration tests..."
 	@$(MAKE) test-api-frontend-integration
 	@$(MAKE) test-api-infrastructure-integration
 	@$(MAKE) test-end-to-end-full-stack
