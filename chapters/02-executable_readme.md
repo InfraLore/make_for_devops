@@ -188,13 +188,13 @@ Make targets should provide clear, actionable feedback:
 ```makefile
 # Good: Informative and helpful
 setup:
-	@echo "🚀 Setting up MyApp development environment"
+	@echo "  Setting up MyApp development environment"
 	@echo "Checking prerequisites..."
-	@command -v node >/dev/null && echo "✅ Node.js found" || (echo "❌ Node.js required" && exit 1)
-	@command -v docker >/dev/null && echo "✅ Docker found" || (echo "❌ Docker required" && exit 1)
+	@command -v node >/dev/null && echo "  Node.js found" || (echo "  Node.js required" && exit 1)
+	@command -v docker >/dev/null && echo "  Docker found" || (echo "  Docker required" && exit 1)
 	@echo "Installing dependencies..."
 	npm install --silent
-	@echo "🎉 Setup complete! Try 'make dev' to start development."
+	@echo "  Setup complete! Try 'make dev' to start development."
 
 # Bad: Silent or confusing
 setup:
@@ -228,17 +228,17 @@ KUBE_NAMESPACE ?= $(APP_NAME)-$(ENVIRONMENT)
 
 .PHONY: help setup dev test build deploy clean
 
-help: ## 📋 Show available commands
+help: ##   Show available commands
 	@echo "$(APP_NAME) Development Commands"
 	@echo "================================"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
-setup: ## 🚀 Set up development environment
+setup: ##   Set up development environment
 	@echo "Setting up $(APP_NAME) for development..."
 	@$(MAKE) check-prerequisites
 	@$(MAKE) install-dependencies
 	@$(MAKE) init-database
-	@echo "✅ Setup complete! Run 'make dev' to start development."
+	@echo "  Setup complete! Run 'make dev' to start development."
 
 dev: ## 👨‍💻 Start development environment
 	@echo "Starting $(APP_NAME) development environment..."
@@ -247,27 +247,27 @@ dev: ## 👨‍💻 Start development environment
 	$(MAKE) watch-files & \
 	wait
 
-test: ## 🧪 Run all tests
+test: ##   Run all tests
 	@echo "Running $(APP_NAME) test suite..."
 	@$(MAKE) test-unit
 	@$(MAKE) test-integration
-	@echo "✅ All tests passed!"
+	@echo "  All tests passed!"
 
 # ============================================================================
 # Build and Deployment
 # ============================================================================
 
-build: ## 🔨 Build application
+build: ##   Build application
 	@echo "Building $(APP_NAME) version $(VERSION)..."
 	docker build -t $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION) .
-	@echo "✅ Build complete: $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)"
+	@echo "  Build complete: $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)"
 
-deploy: build test ## 🚀 Deploy to target environment
+deploy: build test ##   Deploy to target environment
 	@echo "Deploying $(APP_NAME) to $(ENVIRONMENT)..."
 	@$(MAKE) validate-deployment-target
 	@$(MAKE) push-image
 	@$(MAKE) update-kubernetes
-	@echo "✅ Deployment complete!"
+	@echo "  Deployment complete!"
 
 # ============================================================================
 # Utility Targets - Supporting functionality
@@ -275,10 +275,10 @@ deploy: build test ## 🚀 Deploy to target environment
 
 check-prerequisites: ## Check that required tools are installed
 	@echo "Checking prerequisites..."
-	@command -v docker >/dev/null || (echo "❌ Docker required" && exit 1)
-	@command -v kubectl >/dev/null || (echo "❌ kubectl required" && exit 1)
-	@command -v node >/dev/null || (echo "❌ Node.js required" && exit 1)
-	@echo "✅ All prerequisites met"
+	@command -v docker >/dev/null || (echo "  Docker required" && exit 1)
+	@command -v kubectl >/dev/null || (echo "  kubectl required" && exit 1)
+	@command -v node >/dev/null || (echo "  Node.js required" && exit 1)
+	@echo "  All prerequisites met"
 
 install-dependencies:
 	npm install --silent
@@ -296,27 +296,27 @@ start-database:
 		-p 5432:5432 \
 		postgres:13 >/dev/null 2>&1 || echo "Database already running"
 
-clean: ## 🧹 Clean up development environment
+clean: ##   Clean up development environment
 	@echo "Cleaning up $(APP_NAME) environment..."
 	-docker stop $(APP_NAME)-db
 	-docker rm $(APP_NAME)-db
 	-docker rmi $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)
-	@echo "✅ Cleanup complete"
+	@echo "  Cleanup complete"
 
 # ============================================================================
 # Advanced Targets - Less common but important functionality
 # ============================================================================
 
-logs: ## 📋 Show application logs
+logs: ##   Show application logs
 	kubectl logs -f deployment/$(APP_NAME) -n $(KUBE_NAMESPACE)
 
-shell: ## 🐚 Get a shell in the running application
+shell: ##   Get a shell in the running application
 	kubectl exec -it deployment/$(APP_NAME) -n $(KUBE_NAMESPACE) -- /bin/bash
 
-debug: ## 🐛 Start application in debug mode
+debug: ##   Start application in debug mode
 	DEBUG=true $(MAKE) dev
 
-backup: ## 💾 Backup application data
+backup: ##   Backup application data
 	kubectl exec deployment/$(APP_NAME)-db -n $(KUBE_NAMESPACE) -- \
 		pg_dump $(APP_NAME) > backup-$(shell date +%Y%m%d-%H%M%S).sql
 
@@ -346,17 +346,17 @@ The `help` target in the example above demonstrates a crucial pattern for Execut
 You can create sophisticated help systems that organize targets by category:
 
 ```makefile
-help: ## 📋 Show available commands
+help: ##   Show available commands
 	@echo "MyApp Development Commands"
 	@echo "========================="
 	@echo
-	@echo "🚀 Getting Started:"
+	@echo "  Getting Started:"
 	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo
 	@echo "👨‍💻 Development:"
 	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo
-	@echo "🚀 Deployment:"
+	@echo "  Deployment:"
 	@awk '/^##@ Deployment/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 ##@ Getting Started
@@ -386,7 +386,7 @@ deploy: ## Deploy to staging
 You can create help systems that go beyond simple command listing:
 
 ```makefile
-help-interactive: ## 🤔 Interactive help system
+help-interactive: ##   Interactive help system
 	@echo "What would you like to do?"
 	@echo "1) Set up the project for the first time"
 	@echo "2) Start development"
@@ -406,7 +406,7 @@ help-interactive: ## 🤔 Interactive help system
 		*) echo "Invalid choice" ;; \
 	esac
 
-what-can-i-do: ## 🤷 Suggest what to do based on current state
+what-can-i-do: ##   Suggest what to do based on current state
 	@if [ ! -f package.json ]; then \
 		echo "You probably want to run: make setup"; \
 	elif [ ! -d node_modules ]; then \
@@ -578,15 +578,15 @@ help: ## Show available commands
 
 ##@ Getting Started
 
-setup: ## 🚀 Complete project setup
+setup: ##   Complete project setup
 	@echo "Setting up LegacyApp development environment..."
 	@$(MAKE) check-system-requirements
 	@$(MAKE) create-env-file
 	@$(MAKE) install-dependencies
 	@$(MAKE) setup-database
-	@echo "✅ Setup complete! Run 'make dev' to start development."
+	@echo "  Setup complete! Run 'make dev' to start development."
 
-setup-system: ## 📦 Install system requirements (Node.js, Python)
+setup-system: ##   Install system requirements (Node.js, Python)
 	@echo "Installing system requirements..."
 	@command -v brew >/dev/null && $(MAKE) setup-macos || $(MAKE) setup-linux
 
@@ -606,45 +606,45 @@ dev: ## 👨‍💻 Start development environment
 	python app.py & \
 	npm start & \
 	python worker.py & \
-	echo "🚀 All services started. Press Ctrl+C to stop."; \
+	echo "  All services started. Press Ctrl+C to stop."; \
 	wait
 
-test: ## 🧪 Run all tests
+test: ##   Run all tests
 	@echo "Running LegacyApp test suite..."
 	@$(MAKE) test-backend
 	@$(MAKE) test-frontend
-	@echo "✅ All tests passed!"
+	@echo "  All tests passed!"
 
 test-backend: ## 🐍 Run Python tests
 	pytest -v
 
-test-frontend: ## ⚛️ Run JavaScript tests
+test-frontend: ## ⚛  Run JavaScript tests
 	npm test
 
 ##@ Build & Deploy
 
-build: ## 🔨 Build Docker image
+build: ##   Build Docker image
 	@echo "Building $(IMAGE_NAME):$(VERSION)..."
 	docker build -t $(IMAGE_NAME):$(VERSION) .
 	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo "✅ Build complete"
+	@echo "  Build complete"
 
-deploy: build test ## 🚀 Deploy to staging
+deploy: build test ##   Deploy to staging
 	@echo "Deploying $(APP_NAME) version $(VERSION)..."
 	docker push $(IMAGE_NAME):$(VERSION)
 	kubectl apply -f k8s/
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_NAME):$(VERSION)
 	kubectl rollout status deployment/$(APP_NAME)
-	@echo "✅ Deployment complete!"
+	@echo "  Deployment complete!"
 
 ##@ Utilities
 
-check-system-requirements: ## ✅ Verify system requirements
+check-system-requirements: ##   Verify system requirements
 	@echo "Checking system requirements..."
-	@command -v node >/dev/null || (echo "❌ Node.js required. Run 'make setup-system'" && exit 1)
-	@command -v python3 >/dev/null || (echo "❌ Python 3 required. Run 'make setup-system'" && exit 1)
-	@command -v docker >/dev/null || (echo "❌ Docker required. Please install Docker." && exit 1)
-	@echo "✅ All system requirements met"
+	@command -v node >/dev/null || (echo "  Node.js required. Run 'make setup-system'" && exit 1)
+	@command -v python3 >/dev/null || (echo "  Python 3 required. Run 'make setup-system'" && exit 1)
+	@command -v docker >/dev/null || (echo "  Docker required. Please install Docker." && exit 1)
+	@echo "  All system requirements met"
 
 create-env-file: ## 📝 Create .env configuration file
 	@if [ ! -f .env ]; then \
@@ -652,26 +652,26 @@ create-env-file: ## 📝 Create .env configuration file
 		echo "DATABASE_URL=$(DATABASE_URL)" > .env; \
 		echo "SECRET_KEY=$$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" >> .env; \
 		echo "API_KEY=your-api-key-here" >> .env; \
-		echo "⚠️  Please edit .env and set your API_KEY"; \
+		echo "    Please edit .env and set your API_KEY"; \
 	else \
 		echo ".env file already exists"; \
 	fi
 
-install-dependencies: ## 📦 Install all dependencies
+install-dependencies: ##   Install all dependencies
 	@echo "Installing dependencies..."
 	npm install --silent
 	pip install -r requirements.txt --quiet
-	@echo "✅ Dependencies installed"
+	@echo "  Dependencies installed"
 
-setup-database: ## 🗄️ Set up development database
+setup-database: ##    Set up development database
 	@echo "Setting up database..."
 	@$(MAKE) start-database
 	@echo "Waiting for database to be ready..."
 	@timeout 30 bash -c 'until docker exec legacyapp-db pg_isready -U legacyapp; do sleep 1; done'
 	python manage.py migrate
-	@echo "✅ Database ready"
+	@echo "  Database ready"
 
-start-database: ## ▶️ Start PostgreSQL database
+start-database: ## ▶  Start PostgreSQL database
 	@docker run -d --name legacyapp-db \
 		-e POSTGRES_DB=legacyapp \
 		-e POSTGRES_USER=legacyapp \
@@ -679,10 +679,10 @@ start-database: ## ▶️ Start PostgreSQL database
 		-p 5432:5432 \
 		postgres:13 >/dev/null 2>&1 || echo "Database already running"
 
-ensure-database-running: ## 🔍 Ensure database is running
+ensure-database-running: ##   Ensure database is running
 	@docker ps | grep -q legacyapp-db || $(MAKE) start-database
 
-config-help: ## ❓ Show configuration help
+config-help: ##   Show configuration help
 	@echo "LegacyApp Configuration"
 	@echo "====================="
 	@echo "Environment variables (set in .env file):"
@@ -695,17 +695,17 @@ config-help: ## ❓ Show configuration help
 	@echo "  SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | sed 's/\(.*\).../\1.../' || echo 'Not set')"
 	@echo "  API_KEY: $$(test -f .env && grep API_KEY .env | cut -d= -f2 | sed 's/\(.*\).../\1.../' || echo 'Not set')"
 
-clean: ## 🧹 Clean up development environment
+clean: ##   Clean up development environment
 	@echo "Cleaning up..."
 	-docker stop legacyapp-db
 	-docker rm legacyapp-db
 	-docker rmi $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo "✅ Cleanup complete"
+	@echo "  Cleanup complete"
 
-logs: ## 📋 Show application logs (in Kubernetes)
+logs: ##   Show application logs (in Kubernetes)
 	kubectl logs -f deployment/$(APP_NAME)
 
-shell: ## 🐚 Get shell in running container
+shell: ##   Get shell in running container
 	kubectl exec -it deployment/$(APP_NAME) -- /bin/bash
 ````
 

@@ -41,19 +41,19 @@ DOCKER_COMPOSE_FILE ?= docker-compose.yml
 # Development workflow
 .PHONY: dev dev-build dev-stop dev-restart dev-logs dev-shell clean-dev
 
-dev: dev-build ## 🚀 Start development environment
+dev: dev-build ##   Start development environment
 	@echo "Starting $(APP_NAME) development environment..."
 	@docker-compose -f $(DOCKER_COMPOSE_FILE) up -d
-	@echo "✅ Development environment started"
-	@echo "📋 Available services:"
+	@echo "  Development environment started"
+	@echo "  Available services:"
 	@docker-compose -f $(DOCKER_COMPOSE_FILE) ps
 	@echo ""
-	@echo "💡 Useful commands:"
+	@echo "  Useful commands:"
 	@echo "  make dev-logs    # View application logs"
 	@echo "  make dev-shell   # Get shell in main container"
 	@echo "  make dev-stop    # Stop development environment"
 
-dev-build: ## 🔨 Build development Docker image
+dev-build: ##   Build development Docker image
 	@echo "Building development image..."
 	@docker build \
 		--target development \
@@ -61,31 +61,31 @@ dev-build: ## 🔨 Build development Docker image
 		--build-arg USER_ID=$(shell id -u) \
 		--build-arg GROUP_ID=$(shell id -g) \
 		.
-	@echo "✅ Development image built: $(DEV_IMAGE)"
+	@echo "  Development image built: $(DEV_IMAGE)"
 
-dev-stop: ## ⏹️ Stop development environment
+dev-stop: ##    Stop development environment
 	@echo "Stopping development environment..."
 	@docker-compose -f $(DOCKER_COMPOSE_FILE) down
-	@echo "✅ Development environment stopped"
+	@echo "  Development environment stopped"
 
-dev-restart: dev-stop dev ## 🔄 Restart development environment
-	@echo "✅ Development environment restarted"
+dev-restart: dev-stop dev ##   Restart development environment
+	@echo "  Development environment restarted"
 
-dev-logs: ## 📋 Show development environment logs
+dev-logs: ##   Show development environment logs
 	@docker-compose -f $(DOCKER_COMPOSE_FILE) logs -f --tail=100
 
-dev-shell: ## 🐚 Get shell in development container
+dev-shell: ##   Get shell in development container
 	@docker-compose -f $(DOCKER_COMPOSE_FILE) exec app bash
 
-dev-test: ## 🧪 Run tests in development environment
+dev-test: ##   Run tests in development environment
 	@echo "Running tests in development environment..."
 	@docker-compose -f $(DOCKER_COMPOSE_FILE) exec -T app pytest tests/ -v
 
-clean-dev: ## 🧹 Clean development environment
+clean-dev: ##   Clean development environment
 	@echo "Cleaning development environment..."
 	@docker-compose -f $(DOCKER_COMPOSE_FILE) down -v --remove-orphans
 	@docker rmi $(DEV_IMAGE) 2>/dev/null || true
-	@echo "✅ Development environment cleaned"
+	@echo "  Development environment cleaned"
 ```
 
 ### Multi-Stage Dockerfile Integration
@@ -138,41 +138,41 @@ CMD ["npm", "start"]
 # =============================================================================
 
 # Build different stages for different purposes
-build-dev: ## 🔨 Build development image
+build-dev: ##   Build development image
 	@echo "Building development image..."
 	@docker build --target development -t $(APP_NAME):dev .
 
-build-test: ## 🧪 Build test image (includes linting and tests)
+build-test: ##   Build test image (includes linting and tests)
 	@echo "Building test image..."
 	@docker build --target test -t $(APP_NAME):test .
 
-build-prod: ## 📦 Build production image
+build-prod: ##   Build production image
 	@echo "Building production image..."
 	@docker build --target production -t $(APP_NAME):$(VERSION) .
 	@docker tag $(APP_NAME):$(VERSION) $(APP_NAME):latest
 
 # Run tests using the test stage
-test: build-test ## 🧪 Run tests in test container
+test: build-test ##   Run tests in test container
 	@echo "Tests already run during build (see test stage)"
-	@echo "✅ Tests passed"
+	@echo "  Tests passed"
 
 # Alternative: run tests in existing test image
-test-interactive: build-test ## 🧪 Run tests interactively
+test-interactive: build-test ##   Run tests interactively
 	@docker run --rm -it $(APP_NAME):test npm test -- --watchAll=false
 
 # Security scan the production image
-security-scan: build-prod ## 🔒 Run security scan on production image
+security-scan: build-prod ##   Run security scan on production image
 	@echo "Running security scan..."
 	@docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 		aquasec/trivy image $(APP_NAME):$(VERSION)
 
 # Complete CI pipeline using different stages
-ci-pipeline: ## 🤖 Complete CI pipeline
-	@echo "🚀 Running complete CI pipeline..."
+ci-pipeline: ##   Complete CI pipeline
+	@echo "  Running complete CI pipeline..."
 	@$(MAKE) build-test  # Builds and runs tests
 	@$(MAKE) build-prod  # Builds production image
 	@$(MAKE) security-scan  # Scans production image
-	@echo "✅ CI pipeline completed"
+	@echo "  CI pipeline completed"
 ```
 
 ### Development Environment Dependencies
@@ -187,50 +187,50 @@ Modern applications often require multiple services (database, cache, message qu
 # Service management
 .PHONY: dev-services dev-app dev-full dev-db dev-redis dev-migrate
 
-dev-full: dev-services dev-migrate dev-app ## 🚀 Start complete development environment
-	@echo "✅ Complete development environment started"
+dev-full: dev-services dev-migrate dev-app ##   Start complete development environment
+	@echo "  Complete development environment started"
 
-dev-services: ## 🛠️ Start supporting services only
+dev-services: ##    Start supporting services only
 	@echo "Starting supporting services..."
 	@docker-compose -f docker-compose.services.yml up -d
 	@$(MAKE) wait-for-services
-	@echo "✅ Supporting services started"
+	@echo "  Supporting services started"
 
-dev-app: dev-build ## 🚀 Start application (requires services to be running)
+dev-app: dev-build ##   Start application (requires services to be running)
 	@echo "Starting application..."
 	@docker-compose -f docker-compose.app.yml up -d
-	@echo "✅ Application started"
+	@echo "  Application started"
 
 # Individual service management
-dev-db: ## 🗄️ Start database only
+dev-db: ##    Start database only
 	@echo "Starting database..."
 	@docker-compose -f docker-compose.services.yml up -d postgres
 	@timeout 30 bash -c 'until docker-compose -f docker-compose.services.yml exec -T postgres pg_isready; do sleep 1; done'
-	@echo "✅ Database ready"
+	@echo "  Database ready"
 
-dev-redis: ## 📊 Start Redis cache only
+dev-redis: ##   Start Redis cache only
 	@echo "Starting Redis..."
 	@docker-compose -f docker-compose.services.yml up -d redis
 	@timeout 10 bash -c 'until docker-compose -f docker-compose.services.yml exec -T redis redis-cli ping | grep -q PONG; do sleep 1; done'
-	@echo "✅ Redis ready"
+	@echo "  Redis ready"
 
-dev-migrate: dev-db ## 📈 Run database migrations
+dev-migrate: dev-db ##   Run database migrations
 	@echo "Running database migrations..."
 	@docker-compose -f docker-compose.services.yml exec -T postgres createdb -U postgres $(APP_NAME)_dev || echo "Database already exists"
 	@docker run --rm --network $(APP_NAME)_dev-network \
 		-e DATABASE_URL=postgresql://postgres:password@postgres:5432/$(APP_NAME)_dev \
 		$(DEV_IMAGE) alembic upgrade head
-	@echo "✅ Database migrations completed"
+	@echo "  Database migrations completed"
 
 # Wait for services to be ready
-wait-for-services: ## ⏳ Wait for services to be ready
+wait-for-services: ##   Wait for services to be ready
 	@echo "Waiting for services to be ready..."
 	@docker-compose -f docker-compose.services.yml exec -T postgres pg_isready || $(MAKE) dev-db
 	@docker-compose -f docker-compose.services.yml exec -T redis redis-cli ping | grep -q PONG || $(MAKE) dev-redis
-	@echo "✅ All services ready"
+	@echo "  All services ready"
 
 # Development environment status
-dev-status: ## 📊 Show development environment status
+dev-status: ##   Show development environment status
 	@echo "Development Environment Status:"
 	@echo "================================"
 	@echo ""
@@ -262,50 +262,50 @@ CACHE_DIR = .cache
 # Dependency tracking for selective rebuilds
 $(BUILD_DIR)/.base-built: Dockerfile package*.json
 	@mkdir -p $(BUILD_DIR)
-	@echo "🔨 Building base image..."
+	@echo "  Building base image..."
 	@docker build --target base --tag $(APP_NAME):base .
 	@touch $(BUILD_DIR)/.base-built
 
 $(BUILD_DIR)/.deps-installed: $(BUILD_DIR)/.base-built package*.json package-lock.json
-	@echo "📦 Installing dependencies..."
+	@echo "  Installing dependencies..."
 	@docker build --target dependencies --tag $(APP_NAME):deps .
 	@touch $(BUILD_DIR)/.deps-installed
 
 $(BUILD_DIR)/.dev-built: $(BUILD_DIR)/.deps-installed $(shell find src -type f) Dockerfile
-	@echo "🔨 Building development image..."
+	@echo "  Building development image..."
 	@docker build --target development --tag $(APP_NAME):dev .
 	@touch $(BUILD_DIR)/.dev-built
 
 $(BUILD_DIR)/.test-built: $(BUILD_DIR)/.deps-installed $(shell find tests -type f) $(shell find src -type f)
-	@echo "🧪 Building test image..."
+	@echo "  Building test image..."
 	@docker build --target test --tag $(APP_NAME):test .
 	@touch $(BUILD_DIR)/.test-built
 
 $(BUILD_DIR)/.prod-built: $(BUILD_DIR)/.deps-installed $(shell find src -type f)
-	@echo "📦 Building production image..."
+	@echo "  Building production image..."
 	@docker build --target production --tag $(APP_NAME):$(VERSION) .
 	@docker tag $(APP_NAME):$(VERSION) $(APP_NAME):latest
 	@touch $(BUILD_DIR)/.prod-built
 
 # Public targets that depend on build artifacts
-build-dev: $(BUILD_DIR)/.dev-built ## 🔨 Build development image (incremental)
+build-dev: $(BUILD_DIR)/.dev-built ##   Build development image (incremental)
 
-build-test: $(BUILD_DIR)/.test-built ## 🧪 Build test image (incremental)
+build-test: $(BUILD_DIR)/.test-built ##   Build test image (incremental)
 
-build-prod: $(BUILD_DIR)/.prod-built ## 📦 Build production image (incremental)
+build-prod: $(BUILD_DIR)/.prod-built ##   Build production image (incremental)
 
-build-all: build-dev build-test build-prod ## 🔨 Build all images
+build-all: build-dev build-test build-prod ##   Build all images
 
 # Force clean builds
-build-clean: ## 🧹 Clean build and rebuild all images
-	@echo "🧹 Cleaning build artifacts..."
+build-clean: ##   Clean build and rebuild all images
+	@echo "  Cleaning build artifacts..."
 	@rm -rf $(BUILD_DIR)
 	@docker rmi $(APP_NAME):base $(APP_NAME):deps $(APP_NAME):dev $(APP_NAME):test 2>/dev/null || true
 	@$(MAKE) build-all
 
 # Build with caching from registry
-build-with-cache: ## 🔨 Build with registry cache
-	@echo "🔨 Building with registry cache..."
+build-with-cache: ##   Build with registry cache
+	@echo "  Building with registry cache..."
 	@docker build \
 		--cache-from $(REGISTRY)/$(APP_NAME):base \
 		--cache-from $(REGISTRY)/$(APP_NAME):deps \
@@ -315,8 +315,8 @@ build-with-cache: ## 🔨 Build with registry cache
 		.
 
 # Push intermediate layers for caching
-push-cache: ## 📤 Push build cache to registry
-	@echo "📤 Pushing build cache..."
+push-cache: ##   Push build cache to registry
+	@echo "  Pushing build cache..."
 	@docker tag $(APP_NAME):base $(REGISTRY)/$(APP_NAME):base
 	@docker tag $(APP_NAME):deps $(REGISTRY)/$(APP_NAME):deps
 	@docker tag $(APP_NAME):dev $(REGISTRY)/$(APP_NAME):dev
@@ -339,8 +339,8 @@ export DOCKER_BUILDKIT=1
 export BUILDKIT_PROGRESS=plain
 
 # Multi-platform builds
-build-multiplatform: ## 🌍 Build for multiple platforms
-	@echo "🌍 Building for multiple platforms..."
+build-multiplatform: ##   Build for multiple platforms
+	@echo "  Building for multiple platforms..."
 	@docker buildx create --name multiplatform --use || true
 	@docker buildx build \
 		--platform linux/amd64,linux/arm64 \
@@ -350,8 +350,8 @@ build-multiplatform: ## 🌍 Build for multiple platforms
 		.
 
 # Build with advanced cache mounting
-build-with-mounts: ## 🔨 Build with cache mounts
-	@echo "🔨 Building with cache mounts..."
+build-with-mounts: ##   Build with cache mounts
+	@echo "  Building with cache mounts..."
 	@docker build \
 		--target production \
 		--tag $(APP_NAME):$(VERSION) \
@@ -359,8 +359,8 @@ build-with-mounts: ## 🔨 Build with cache mounts
 		.
 
 # Build with secrets
-build-with-secrets: ## 🔐 Build with secrets (for private dependencies)
-	@echo "🔐 Building with secrets..."
+build-with-secrets: ##   Build with secrets (for private dependencies)
+	@echo "  Building with secrets..."
 	@docker build \
 		--secret id=npm,src=.npmrc \
 		--secret id=ssh,src=$(HOME)/.ssh/id_rsa \
@@ -372,7 +372,7 @@ build-parallel: ## ⚡ Build multiple stages in parallel
 	@echo "⚡ Building stages in parallel..."
 	@$(MAKE) -j3 build-dev build-test build-stage-docs
 
-build-stage-docs: ## 📚 Build documentation stage
+build-stage-docs: ##   Build documentation stage
 	@docker build --target docs --tag $(APP_NAME):docs .
 ```
 
@@ -406,42 +406,42 @@ LATEST_TAG = $(REGISTRY_NAMESPACE):latest
 .PHONY: login push push-all push-dev push-test push-prod tag-all cleanup-tags
 
 # Registry authentication
-login: ## 🔑 Login to container registry
-	@echo "🔑 Logging into registry..."
+login: ##   Login to container registry
+	@echo "  Logging into registry..."
 	@if [ -n "$(REGISTRY_USER)" ] && [ -n "$(REGISTRY_PASS)" ]; then \
 		echo "$(REGISTRY_PASS)" | docker login $(REGISTRY) -u "$(REGISTRY_USER)" --password-stdin; \
 	else \
-		echo "⚠️ REGISTRY_USER and REGISTRY_PASS not set, using existing credentials"; \
+		echo "   REGISTRY_USER and REGISTRY_PASS not set, using existing credentials"; \
 	fi
 
 # Tagging strategy
-tag-all: build-all ## 🏷️ Tag all images for registry
-	@echo "🏷️ Tagging images..."
+tag-all: build-all ##    Tag all images for registry
+	@echo "   Tagging images..."
 	@docker tag $(APP_NAME):dev $(DEV_TAG)
 	@docker tag $(APP_NAME):test $(TEST_TAG)
 	@docker tag $(APP_NAME):$(VERSION) $(PROD_TAG)
 	@docker tag $(APP_NAME):$(VERSION) $(LATEST_TAG)
-	@echo "✅ All images tagged"
+	@echo "  All images tagged"
 
 # Selective pushing
-push-dev: build-dev tag-all login ## 📤 Push development image
-	@echo "📤 Pushing development image..."
+push-dev: build-dev tag-all login ##   Push development image
+	@echo "  Pushing development image..."
 	@docker push $(DEV_TAG)
 
-push-test: build-test tag-all login ## 📤 Push test image
-	@echo "📤 Pushing test image..."
+push-test: build-test tag-all login ##   Push test image
+	@echo "  Pushing test image..."
 	@docker push $(TEST_TAG)
 
-push-prod: build-prod tag-all login ## 📤 Push production image
-	@echo "📤 Pushing production image..."
+push-prod: build-prod tag-all login ##   Push production image
+	@echo "  Pushing production image..."
 	@docker push $(PROD_TAG)
 	@docker push $(LATEST_TAG)
 
-push-all: push-dev push-test push-prod ## 📤 Push all images
+push-all: push-dev push-test push-prod ##   Push all images
 
 # Push with metadata
-push-with-metadata: tag-all login ## 📤 Push with build metadata
-	@echo "📤 Pushing with build metadata..."
+push-with-metadata: tag-all login ##   Push with build metadata
+	@echo "  Pushing with build metadata..."
 	@docker push $(PROD_TAG)
 	@docker push $(LATEST_TAG)
 	@echo "📝 Recording build metadata..."
@@ -451,12 +451,12 @@ push-with-metadata: tag-all login ## 📤 Push with build metadata
 	@echo "registry=$(REGISTRY_NAMESPACE)" >> build-metadata.txt
 
 # Registry cleanup
-list-tags: ## 📋 List all tags in registry
-	@echo "📋 Tags in registry:"
+list-tags: ##   List all tags in registry
+	@echo "  Tags in registry:"
 	@docker run --rm quay.io/skopeo/skopeo list-tags docker://$(REGISTRY_NAMESPACE) | jq -r '.Tags[]' | sort
 
-cleanup-old-tags: ## 🧹 Clean up old tags from registry
-	@echo "🧹 Cleaning up old tags..."
+cleanup-old-tags: ##   Clean up old tags from registry
+	@echo "  Cleaning up old tags..."
 	@TAGS=$$(docker run --rm quay.io/skopeo/skopeo list-tags docker://$(REGISTRY_NAMESPACE) | jq -r '.Tags[]' | grep -E '^dev-|^test-' | head -n -10); \
 	for tag in $$TAGS; do \
 		echo "Deleting tag: $$tag"; \
@@ -464,11 +464,11 @@ cleanup-old-tags: ## 🧹 Clean up old tags from registry
 	done
 
 # Registry health check
-check-registry: ## 🏥 Check registry health
-	@echo "🏥 Checking registry health..."
+check-registry: ##   Check registry health
+	@echo "  Checking registry health..."
 	@docker run --rm quay.io/skopeo/skopeo inspect docker://$(REGISTRY_NAMESPACE):latest >/dev/null && \
-		echo "✅ Registry is accessible" || \
-		echo "❌ Registry is not accessible"
+		echo "  Registry is accessible" || \
+		echo "  Registry is not accessible"
 ```
 
 ### Semantic Versioning and Release Management
@@ -489,51 +489,51 @@ NEXT_MAJOR = $(shell echo $(CURRENT_VERSION) | awk -F. -v OFS=. '{$$1 = substr($
 # Release management
 .PHONY: release-patch release-minor release-major release-check
 
-release-check: ## ✅ Check release readiness
-	@echo "🔍 Checking release readiness..."
-	@git diff --quiet || (echo "❌ Uncommitted changes" && exit 1)
-	@git diff --cached --quiet || (echo "❌ Uncommitted staged changes" && exit 1)
+release-check: ##   Check release readiness
+	@echo "  Checking release readiness..."
+	@git diff --quiet || (echo "  Uncommitted changes" && exit 1)
+	@git diff --cached --quiet || (echo "  Uncommitted staged changes" && exit 1)
 	@$(MAKE) test
 	@$(MAKE) security-scan
-	@echo "✅ Release checks passed"
+	@echo "  Release checks passed"
 
-release-patch: release-check ## 🏷️ Create patch release
-	@echo "🏷️ Creating patch release: $(NEXT_PATCH)"
+release-patch: release-check ##    Create patch release
+	@echo "   Creating patch release: $(NEXT_PATCH)"
 	@git tag $(NEXT_PATCH)
 	@$(MAKE) build-prod VERSION=$(NEXT_PATCH)
 	@$(MAKE) push-prod VERSION=$(NEXT_PATCH)
 	@git push origin $(NEXT_PATCH)
-	@echo "✅ Patch release $(NEXT_PATCH) created and pushed"
+	@echo "  Patch release $(NEXT_PATCH) created and pushed"
 
-release-minor: release-check ## 🏷️ Create minor release
-	@echo "🏷️ Creating minor release: $(NEXT_MINOR)"
+release-minor: release-check ##    Create minor release
+	@echo "   Creating minor release: $(NEXT_MINOR)"
 	@git tag $(NEXT_MINOR)
 	@$(MAKE) build-prod VERSION=$(NEXT_MINOR)
 	@$(MAKE) push-prod VERSION=$(NEXT_MINOR)
 	@git push origin $(NEXT_MINOR)
-	@echo "✅ Minor release $(NEXT_MINOR) created and pushed"
+	@echo "  Minor release $(NEXT_MINOR) created and pushed"
 
-release-major: release-check ## 🏷️ Create major release
+release-major: release-check ##    Create major release
 	@echo "🚨 Creating MAJOR release: $(NEXT_MAJOR)"
-	@echo "⚠️ This is a major version bump. Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo "   This is a major version bump. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@git tag $(NEXT_MAJOR)
 	@$(MAKE) build-prod VERSION=$(NEXT_MAJOR)
 	@$(MAKE) push-prod VERSION=$(NEXT_MAJOR)
 	@git push origin $(NEXT_MAJOR)
-	@echo "✅ Major release $(NEXT_MAJOR) created and pushed"
+	@echo "  Major release $(NEXT_MAJOR) created and pushed"
 
 # Release candidates
-release-candidate: ## 🧪 Create release candidate
+release-candidate: ##   Create release candidate
 	@RC_VERSION="$(NEXT_MINOR)-rc.$(shell date +%Y%m%d%H%M%S)"; \
-	echo "🧪 Creating release candidate: $$RC_VERSION"; \
+	echo "  Creating release candidate: $$RC_VERSION"; \
 	git tag $$RC_VERSION; \
 	$(MAKE) build-prod VERSION=$$RC_VERSION; \
 	$(MAKE) push-prod VERSION=$$RC_VERSION; \
 	git push origin $$RC_VERSION; \
-	echo "✅ Release candidate $$RC_VERSION created"
+	echo "  Release candidate $$RC_VERSION created"
 
 # Show version information
-version-info: ## ℹ️ Show version information
+version-info: ##    Show version information
 	@echo "Version Information:"
 	@echo "  Current: $(CURRENT_VERSION)"
 	@echo "  Next patch: $(NEXT_PATCH)"
@@ -565,117 +565,117 @@ export COMPOSE_PROJECT_NAME
 .PHONY: dev-up dev-down dev-restart dev-build dev-logs dev-ps dev-exec
 
 # Complete development environment
-dev-up: ## 🚀 Start complete development environment
-	@echo "🚀 Starting complete development environment..."
+dev-up: ##   Start complete development environment
+	@echo "  Starting complete development environment..."
 	@$(MAKE) dev-services-up
 	@$(MAKE) dev-app-up
 	@$(MAKE) dev-status
 	@echo ""
-	@echo "💡 Development environment ready!"
+	@echo "  Development environment ready!"
 	@echo "   App: http://localhost:8080"
 	@echo "   Docs: http://localhost:8081"
 	@echo "   Logs: make dev-logs"
 
-dev-services-up: ## 🛠️ Start supporting services
-	@echo "🛠️ Starting supporting services..."
+dev-services-up: ##    Start supporting services
+	@echo "   Starting supporting services..."
 	@docker-compose -f $(COMPOSE_FILE_SERVICES) up -d
-	@echo "⏳ Waiting for services to be ready..."
+	@echo "  Waiting for services to be ready..."
 	@$(MAKE) wait-for-db
 	@$(MAKE) wait-for-redis
 	@$(MAKE) run-migrations
-	@echo "✅ Supporting services ready"
+	@echo "  Supporting services ready"
 
-dev-app-up: ## 🚀 Start application services
-	@echo "🚀 Starting application services..."
+dev-app-up: ##   Start application services
+	@echo "  Starting application services..."
 	@docker-compose -f $(COMPOSE_FILE_DEV) up -d
-	@echo "⏳ Waiting for application to be ready..."
+	@echo "  Waiting for application to be ready..."
 	@timeout 60 bash -c 'until curl -f http://localhost:8080/health; do sleep 2; done'
-	@echo "✅ Application ready"
+	@echo "  Application ready"
 
-dev-down: ## ⏹️ Stop development environment
-	@echo "⏹️ Stopping development environment..."
+dev-down: ##    Stop development environment
+	@echo "   Stopping development environment..."
 	@docker-compose -f $(COMPOSE_FILE_DEV) down
 	@docker-compose -f $(COMPOSE_FILE_SERVICES) down
-	@echo "✅ Development environment stopped"
+	@echo "  Development environment stopped"
 
-dev-restart: dev-down dev-up ## 🔄 Restart development environment
+dev-restart: dev-down dev-up ##   Restart development environment
 
-dev-build: ## 🔨 Build development services
-	@echo "🔨 Building development services..."
+dev-build: ##   Build development services
+	@echo "  Building development services..."
 	@docker-compose -f $(COMPOSE_FILE_DEV) build --parallel
-	@echo "✅ Development services built"
+	@echo "  Development services built"
 
-dev-logs: ## 📋 Show development environment logs
+dev-logs: ##   Show development environment logs
 	@docker-compose -f $(COMPOSE_FILE_DEV) -f $(COMPOSE_FILE_SERVICES) logs -f --tail=100
 
-dev-ps: ## 📊 Show running development services
+dev-ps: ##   Show running development services
 	@echo "Running Development Services:"
 	@docker-compose -f $(COMPOSE_FILE_DEV) -f $(COMPOSE_FILE_SERVICES) ps
 
 # Individual service management
-dev-db-up: ## 🗄️ Start database only
+dev-db-up: ##    Start database only
 	@docker-compose -f $(COMPOSE_FILE_SERVICES) up -d postgres
 	@$(MAKE) wait-for-db
 
-dev-redis-up: ## 📊 Start Redis only
+dev-redis-up: ##   Start Redis only
 	@docker-compose -f $(COMPOSE_FILE_SERVICES) up -d redis
 	@$(MAKE) wait-for-redis
 
-dev-app-only: ## 🚀 Start app without rebuilding services
+dev-app-only: ##   Start app without rebuilding services
 	@docker-compose -f $(COMPOSE_FILE_DEV) up -d app
 
 # Service health checks
-wait-for-db: ## ⏳ Wait for database to be ready
-	@echo "⏳ Waiting for database..."
+wait-for-db: ##   Wait for database to be ready
+	@echo "  Waiting for database..."
 	@timeout 30 bash -c 'until docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T postgres pg_isready -U postgres; do sleep 1; done'
-	@echo "✅ Database ready"
+	@echo "  Database ready"
 
-wait-for-redis: ## ⏳ Wait for Redis to be ready
-	@echo "⏳ Waiting for Redis..."
+wait-for-redis: ##   Wait for Redis to be ready
+	@echo "  Waiting for Redis..."
 	@timeout 30 bash -c 'until docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T redis redis-cli ping | grep -q PONG; do sleep 1; done'
-	@echo "✅ Redis ready"
+	@echo "  Redis ready"
 
 # Database operations
-run-migrations: wait-for-db ## 📈 Run database migrations
-	@echo "📈 Running database migrations..."
+run-migrations: wait-for-db ##   Run database migrations
+	@echo "  Running database migrations..."
 	@docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T postgres createdb -U postgres $(APP_NAME)_dev 2>/dev/null || echo "Database exists"
 	@docker-compose -f $(COMPOSE_FILE_DEV) run --rm app alembic upgrade head
-	@echo "✅ Migrations completed"
+	@echo "  Migrations completed"
 
-reset-db: ## 🔄 Reset development database
-	@echo "⚠️ This will destroy all data in the development database. Continue? [y/N]" && read ans && [ $$ans = y ]
+reset-db: ##   Reset development database
+	@echo "   This will destroy all data in the development database. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T postgres dropdb -U postgres $(APP_NAME)_dev || true
 	@$(MAKE) run-migrations
-	@echo "✅ Database reset completed"
+	@echo "  Database reset completed"
 
 # Development utilities
-dev-exec: ## 🐚 Execute command in app container
+dev-exec: ##   Execute command in app container
 	@read -p "Command: " cmd; \
 	docker-compose -f $(COMPOSE_FILE_DEV) exec app $$cmd
 
-dev-shell: ## 🐚 Get shell in app container
+dev-shell: ##   Get shell in app container
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec app bash
 
-dev-test: ## 🧪 Run tests in development environment
-	@echo "🧪 Running tests in development environment..."
+dev-test: ##   Run tests in development environment
+	@echo "  Running tests in development environment..."
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec -T app pytest tests/ -v
 
-dev-status: ## 📊 Show development environment status
+dev-status: ##   Show development environment status
 	@echo "Development Environment Status:"
 	@echo "================================"
 	@docker-compose -f $(COMPOSE_FILE_DEV) -f $(COMPOSE_FILE_SERVICES) ps
 	@echo ""
 	@echo "Health Checks:"
-	@curl -s http://localhost:8080/health | jq '.' 2>/dev/null && echo "✅ App healthy" || echo "❌ App unhealthy"
-	@docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T postgres pg_isready -U postgres >/dev/null 2>&1 && echo "✅ Database healthy" || echo "❌ Database unhealthy"
-	@docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T redis redis-cli ping | grep -q PONG && echo "✅ Redis healthy" || echo "❌ Redis unhealthy"
+	@curl -s http://localhost:8080/health | jq '.' 2>/dev/null && echo "  App healthy" || echo "  App unhealthy"
+	@docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T postgres pg_isready -U postgres >/dev/null 2>&1 && echo "  Database healthy" || echo "  Database unhealthy"
+	@docker-compose -f $(COMPOSE_FILE_SERVICES) exec -T redis redis-cli ping | grep -q PONG && echo "  Redis healthy" || echo "  Redis unhealthy"
 
 # Clean development environment
-dev-clean: dev-down ## 🧹 Clean development environment
-	@echo "🧹 Cleaning development environment..."
+dev-clean: dev-down ##   Clean development environment
+	@echo "  Cleaning development environment..."
 	@docker-compose -f $(COMPOSE_FILE_DEV) -f $(COMPOSE_FILE_SERVICES) down -v --remove-orphans
 	@docker system prune -f --filter "label=com.docker.compose.project=$(COMPOSE_PROJECT_NAME)"
-	@echo "✅ Development environment cleaned"
+	@echo "  Development environment cleaned"
 ```
 
 ### Hot Reloading and Development Workflows
@@ -688,48 +688,48 @@ Enable efficient development workflows with hot reloading and file watching:
 # =============================================================================
 
 # Development modes
-dev-watch: ## 👁️ Start development with file watching
-	@echo "👁️ Starting development with file watching..."
+dev-watch: ## 👁  Start development with file watching
+	@echo "👁  Starting development with file watching..."
 	@$(MAKE) dev-services-up
 	@docker-compose -f $(COMPOSE_FILE_DEV) -f docker-compose.watch.yml up --build
-	@echo "💡 File watching active - changes will trigger rebuilds"
+	@echo "  File watching active - changes will trigger rebuilds"
 
-dev-debug: ## 🐛 Start development in debug mode
-	@echo "🐛 Starting development in debug mode..."
+dev-debug: ##   Start development in debug mode
+	@echo "  Starting development in debug mode..."
 	@$(MAKE) dev-services-up
 	@COMPOSE_FILE_DEV=docker-compose.debug.yml $(MAKE) dev-app-up
-	@echo "🐛 Debug server started on port 5678"
-	@echo "💡 Attach your debugger to localhost:5678"
+	@echo "  Debug server started on port 5678"
+	@echo "  Attach your debugger to localhost:5678"
 
-dev-profile: ## 📊 Start development with profiling
-	@echo "📊 Starting development with profiling..."
+dev-profile: ##   Start development with profiling
+	@echo "  Starting development with profiling..."
 	@$(MAKE) dev-services-up  
 	@COMPOSE_FILE_DEV=docker-compose.profile.yml $(MAKE) dev-app-up
-	@echo "📊 Profiler available at http://localhost:8080/profile"
+	@echo "  Profiler available at http://localhost:8080/profile"
 
 # File synchronization options
-dev-sync: ## 🔄 Start with file synchronization (for better performance)
-	@echo "🔄 Starting with file synchronization..."
+dev-sync: ##   Start with file synchronization (for better performance)
+	@echo "  Starting with file synchronization..."
 	@docker volume create $(APP_NAME)-sync-volume
 	@$(MAKE) dev-services-up
 	@docker-compose -f $(COMPOSE_FILE_DEV) -f docker-compose.sync.yml up -d
-	@echo "🔄 File sync active - better performance on non-Linux hosts"
+	@echo "  File sync active - better performance on non-Linux hosts"
 
 # Testing in development
-dev-test-watch: ## 🧪 Run tests with file watching
-	@echo "🧪 Running tests with file watching..."
+dev-test-watch: ##   Run tests with file watching
+	@echo "  Running tests with file watching..."
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec app pytest tests/ --testmon --looponfail
 
-dev-test-coverage: ## 📊 Run tests with coverage in development
-	@echo "📊 Running tests with coverage..."
+dev-test-coverage: ##   Run tests with coverage in development
+	@echo "  Running tests with coverage..."
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec app pytest tests/ --cov=src --cov-report=html --cov-report=term
-	@echo "📊 Coverage report available at htmlcov/index.html"
+	@echo "  Coverage report available at htmlcov/index.html"
 
 # Performance monitoring in development
-dev-monitor: ## 📈 Start performance monitoring
-	@echo "📈 Starting performance monitoring..."
+dev-monitor: ##   Start performance monitoring
+	@echo "  Starting performance monitoring..."
 	@docker-compose -f $(COMPOSE_FILE_SERVICES) -f docker-compose.monitoring.yml up -d
-	@echo "📈 Monitoring available:"
+	@echo "  Monitoring available:"
 	@echo "   Grafana: http://localhost:3000 (admin/admin)"
 	@echo "   Prometheus: http://localhost:9090"
 ```
@@ -752,18 +752,18 @@ SECURITY_REPORTS_DIR = security-reports
 .PHONY: security-scan security-scan-all security-report security-compliance
 
 # Comprehensive security scanning
-security-scan: build-prod ## 🔒 Run comprehensive security scan
-	@echo "🔒 Running comprehensive security scan..."
+security-scan: build-prod ##   Run comprehensive security scan
+	@echo "  Running comprehensive security scan..."
 	@mkdir -p $(SECURITY_REPORTS_DIR)
 	@$(MAKE) scan-vulnerabilities
 	@$(MAKE) scan-secrets
 	@$(MAKE) scan-configuration
 	@$(MAKE) scan-compliance
-	@echo "✅ Security scan completed - check $(SECURITY_REPORTS_DIR)/"
+	@echo "  Security scan completed - check $(SECURITY_REPORTS_DIR)/"
 
 # Vulnerability scanning with Trivy
-scan-vulnerabilities: ## 🕳️ Scan for vulnerabilities
-	@echo "🕳️ Scanning for vulnerabilities..."
+scan-vulnerabilities: ## 🕳  Scan for vulnerabilities
+	@echo "🕳  Scanning for vulnerabilities..."
 	@mkdir -p $(TRIVY_CACHE_DIR) $(SECURITY_REPORTS_DIR)
 	@docker run --rm \
 		-v $(TRIVY_CACHE_DIR):/root/.cache/ \
@@ -780,8 +780,8 @@ scan-vulnerabilities: ## 🕳️ Scan for vulnerabilities
 		$(APP_NAME):$(VERSION)
 
 # Secrets scanning
-scan-secrets: ## 🕵️ Scan for secrets in image
-	@echo "🕵️ Scanning for secrets..."
+scan-secrets: ## 🕵  Scan for secrets in image
+	@echo "🕵  Scanning for secrets..."
 	@docker run --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		trufflesecurity/trufflehog docker \
@@ -789,8 +789,8 @@ scan-secrets: ## 🕵️ Scan for secrets in image
 		--json > $(SECURITY_REPORTS_DIR)/secrets.json || true
 
 # Configuration scanning
-scan-configuration: ## ⚙️ Scan container configuration
-	@echo "⚙️ Scanning container configuration..."
+scan-configuration: ## ⚙  Scan container configuration
+	@echo "⚙  Scanning container configuration..."
 	@docker run --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aquasec/trivy config \
@@ -799,8 +799,8 @@ scan-configuration: ## ⚙️ Scan container configuration
 		.
 
 # Compliance scanning
-scan-compliance: ## 📋 Run compliance checks
-	@echo "📋 Running compliance checks..."
+scan-compliance: ##   Run compliance checks
+	@echo "  Running compliance checks..."
 	@docker run --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		-v $(PWD):/workspace \
@@ -810,15 +810,15 @@ scan-compliance: ## 📋 Run compliance checks
 		$(APP_NAME):$(VERSION) || true
 
 # Generate security report
-security-report: ## 📊 Generate comprehensive security report
-	@echo "📊 Generating security report..."
+security-report: ##   Generate comprehensive security report
+	@echo "  Generating security report..."
 	@python3 scripts/generate-security-report.py \
 		--vulnerabilities $(SECURITY_REPORTS_DIR)/vulnerabilities.json \
 		--secrets $(SECURITY_REPORTS_DIR)/secrets.json \
 		--config $(SECURITY_REPORTS_DIR)/config.json \
 		--compliance $(SECURITY_REPORTS_DIR)/compliance.json \
 		--output $(SECURITY_REPORTS_DIR)/security-report.html
-	@echo "✅ Security report generated: $(SECURITY_REPORTS_DIR)/security-report.html"
+	@echo "  Security report generated: $(SECURITY_REPORTS_DIR)/security-report.html"
 
 # Security gates for CI/CD
 security-gate: ## 🚪 Security gate for CI/CD pipeline
@@ -827,18 +827,18 @@ security-gate: ## 🚪 Security gate for CI/CD pipeline
 	@CRITICAL_VULNS=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "CRITICAL")] | length' $(SECURITY_REPORTS_DIR)/vulnerabilities.json); \
 	HIGH_VULNS=$(jq '[.Results[]?.Vulnerabilities[]? | select(.Severity == "HIGH")] | length' $(SECURITY_REPORTS_DIR)/vulnerabilities.json); \
 	if [ $CRITICAL_VULNS -gt 0 ]; then \
-		echo "❌ Security gate failed: $CRITICAL_VULNS critical vulnerabilities found"; \
+		echo "  Security gate failed: $CRITICAL_VULNS critical vulnerabilities found"; \
 		exit 1; \
 	elif [ $HIGH_VULNS -gt 10 ]; then \
-		echo "❌ Security gate failed: $HIGH_VULNS high vulnerabilities found (limit: 10)"; \
+		echo "  Security gate failed: $HIGH_VULNS high vulnerabilities found (limit: 10)"; \
 		exit 1; \
 	else \
-		echo "✅ Security gate passed"; \
+		echo "  Security gate passed"; \
 	fi
 
 # Continuous security monitoring
-security-monitor: ## 🔍 Set up continuous security monitoring
-	@echo "🔍 Setting up security monitoring..."
+security-monitor: ##   Set up continuous security monitoring
+	@echo "  Setting up security monitoring..."
 	@docker run -d \
 		--name $(APP_NAME)-security-monitor \
 		--restart unless-stopped \
@@ -848,8 +848,8 @@ security-monitor: ## 🔍 Set up continuous security monitoring
 		aquasec/harbor-scanner-trivy:latest
 
 # Security scan for multiple images
-security-scan-all: ## 🔒 Scan all project images
-	@echo "🔒 Scanning all project images..."
+security-scan-all: ##   Scan all project images
+	@echo "  Scanning all project images..."
 	@for image in dev test $(VERSION) latest; do \
 		echo "Scanning $(APP_NAME):$image..."; \
 		$(MAKE) scan-vulnerabilities APP_NAME=$(APP_NAME) VERSION=$image; \
@@ -870,8 +870,8 @@ dockerfile-lint: ## 📝 Lint Dockerfile for best practices
 	@echo "📝 Linting Dockerfile..."
 	@docker run --rm -i hadolint/hadolint < Dockerfile || true
 
-dockerfile-security: ## 🔒 Check Dockerfile security
-	@echo "🔒 Checking Dockerfile security..."
+dockerfile-security: ##   Check Dockerfile security
+	@echo "  Checking Dockerfile security..."
 	@docker run --rm \
 		-v $(PWD):/workspace \
 		aquasec/trivy config \
@@ -922,27 +922,27 @@ EXPOSE 3000
 # Start application
 CMD ["npm", "start"]
 EOF
-	@echo "✅ Secure Dockerfile template created: Dockerfile.secure"
+	@echo "  Secure Dockerfile template created: Dockerfile.secure"
 
 # Validate Dockerfile security practices
-validate-dockerfile-security: ## ✅ Validate Dockerfile follows security best practices
-	@echo "✅ Validating Dockerfile security practices..."
+validate-dockerfile-security: ##   Validate Dockerfile follows security best practices
+	@echo "  Validating Dockerfile security practices..."
 	@ERRORS=0; \
-	if ! grep -q "FROM.*:" Dockerfile; then echo "❌ Use specific image tags"; ERRORS=$((ERRORS+1)); fi; \
-	if grep -q "FROM.*latest" Dockerfile; then echo "❌ Avoid 'latest' tag"; ERRORS=$((ERRORS+1)); fi; \
-	if ! grep -q "USER" Dockerfile; then echo "❌ Set non-root user"; ERRORS=$((ERRORS+1)); fi; \
-	if ! grep -q "HEALTHCHECK" Dockerfile; then echo "⚠️ Consider adding health check"; fi; \
-	if grep -q "ADD " Dockerfile; then echo "⚠️ Prefer COPY over ADD"; fi; \
+	if ! grep -q "FROM.*:" Dockerfile; then echo "  Use specific image tags"; ERRORS=$((ERRORS+1)); fi; \
+	if grep -q "FROM.*latest" Dockerfile; then echo "  Avoid 'latest' tag"; ERRORS=$((ERRORS+1)); fi; \
+	if ! grep -q "USER" Dockerfile; then echo "  Set non-root user"; ERRORS=$((ERRORS+1)); fi; \
+	if ! grep -q "HEALTHCHECK" Dockerfile; then echo "   Consider adding health check"; fi; \
+	if grep -q "ADD " Dockerfile; then echo "   Prefer COPY over ADD"; fi; \
 	if [ $ERRORS -eq 0 ]; then \
-		echo "✅ Dockerfile security validation passed"; \
+		echo "  Dockerfile security validation passed"; \
 	else \
-		echo "❌ Dockerfile security validation failed ($ERRORS errors)"; \
+		echo "  Dockerfile security validation failed ($ERRORS errors)"; \
 		exit 1; \
 	fi
 
 # SBOM (Software Bill of Materials) generation
-generate-sbom: build-prod ## 📋 Generate Software Bill of Materials
-	@echo "📋 Generating SBOM..."
+generate-sbom: build-prod ##   Generate Software Bill of Materials
+	@echo "  Generating SBOM..."
 	@docker run --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		anchore/syft $(APP_NAME):$(VERSION) \
@@ -951,18 +951,18 @@ generate-sbom: build-prod ## 📋 Generate Software Bill of Materials
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		anchore/syft $(APP_NAME):$(VERSION) \
 		-o table
-	@echo "✅ SBOM generated: $(SECURITY_REPORTS_DIR)/sbom.json"
+	@echo "  SBOM generated: $(SECURITY_REPORTS_DIR)/sbom.json"
 
 # Sign images for supply chain security
-sign-image: push-prod ## ✍️ Sign container image
-	@echo "✍️ Signing container image..."
+sign-image: push-prod ##    Sign container image
+	@echo "   Signing container image..."
 	@cosign sign --yes $(PROD_TAG)
-	@echo "✅ Image signed: $(PROD_TAG)"
+	@echo "  Image signed: $(PROD_TAG)"
 
-verify-signature: ## ✅ Verify container image signature
-	@echo "✅ Verifying image signature..."
+verify-signature: ##   Verify container image signature
+	@echo "  Verifying image signature..."
 	@cosign verify $(PROD_TAG)
-	@echo "✅ Signature verified"
+	@echo "  Signature verified"
 ```
 
 ## Advanced Docker Workflows
@@ -981,15 +981,15 @@ PLATFORMS ?= linux/amd64,linux/arm64,linux/arm/v7
 BUILDER_NAME = $(APP_NAME)-builder
 
 # Set up buildx for multi-arch
-setup-buildx: ## 🏗️ Set up Docker Buildx for multi-architecture builds
-	@echo "🏗️ Setting up Docker Buildx..."
+setup-buildx: ##    Set up Docker Buildx for multi-architecture builds
+	@echo "   Setting up Docker Buildx..."
 	@docker buildx create --name $(BUILDER_NAME) --use || true
 	@docker buildx inspect --bootstrap
-	@echo "✅ Buildx ready for platforms: $(PLATFORMS)"
+	@echo "  Buildx ready for platforms: $(PLATFORMS)"
 
 # Multi-architecture build
-build-multiarch: setup-buildx ## 🌍 Build for multiple architectures
-	@echo "🌍 Building for multiple architectures..."
+build-multiarch: setup-buildx ##   Build for multiple architectures
+	@echo "  Building for multiple architectures..."
 	@docker buildx build \
 		--platform $(PLATFORMS) \
 		--target production \
@@ -999,25 +999,25 @@ build-multiarch: setup-buildx ## 🌍 Build for multiple architectures
 		--cache-from type=registry,ref=$(REGISTRY_NAMESPACE):buildcache \
 		--cache-to type=registry,ref=$(REGISTRY_NAMESPACE):buildcache,mode=max \
 		.
-	@echo "✅ Multi-architecture build completed"
+	@echo "  Multi-architecture build completed"
 
 # Architecture-specific builds
-build-amd64: ## 🔧 Build for AMD64 only
+build-amd64: ##   Build for AMD64 only
 	@docker buildx build --platform linux/amd64 --tag $(APP_NAME):amd64 --load .
 
-build-arm64: ## 🔧 Build for ARM64 only
+build-arm64: ##   Build for ARM64 only
 	@docker buildx build --platform linux/arm64 --tag $(APP_NAME):arm64 --load .
 
 # Test multi-arch images
-test-multiarch: build-multiarch ## 🧪 Test multi-architecture images
-	@echo "🧪 Testing multi-architecture images..."
+test-multiarch: build-multiarch ##   Test multi-architecture images
+	@echo "  Testing multi-architecture images..."
 	@for platform in linux/amd64 linux/arm64; do \
 		echo "Testing $platform..."; \
-		docker run --rm --platform $platform $(PROD_TAG) echo "✅ $platform works"; \
+		docker run --rm --platform $platform $(PROD_TAG) echo "  $platform works"; \
 	done
 
 # Clean up buildx
-cleanup-buildx: ## 🧹 Clean up Buildx builder
+cleanup-buildx: ##   Clean up Buildx builder
 	@docker buildx rm $(BUILDER_NAME) || true
 ```
 
@@ -1031,13 +1031,13 @@ Optimize container resource usage:
 # =============================================================================
 
 # Resource monitoring
-monitor-resources: ## 📊 Monitor container resource usage
-	@echo "📊 Container resource usage:"
+monitor-resources: ##   Monitor container resource usage
+	@echo "  Container resource usage:"
 	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}\t{{.NetIO}}\t{{.BlockIO}}"
 
 # Resource-constrained builds
-build-low-memory: ## 🔨 Build with memory constraints
-	@echo "🔨 Building with memory constraints..."
+build-low-memory: ##   Build with memory constraints
+	@echo "  Building with memory constraints..."
 	@docker build \
 		--memory=1g \
 		--memory-swap=2g \
@@ -1045,8 +1045,8 @@ build-low-memory: ## 🔨 Build with memory constraints
 		.
 
 # Optimize image size
-optimize-image-size: ## 📦 Optimize image size
-	@echo "📦 Optimizing image size..."
+optimize-image-size: ##   Optimize image size
+	@echo "  Optimizing image size..."
 	@echo "Current size:"
 	@docker images $(APP_NAME):$(VERSION) --format "table {{.Repository}}:{{.Tag}}\t{{.Size}}"
 	@docker run --rm \
@@ -1054,17 +1054,17 @@ optimize-image-size: ## 📦 Optimize image size
 		wagoodman/dive:latest $(APP_NAME):$(VERSION) --ci --highestUserWastedPercent=0.1
 
 # Image analysis
-analyze-layers: ## 🔍 Analyze image layers
-	@echo "🔍 Analyzing image layers..."
+analyze-layers: ##   Analyze image layers
+	@echo "  Analyzing image layers..."
 	@docker history $(APP_NAME):$(VERSION) --human --format "table {{.CreatedBy}}\t{{.Size}}"
 
 # Clean unused resources
-clean-docker: ## 🧹 Clean unused Docker resources
-	@echo "🧹 Cleaning unused Docker resources..."
+clean-docker: ##   Clean unused Docker resources
+	@echo "  Cleaning unused Docker resources..."
 	@docker system df
 	@docker system prune -f
 	@docker image prune -f
-	@echo "✅ Docker cleanup completed"
+	@echo "  Docker cleanup completed"
 	@docker system df
 ```
 
@@ -1080,14 +1080,14 @@ Create Make targets optimized for CI/CD execution:
 # =============================================================================
 
 # CI pipeline target
-ci-pipeline: ## 🤖 Complete CI pipeline
-	@echo "🤖 Starting CI pipeline..."
+ci-pipeline: ##   Complete CI pipeline
+	@echo "  Starting CI pipeline..."
 	@$(MAKE) dockerfile-lint
 	@$(MAKE) build-test
 	@$(MAKE) build-prod  
 	@$(MAKE) security-gate
 	@$(MAKE) push-prod
-	@echo "✅ CI pipeline completed successfully"
+	@echo "  CI pipeline completed successfully"
 
 # Parallel CI pipeline
 ci-pipeline-parallel: ## ⚡ Parallel CI pipeline
@@ -1095,30 +1095,30 @@ ci-pipeline-parallel: ## ⚡ Parallel CI pipeline
 	@$(MAKE) -j4 dockerfile-lint validate-dockerfile-security build-test build-prod
 	@$(MAKE) security-gate
 	@$(MAKE) push-prod
-	@echo "✅ Parallel CI pipeline completed"
+	@echo "  Parallel CI pipeline completed"
 
 # CD pipeline target
-cd-pipeline: ## 🚀 Complete CD pipeline  
-	@echo "🚀 Starting CD pipeline..."
-	@$(MAKE) verify-signature || echo "⚠️ No signature found"
+cd-pipeline: ##   Complete CD pipeline  
+	@echo "  Starting CD pipeline..."
+	@$(MAKE) verify-signature || echo "   No signature found"
 	@$(MAKE) deploy-staging
 	@$(MAKE) smoke-test ENVIRONMENT=staging
 	@$(MAKE) deploy-production
 	@$(MAKE) smoke-test ENVIRONMENT=production
-	@echo "✅ CD pipeline completed successfully"
+	@echo "  CD pipeline completed successfully"
 
 # Environment-specific CI/CD
-ci-branch-main: ## 🤖 CI pipeline for main branch
+ci-branch-main: ##   CI pipeline for main branch
 	@$(MAKE) ci-pipeline
 	@$(MAKE) sign-image
 
-ci-branch-develop: ## 🤖 CI pipeline for develop branch
+ci-branch-develop: ##   CI pipeline for develop branch
 	@$(MAKE) build-test
 	@$(MAKE) build-prod
 	@$(MAKE) security-scan
 	@$(MAKE) push-dev
 
-ci-pull-request: ## 🤖 CI pipeline for pull requests
+ci-pull-request: ##   CI pipeline for pull requests
 	@$(MAKE) dockerfile-lint
 	@$(MAKE) build-test
 	@$(MAKE) security-scan
@@ -1130,13 +1130,13 @@ ci-cache-pull: ## 📥 Pull build cache in CI
 	@docker pull $(REGISTRY_NAMESPACE):base || true
 	@docker pull $(REGISTRY_NAMESPACE):deps || true
 
-ci-cache-push: ## 📤 Push build cache in CI
-	@echo "📤 Pushing build cache..."
+ci-cache-push: ##   Push build cache in CI
+	@echo "  Pushing build cache..."
 	@$(MAKE) push-cache
 
 # CI cleanup
-ci-cleanup: ## 🧹 Cleanup after CI run
-	@echo "🧹 CI cleanup..."
+ci-cleanup: ##   Cleanup after CI run
+	@echo "  CI cleanup..."
 	@docker system prune -f
 	@rm -rf $(BUILD_DIR) $(SECURITY_REPORTS_DIR)
 ```
@@ -1176,20 +1176,20 @@ COMPOSE_PROJECT_NAME = $(APP_NAME)-dev
 # Help and Information
 # =============================================================================
 
-help: ## 📋 Show available commands
+help: ##   Show available commands
 	@echo "$(APP_NAME) Docker Workflow"
 	@echo "============================"
 	@echo ""
-	@echo "🚀 Quick Start:"
+	@echo "  Quick Start:"
 	@echo "  make dev         # Start development environment"
 	@echo "  make build       # Build production image"
 	@echo "  make test        # Run tests"
 	@echo "  make push        # Push to registry"
 	@echo ""
-	@echo "📖 All Commands:"
+	@echo "  All Commands:"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-18s\033[0m %s\n", $1, $2 }' $(MAKEFILE_LIST)
 
-status: ## 📊 Show Docker environment status
+status: ##   Show Docker environment status
 	@echo "Docker Environment Status:"
 	@echo "=========================="
 	@echo "App: $(APP_NAME) v$(VERSION)"
@@ -1207,30 +1207,30 @@ status: ## 📊 Show Docker environment status
 
 .PHONY: dev dev-build dev-stop dev-clean dev-logs dev-shell dev-test
 
-dev: dev-build ## 🚀 Start development environment
+dev: dev-build ##   Start development environment
 	@$(MAKE) dev-services
 	@docker-compose -f $(COMPOSE_FILE_DEV) up -d
-	@echo "✅ Development environment started"
+	@echo "  Development environment started"
 	@echo "   App: http://localhost:8080"
 	@echo "   Logs: make dev-logs"
 
-dev-build: ## 🔨 Build development image
+dev-build: ##   Build development image
 	@docker build --target development -t $(APP_NAME):dev .
 
-dev-stop: ## ⏹️ Stop development environment
+dev-stop: ##    Stop development environment
 	@docker-compose -f $(COMPOSE_FILE_DEV) down
 
-dev-clean: dev-stop ## 🧹 Clean development environment
+dev-clean: dev-stop ##   Clean development environment
 	@docker-compose -f $(COMPOSE_FILE_DEV) down -v --remove-orphans
 	@docker rmi $(APP_NAME):dev 2>/dev/null || true
 
-dev-logs: ## 📋 Show development logs
+dev-logs: ##   Show development logs
 	@docker-compose -f $(COMPOSE_FILE_DEV) logs -f --tail=100
 
-dev-shell: ## 🐚 Get shell in development container
+dev-shell: ##   Get shell in development container
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec app bash
 
-dev-test: ## 🧪 Run tests in development environment
+dev-test: ##   Run tests in development environment
 	@docker-compose -f $(COMPOSE_FILE_DEV) exec -T app pytest tests/ -v
 
 # =============================================================================
@@ -1239,10 +1239,10 @@ dev-test: ## 🧪 Run tests in development environment
 
 .PHONY: build build-prod build-test clean-build
 
-build: build-prod ## 🔨 Build production image
+build: build-prod ##   Build production image
 
-build-prod: ## 📦 Build production image
-	@echo "📦 Building production image..."
+build-prod: ##   Build production image
+	@echo "  Building production image..."
 	@docker build \
 		--target production \
 		--tag $(APP_NAME):$(VERSION) \
@@ -1252,10 +1252,10 @@ build-prod: ## 📦 Build production image
 		--build-arg GIT_COMMIT=$(shell git rev-parse HEAD) \
 		$(DOCKER_CONTEXT)
 
-build-test: ## 🧪 Build test image
+build-test: ##   Build test image
 	@docker build --target test -t $(APP_NAME):test .
 
-clean-build: ## 🧹 Clean build artifacts
+clean-build: ##   Clean build artifacts
 	@docker rmi $(APP_NAME):$(VERSION) $(APP_NAME):latest $(APP_NAME):test 2>/dev/null || true
 
 # =============================================================================
@@ -1264,11 +1264,11 @@ clean-build: ## 🧹 Clean build artifacts
 
 .PHONY: test security-scan dockerfile-lint
 
-test: build-test ## 🧪 Run tests
-	@echo "✅ Tests already run during build"
+test: build-test ##   Run tests
+	@echo "  Tests already run during build"
 
-security-scan: build-prod ## 🔒 Run security scan
-	@echo "🔒 Running security scan..."
+security-scan: build-prod ##   Run security scan
+	@echo "  Running security scan..."
 	@docker run --rm \
 		-v /var/run/docker.sock:/var/run/docker.sock \
 		aquasec/trivy image $(APP_NAME):$(VERSION)
@@ -1282,22 +1282,22 @@ dockerfile-lint: ## 📝 Lint Dockerfile
 
 .PHONY: push push-dev push-prod login tag-all
 
-login: ## 🔑 Login to container registry
+login: ##   Login to container registry
 	@echo "$(REGISTRY_PASS)" | docker login $(REGISTRY) -u "$(REGISTRY_USER)" --password-stdin
 
-tag-all: build-prod ## 🏷️ Tag images for registry
+tag-all: build-prod ##    Tag images for registry
 	@docker tag $(APP_NAME):$(VERSION) $(PROD_TAG)
 	@docker tag $(APP_NAME):$(VERSION) $(LATEST_TAG)
 	@docker tag $(APP_NAME):dev $(DEV_TAG)
 
-push: push-prod ## 📤 Push production image
+push: push-prod ##   Push production image
 
-push-prod: tag-all login ## 📤 Push production image to registry
-	@echo "📤 Pushing production image..."
+push-prod: tag-all login ##   Push production image to registry
+	@echo "  Pushing production image..."
 	@docker push $(PROD_TAG)
 	@docker push $(LATEST_TAG)
 
-push-dev: tag-all login ## 📤 Push development image
+push-dev: tag-all login ##   Push development image
 	@docker push $(DEV_TAG)
 
 # =============================================================================
@@ -1306,17 +1306,17 @@ push-dev: tag-all login ## 📤 Push development image
 
 .PHONY: ci-pipeline cd-pipeline
 
-ci-pipeline: ## 🤖 Complete CI pipeline
-	@echo "🤖 Starting CI pipeline..."
+ci-pipeline: ##   Complete CI pipeline
+	@echo "  Starting CI pipeline..."
 	@$(MAKE) dockerfile-lint
 	@$(MAKE) build-test
 	@$(MAKE) build-prod
 	@$(MAKE) security-scan
 	@$(MAKE) push-prod
-	@echo "✅ CI pipeline completed"
+	@echo "  CI pipeline completed"
 
-cd-pipeline: ## 🚀 Complete CD pipeline
-	@echo "🚀 CD pipeline not implemented - see Chapter 11"
+cd-pipeline: ##   Complete CD pipeline
+	@echo "  CD pipeline not implemented - see Chapter 11"
 
 # =============================================================================
 # Utilities
@@ -1324,10 +1324,10 @@ cd-pipeline: ## 🚀 Complete CD pipeline
 
 .PHONY: clean version-info
 
-clean: dev-clean clean-build ## 🧹 Clean everything
+clean: dev-clean clean-build ##   Clean everything
 	@docker system prune -f
 
-version-info: ## ℹ️ Show version information
+version-info: ##    Show version information
 	@echo "Version: $(VERSION)"
 	@echo "Git commit: $(shell git rev-parse HEAD)"
 	@echo "Git branch: $(shell git rev-parse --abbrev-ref HEAD)"
@@ -1336,7 +1336,7 @@ version-info: ## ℹ️ Show version information
 # Supporting targets
 dev-services:
 	@docker-compose -f docker-compose.services.yml up -d
-	@echo "⏳ Waiting for services..."
+	@echo "  Waiting for services..."
 	@sleep 5
 ```
 

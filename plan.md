@@ -18,9 +18,9 @@ Build plan: 2-3 chapters a day:
 - [ ] Appendix C (Migration)
 - [ ] Chapter 1 (Why make)
 - [ ] Review existing chapters (3,16,A in context of more recent chapters)
-- [x] Chapter 9 (Docker) ✅ 2025-09-18
-- [x] Chapter 8 (Advanced Make) ✅ 2025-09-18
-- [x] Chapter 8 (Advanced Features) ✅ 2025-09-18
+- [x] Chapter 9 (Docker)   2025-09-18
+- [x] Chapter 8 (Advanced Make)   2025-09-18
+- [x] Chapter 8 (Advanced Features)   2025-09-18
 - [x] Chapter 3
 - [x] Chapter 16
 - [x] Appendix A (can use Claude 3.5, it's a reference)
@@ -28,7 +28,7 @@ Build plan: 2-3 chapters a day:
 - [x] Chapter 5 (variables and configuration)
 - [x] Chapter 4 (testing)
 - [x] Chapter 6 (Phony Targets)
-- [x] Chapter 7 (Dependency Management) ✅ 2025-09-18
+- [x] Chapter 7 (Dependency Management)   2025-09-18
 
 In addition to Appendix A, I think we need a really nice cheat sheet reference, ask for it after chapter 17, and definitely ask Claude 4 to write it, not Versa)
 
