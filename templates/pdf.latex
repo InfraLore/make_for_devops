@@ -324,7 +324,7 @@ $endif$
 $for(header-includes)$
 $header-includes$
 $endfor$
-% Insert page break befor each chapter
+% Insert page break before each chapter
 \usepackage{etoolbox}
 \pretocmd{\chapter}{\clearpage}{}{}
 $if(lang)$
