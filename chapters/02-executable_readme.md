@@ -90,9 +90,6 @@ make deploy   # Deploy to staging
 
 Run `make help` to see all available commands.
 
-````
-
-**Makefile:**
 ```makefile
 .DEFAULT_GOAL := help
 
@@ -106,13 +103,17 @@ KUBE_NAMESPACE := myapp-staging
 
 help: ## Show this help message
 	@echo "Available commands:"
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS=":.*##"} /^[a-zA-Z_-]+:.*?##/ \
+	{ printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 setup: ## Set up development environment
 	@echo "Setting up MyApp development environment..."
-	@command -v node >/dev/null || (echo "Please install Node.js $(NODE_VERSION)" && exit 1)
-	@command -v python3 >/dev/null || (echo "Please install Python $(PYTHON_VERSION)" && exit 1)
-	@command -v docker >/dev/null || (echo "Please install Docker" && exit 1)
+	@command -v node >/dev/null || \
+		(echo "Please install Node.js $(NODE_VERSION)" && exit 1)
+	@command -v python3 >/dev/null || \
+		(echo "Please install Python $(PYTHON_VERSION)" && exit 1)
+	@command -v docker >/dev/null || \
+		(echo "Please install Docker" && exit 1)
 	npm install
 	pip install -r requirements.txt
 	@$(MAKE) db-setup
@@ -120,9 +121,12 @@ setup: ## Set up development environment
 
 db-setup: ## Initialize database
 	@echo "Starting database..."
-	@docker run -d --name myapp-db -p 5432:5432 -e POSTGRES_DB=myapp -e POSTGRES_PASSWORD=dev $(DB_IMAGE) >/dev/null 2>&1 || true
+	@docker run -d --name myapp-db -p 5432:5432 \
+		-e POSTGRES_DB=myapp -e POSTGRES_PASSWORD=dev \
+		$(DB_IMAGE) >/dev/null 2>&1 || true
 	@echo "Waiting for database to be ready..."
-	@timeout 30 bash -c 'until docker exec myapp-db pg_isready; do sleep 1; done'
+	@timeout 30 bash -c \
+		'until docker exec myapp-db pg_isready; do sleep 1; done'
 	python manage.py migrate
 	@echo "Database ready!"
 
@@ -141,19 +145,21 @@ test: ## Run all tests
 deploy: check-kubectl ## Deploy to staging
 	@echo "Deploying to staging..."
 	kubectl apply -f k8s/staging/ -n $(KUBE_NAMESPACE)
-	kubectl set image deployment/myapp app=myapp:$$(git rev-parse --short HEAD) -n $(KUBE_NAMESPACE)
+	kubectl set image deployment/myapp \
+		app=myapp:$$(git rev-parse --short HEAD) -n $(KUBE_NAMESPACE)
 	kubectl rollout status deployment/myapp -n $(KUBE_NAMESPACE)
 	@echo "Deployment complete!"
 
 check-kubectl: ## Verify kubectl is configured
-	@kubectl cluster-info >/dev/null || (echo "kubectl not configured properly" && exit 1)
+	@kubectl cluster-info >/dev/null || \
+		(echo "kubectl not configured properly" && exit 1)
 
 clean: ## Clean up development environment
 	@echo "Cleaning up..."
 	docker stop myapp-db >/dev/null 2>&1 || true
 	docker rm myapp-db >/dev/null 2>&1 || true
 	@echo "Cleanup complete!"
-````
+```
 
 Notice what's happened here. The README is now incredibly simple—it doesn't try
 to document complex processes, it just points to executable commands. The
@@ -219,8 +225,12 @@ Make targets should provide clear, actionable feedback:
 setup:
 	@echo "  Setting up MyApp development environment"
 	@echo "Checking prerequisites..."
-	@command -v node >/dev/null && echo "  Node.js found" || (echo "  Node.js required" && exit 1)
-	@command -v docker >/dev/null && echo "  Docker found" || (echo "  Docker required" && exit 1)
+	@command -v node >/dev/null && \
+		echo "  Node.js found" || \
+		(echo "  Node.js required" && exit 1)
+	@command -v docker >/dev/null && \
+		echo "  Docker found" || \
+		(echo "  Docker required" && exit 1)
 	@echo "Installing dependencies..."
 	npm install --silent
 	@echo "  Setup complete! Try 'make dev' to start development."
@@ -261,7 +271,9 @@ KUBE_NAMESPACE ?= $(APP_NAME)-$(ENVIRONMENT)
 help: ##   Show available commands
 	@echo "$(APP_NAME) Development Commands"
 	@echo "================================"
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ \
+	{ printf "  \033[36m%-12s\033[0m %s\n", $$1, \
+	substr($$2, 1, 65) (length($$2)>65?"...":"") }' $(MAKEFILE_LIST)
 
 setup: ##   Set up development environment
 	@echo "Setting up $(APP_NAME) for development..."
@@ -363,7 +375,9 @@ push-image:
 
 update-kubernetes:
 	kubectl apply -f k8s/$(ENVIRONMENT)/ -n $(KUBE_NAMESPACE)
-	kubectl set image deployment/$(APP_NAME) app=$(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION) -n $(KUBE_NAMESPACE)
+	kubectl set image deployment/$(APP_NAME) \
+		app=$(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION) \
+		-n $(KUBE_NAMESPACE)
 	kubectl rollout status deployment/$(APP_NAME) -n $(KUBE_NAMESPACE)
 ```
 
@@ -384,13 +398,22 @@ help: ##   Show available commands
 	@echo "========================="
 	@echo
 	@echo "  Getting Started:"
-	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@echo
-	@echo " Development:"
-	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@echo
-	@echo "  Deployment:"
-	@awk '/^##@ Deployment/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+		@awk '/^##@ Getting Started/,/^##@ / { \
+			if(/^[a-zA-Z_-]+:.*##/) \
+				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
+		}' $(MAKEFILE_LIST)
+		@echo
+		@echo "  Development:"
+		@awk '/^##@ Development/,/^##@ / { \
+			if(/^[a-zA-Z_-]+:.*##/) \
+				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
+		}' $(MAKEFILE_LIST)
+		@echo
+		@echo "  Deployment:"
+		@awk '/^##@ Deployment/,/^##@ / { \
+			if(/^[a-zA-Z_-]+:.*##/) \
+				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
+		}' $(MAKEFILE_LIST)
 
 ##@ Getting Started
 
@@ -554,8 +577,8 @@ into an Executable README approach.
 - Build: `docker build -t legacyapp .`
 - Push: `docker push registry.company.com/legacyapp`
 - Deploy: `kubectl apply -f k8s/`
-- Update image: `kubectl set image deployment/legacyapp app=registry.company.com/legacyapp:latest`
-```
+- Update image:  
+	`kubectl set image deployment/legacyapp app=registry.company.com/legacyapp:latest`
 
 **After: Executable README**
 
@@ -610,7 +633,10 @@ DATABASE_URL ?= postgresql://legacyapp:dev@localhost:5432/legacyapp
 help: ## Show available commands
 	@echo "LegacyApp Development Commands"
 	@echo "============================="
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
+		printf "  \033[36m%-15s\033[0m %s\n", $$1, \
+		(substr($$2, 1, 65) (length($$2)>65?"...":"")) \
+	}' $(MAKEFILE_LIST)
 
 ##@ Getting Started
 
@@ -677,9 +703,12 @@ deploy: build test ##   Deploy to staging
 
 check-system-requirements: ##   Verify system requirements
 	@echo "Checking system requirements..."
-	@command -v node >/dev/null || (echo "  Node.js required. Run 'make setup-system'" && exit 1)
-	@command -v python3 >/dev/null || (echo "  Python 3 required. Run 'make setup-system'" && exit 1)
-	@command -v docker >/dev/null || (echo "  Docker required. Please install Docker." && exit 1)
+	@command -v node >/dev/null || \
+		(echo "  Node.js required. Run 'make setup-system'" && exit 1)
+	@command -v python3 >/dev/null || \
+		(echo "  Python 3 required. Run 'make setup-system'" && exit 1)
+	@command -v docker >/dev/null || \
+		(echo "  Docker required. Please install Docker." && exit 1)
 	@echo "  All system requirements met"
 
 create-env-file: ##  Create .env configuration file
@@ -722,14 +751,16 @@ config-help: ##   Show configuration help
 	@echo "LegacyApp Configuration"
 	@echo "====================="
 	@echo "Environment variables (set in .env file):"
-	@echo "  DATABASE_URL    - PostgreSQL connection string"
-	@echo "  SECRET_KEY      - Application secret (auto-generated)"
-	@echo "  API_KEY         - External service API key (required)"
+	@echo "  DATABASE_URL  - PostgreSQL connection string"
+	@echo "  SECRET_KEY    - Application secret (auto-generated)"
+	@echo "  API_KEY       - External service API key (required)"
 	@echo ""
 	@echo "Current configuration:"
 	@echo "  DATABASE_URL: $(DATABASE_URL)"
-	@echo "  SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | sed 's/\(.*\).../\1.../' || echo 'Not set')"
-	@echo "  API_KEY: $$(test -f .env && grep API_KEY .env | cut -d= -f2 | sed 's/\(.*\).../\1.../' || echo 'Not set')"
+	@echo "  SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | \
+sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
+	@echo "  API_KEY: $$(test -f .env && grep API_KEY .env | cut -d= -f2 | \
+sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
 
 clean: ##   Clean up development environment
 	@echo "Cleaning up..."
