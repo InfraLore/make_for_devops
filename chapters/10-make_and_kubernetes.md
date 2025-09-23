@@ -8,7 +8,7 @@ Make provides an elegant solution by creating a discoverable orchestration layer
 
 This chapter demonstrates how to create maintainable, reliable Kubernetes workflows using Make. We'll explore patterns for manifest generation, environment-specific deployments, health checks, and Helm chart management. Advanced topics like database migrations, comprehensive monitoring setup, and CI/CD integration are covered in dedicated chapters (12, 13, and 11 respectively).
 
-> **☸️ Start Simple: Essential Kubernetes + Make Patterns**
+> ** Start Simple: Essential Kubernetes + Make Patterns**
 > 
 > Master these fundamental patterns before exploring advanced Kubernetes orchestration:
 > 
@@ -71,15 +71,15 @@ MANIFESTS_DIR = k8s/manifests
 .PHONY: generate-manifests validate-manifests clean-manifests
 
 # Generate manifests from templates
-generate-manifests: ## 📝 Generate Kubernetes manifests
-	@echo "📝 Generating Kubernetes manifests for $(ENVIRONMENT)..."
+generate-manifests: ##  Generate Kubernetes manifests
+	@echo " Generating Kubernetes manifests for $(ENVIRONMENT)..."
 	@mkdir -p $(MANIFESTS_DIR)
 	@$(MAKE) generate-deployment
 	@$(MAKE) generate-service  
 	@$(MAKE) generate-ingress
 	@$(MAKE) generate-configmap
 	@$(MAKE) generate-secrets
-	@echo "✅ Manifests generated in $(MANIFESTS_DIR)/"
+	@echo " Manifests generated in $(MANIFESTS_DIR)/"
 
 # Generate individual manifest types
 generate-deployment: ## Generate deployment manifest
@@ -106,25 +106,25 @@ generate-secrets: ## Generate secrets manifest
 		--dry-run=client -o yaml > $(MANIFESTS_DIR)/secrets.yaml
 
 # Validate generated manifests
-validate-manifests: generate-manifests ## ✅ Validate Kubernetes manifests
-	@echo "✅ Validating Kubernetes manifests..."
+validate-manifests: generate-manifests ##  Validate Kubernetes manifests
+	@echo " Validating Kubernetes manifests..."
 	@for manifest in $(MANIFESTS_DIR)/*.yaml; do \
 		echo "Validating $$manifest..."; \
 		kubectl apply --dry-run=client --validate=true -f $$manifest >/dev/null || exit 1; \
 	done
-	@echo "✅ All manifests are valid"
+	@echo " All manifests are valid"
 
 # Advanced validation with kubeval
-validate-with-kubeval: generate-manifests ## ✅ Validate with kubeval
-	@echo "✅ Validating with kubeval..."
+validate-with-kubeval: generate-manifests ##  Validate with kubeval
+	@echo " Validating with kubeval..."
 	@for manifest in $(MANIFESTS_DIR)/*.yaml; do \
 		kubeval $$manifest || exit 1; \
 	done
 
 # Clean generated manifests
-clean-manifests: ## 🧹 Clean generated manifests
+clean-manifests: ##  Clean generated manifests
 	@rm -rf $(MANIFESTS_DIR)
-	@echo "🧹 Generated manifests cleaned"
+	@echo " Generated manifests cleaned"
 ```
 
 ### Template-Based Configuration Management
@@ -242,88 +242,88 @@ Create sophisticated deployment strategies that adapt to different environments:
 # =============================================================================
 
 # Environment validation
-validate-environment: ## ✅ Validate environment configuration
-	@echo "✅ Validating $(ENVIRONMENT) environment..."
+validate-environment: ##  Validate environment configuration
+	@echo " Validating $(ENVIRONMENT) environment..."
 	@case "$(ENVIRONMENT)" in \
 		development|staging|production) ;; \
-		*) echo "❌ Invalid environment: $(ENVIRONMENT)" && exit 1 ;; \
+		*) echo " Invalid environment: $(ENVIRONMENT)" && exit 1 ;; \
 	esac
 	@$(MAKE) validate-cluster-access
 	@$(MAKE) validate-namespace-exists
 	@$(MAKE) validate-secrets-available
 
-validate-cluster-access: ## ✅ Validate cluster access
-	@kubectl cluster-info >/dev/null || (echo "❌ Cannot access Kubernetes cluster" && exit 1)
-	@echo "✅ Cluster access verified"
+validate-cluster-access: ##  Validate cluster access
+	@kubectl cluster-info >/dev/null || (echo " Cannot access Kubernetes cluster" && exit 1)
+	@echo " Cluster access verified"
 
-validate-namespace-exists: ## ✅ Ensure namespace exists
+validate-namespace-exists: ##  Ensure namespace exists
 	@kubectl get namespace $(NAMESPACE) >/dev/null 2>&1 || \
-		(echo "📝 Creating namespace $(NAMESPACE)" && kubectl create namespace $(NAMESPACE))
+		(echo " Creating namespace $(NAMESPACE)" && kubectl create namespace $(NAMESPACE))
 
-validate-secrets-available: ## ✅ Validate required secrets exist
+validate-secrets-available: ##  Validate required secrets exist
 	@if [ "$(ENVIRONMENT)" != "development" ]; then \
 		kubectl get secret $(APP_NAME)-secrets -n $(NAMESPACE) >/dev/null 2>&1 || \
-		(echo "❌ Required secrets not found in $(NAMESPACE)" && exit 1); \
+		(echo " Required secrets not found in $(NAMESPACE)" && exit 1); \
 	fi
 
 # Environment-specific deployment strategies
-deploy: validate-environment deploy-$(ENVIRONMENT) ## 🚀 Deploy to configured environment
+deploy: validate-environment deploy-$(ENVIRONMENT) ##  Deploy to configured environment
 
-deploy-development: build push generate-manifests ## 🚀 Development deployment (fast, minimal checks)
-	@echo "🚀 Development deployment..."
+deploy-development: build push generate-manifests ##  Development deployment (fast, minimal checks)
+	@echo " Development deployment..."
 	@kubectl apply -f $(MANIFESTS_DIR)/ -n $(NAMESPACE)
 	@$(MAKE) wait-for-rollout-fast
-	@echo "✅ Development deployment completed"
+	@echo " Development deployment completed"
 
-deploy-staging: build push generate-manifests validate-manifests ## 🚀 Staging deployment (full validation)
-	@echo "🚀 Staging deployment..."
+deploy-staging: build push generate-manifests validate-manifests ##  Staging deployment (full validation)
+	@echo " Staging deployment..."
 	@$(MAKE) pre-deployment-checks
 	@kubectl apply -f $(MANIFESTS_DIR)/ -n $(NAMESPACE)
 	@$(MAKE) wait-for-rollout
 	@$(MAKE) smoke-test
-	@echo "✅ Staging deployment completed"
+	@echo " Staging deployment completed"
 
-deploy-production: build push generate-manifests validate-manifests ## 🚀 Production deployment (maximum safety)
-	@echo "🚨 Production deployment..."
+deploy-production: build push generate-manifests validate-manifests ##  Production deployment (maximum safety)
+	@echo " Production deployment..."
 	@$(MAKE) pre-production-checks
 	@$(MAKE) backup-current-state
-	@echo "⚠️ Type 'production' to confirm deployment: " && read confirm && [ "$$confirm" = "production" ]
+	@echo " Type 'production' to confirm deployment: " && read confirm && [ "$$confirm" = "production" ]
 	@kubectl apply -f $(MANIFESTS_DIR)/ -n $(NAMESPACE)
 	@$(MAKE) wait-for-rollout-production
 	@$(MAKE) verify-production-deployment
-	@echo "✅ Production deployment completed"
+	@echo " Production deployment completed"
 
 # Pre-deployment checks
-pre-deployment-checks: ## 🔍 Run pre-deployment checks
-	@echo "🔍 Running pre-deployment checks..."
+pre-deployment-checks: ##  Run pre-deployment checks
+	@echo " Running pre-deployment checks..."
 	@$(MAKE) validate-manifests
 	@$(MAKE) check-resource-requirements
 	@$(MAKE) verify-image-exists
 
-pre-production-checks: pre-deployment-checks ## 🔍 Additional production checks
-	@echo "🔍 Running production-specific checks..."
+pre-production-checks: pre-deployment-checks ##  Additional production checks
+	@echo " Running production-specific checks..."
 	@$(MAKE) security-scan-image
 	@$(MAKE) validate-backup-systems
-	@echo "✅ Production checks completed"
+	@echo " Production checks completed"
 
 # Utility checks
-check-resource-requirements: ## 🔍 Validate cluster has sufficient resources
-	@echo "🔍 Checking resource requirements..."
-	@kubectl top nodes >/dev/null 2>&1 || echo "⚠️ Cannot verify resource usage (metrics-server not available)"
+check-resource-requirements: ##  Validate cluster has sufficient resources
+	@echo " Checking resource requirements..."
+	@kubectl top nodes >/dev/null 2>&1 || echo " Cannot verify resource usage (metrics-server not available)"
 
-verify-image-exists: ## ✅ Verify Docker image exists in registry
-	@echo "✅ Verifying image exists: $(IMAGE_TAG)"
+verify-image-exists: ##  Verify Docker image exists in registry
+	@echo " Verifying image exists: $(IMAGE_TAG)"
 	@docker manifest inspect $(IMAGE_TAG) >/dev/null 2>&1 || \
-		(echo "❌ Image not found: $(IMAGE_TAG)" && exit 1)
-	@echo "✅ Image verified"
+		(echo " Image not found: $(IMAGE_TAG)" && exit 1)
+	@echo " Image verified"
 
-security-scan-image: ## 🔒 Run security scan on image
-	@echo "🔒 Running security scan..."
-	@command -v trivy >/dev/null && trivy image $(IMAGE_TAG) || echo "⚠️ Trivy not available, skipping scan"
+security-scan-image: ##  Run security scan on image
+	@echo " Running security scan..."
+	@command -v trivy >/dev/null && trivy image $(IMAGE_TAG) || echo " Trivy not available, skipping scan"
 
-validate-backup-systems: ## ✅ Validate backup systems are ready
-	@echo "✅ Checking backup systems..."
-	@echo "⚠️ Backup validation not implemented - see Chapter 12 for database backup patterns"
+validate-backup-systems: ##  Validate backup systems are ready
+	@echo " Checking backup systems..."
+	@echo " Backup validation not implemented - see Chapter 12 for database backup patterns"
 ```
 
 ### Pattern Rules for Multiple Environments
@@ -336,20 +336,20 @@ Use Make's pattern rules to handle multiple environments elegantly:
 # =============================================================================
 
 # Deploy to specific environment using pattern rule
-deploy-%: ## 🚀 Deploy to specific environment
-	@echo "🚀 Deploying to $* environment..."
+deploy-%: ##  Deploy to specific environment
+	@echo " Deploying to $* environment..."
 	@ENVIRONMENT=$* $(MAKE) deploy
 
 # Show status for specific environment
-status-%: ## 📊 Show status for specific environment
+status-%: ##  Show status for specific environment
 	@ENVIRONMENT=$* $(MAKE) status
 
 # Get logs for specific environment
-logs-%: ## 📋 Show logs for specific environment
+logs-%: ##  Show logs for specific environment
 	@ENVIRONMENT=$* $(MAKE) logs
 
 # Rollback specific environment
-rollback-%: ## 🔄 Rollback specific environment
+rollback-%: ##  Rollback specific environment
 	@ENVIRONMENT=$* $(MAKE) rollback
 
 # Example usage:
@@ -370,95 +370,95 @@ Implement robust rollout management with appropriate monitoring for each environ
 # =============================================================================
 
 # Rollout monitoring
-wait-for-rollout: ## ⏳ Wait for rollout to complete
-	@echo "⏳ Waiting for rollout to complete..."
+wait-for-rollout: ##  Wait for rollout to complete
+	@echo " Waiting for rollout to complete..."
 	@kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=300s
 	@$(MAKE) verify-deployment-health
-	@echo "✅ Rollout completed successfully"
+	@echo " Rollout completed successfully"
 
-wait-for-rollout-fast: ## ⏳ Quick rollout wait (development)
-	@echo "⏳ Quick rollout check..."
+wait-for-rollout-fast: ##  Quick rollout wait (development)
+	@echo " Quick rollout check..."
 	@kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=60s
-	@echo "✅ Development rollout completed"
+	@echo " Development rollout completed"
 
-wait-for-rollout-production: ## ⏳ Production rollout with extended monitoring
-	@echo "⏳ Production rollout monitoring..."
+wait-for-rollout-production: ##  Production rollout with extended monitoring
+	@echo " Production rollout monitoring..."
 	@kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=600s
 	@$(MAKE) verify-deployment-health
 	@$(MAKE) extended-health-monitoring
-	@echo "✅ Production rollout completed"
+	@echo " Production rollout completed"
 
 # Health verification
-verify-deployment-health: ## 🏥 Verify deployment health
-	@echo "🏥 Verifying deployment health..."
+verify-deployment-health: ##  Verify deployment health
+	@echo " Verifying deployment health..."
 	@READY_REPLICAS=$$(kubectl get deployment $(APP_NAME) -n $(NAMESPACE) -o jsonpath='{.status.readyReplicas}'); \
 	DESIRED_REPLICAS=$$(kubectl get deployment $(APP_NAME) -n $(NAMESPACE) -o jsonpath='{.spec.replicas}'); \
 	if [ "$$READY_REPLICAS" != "$$DESIRED_REPLICAS" ]; then \
-		echo "❌ Health check failed: $$READY_REPLICAS/$$DESIRED_REPLICAS replicas ready"; \
+		echo " Health check failed: $$READY_REPLICAS/$$DESIRED_REPLICAS replicas ready"; \
 		exit 1; \
 	fi; \
-	echo "✅ All $$READY_REPLICAS replicas are healthy"
+	echo " All $$READY_REPLICAS replicas are healthy"
 
-extended-health-monitoring: ## 🏥 Extended health monitoring for production
-	@echo "🏥 Extended health monitoring..."
+extended-health-monitoring: ##  Extended health monitoring for production
+	@echo " Extended health monitoring..."
 	@for i in $$(seq 1 6); do \
 		echo "Health check $$i/6..."; \
-		$(MAKE) app-health-check || (echo "❌ Application health check failed" && exit 1); \
+		$(MAKE) app-health-check || (echo " Application health check failed" && exit 1); \
 		sleep 10; \
 	done
-	@echo "✅ Extended health monitoring passed"
+	@echo " Extended health monitoring passed"
 
-app-health-check: ## 🏥 Application-specific health check
-	@echo "🏥 Checking application health..."
+app-health-check: ##  Application-specific health check
+	@echo " Checking application health..."
 	@kubectl port-forward service/$(APP_NAME) 8080:80 -n $(NAMESPACE) >/dev/null 2>&1 &
 	@PF_PID=$$!; \
 	sleep 2; \
 	curl -f -m 10 http://localhost:8080/health >/dev/null && \
-		echo "✅ Application health check passed" || \
-		echo "⚠️ Application health check failed"; \
+		echo " Application health check passed" || \
+		echo " Application health check failed"; \
 	kill $$PF_PID 2>/dev/null || true
 
 # Smoke testing
-smoke-test: ## 🧪 Run smoke tests
-	@echo "🧪 Running smoke tests..."
+smoke-test: ##  Run smoke tests
+	@echo " Running smoke tests..."
 	@$(MAKE) app-health-check
-	@echo "✅ Smoke tests completed"
+	@echo " Smoke tests completed"
 
-verify-production-deployment: ## ✅ Comprehensive production verification
-	@echo "✅ Running production verification..."
+verify-production-deployment: ##  Comprehensive production verification
+	@echo " Running production verification..."
 	@$(MAKE) verify-deployment-health
 	@$(MAKE) smoke-test
-	@echo "✅ Production verification completed"
+	@echo " Production verification completed"
 
 # Rollback operations
-rollback: ## 🔄 Rollback to previous version
-	@echo "🔄 Rolling back to previous version..."
+rollback: ##  Rollback to previous version
+	@echo " Rolling back to previous version..."
 	@kubectl rollout undo deployment/$(APP_NAME) -n $(NAMESPACE)
 	@kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=300s
 	@$(MAKE) verify-deployment-health
-	@echo "✅ Rollback completed"
+	@echo " Rollback completed"
 
-rollback-to-revision: ## 🔄 Rollback to specific revision
+rollback-to-revision: ##  Rollback to specific revision
 	@echo "Available revisions:"
 	@kubectl rollout history deployment/$(APP_NAME) -n $(NAMESPACE)
 	@echo ""
 	@read -p "Revision number: " REVISION; \
-	echo "🔄 Rolling back to revision $$REVISION..."; \
+	echo " Rolling back to revision $$REVISION..."; \
 	kubectl rollout undo deployment/$(APP_NAME) -n $(NAMESPACE) --to-revision=$$REVISION; \
 	kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=300s; \
 	$(MAKE) verify-deployment-health
 
 # Deployment history and status
-rollout-history: ## 📋 Show rollout history
+rollout-history: ##  Show rollout history
 	@kubectl rollout history deployment/$(APP_NAME) -n $(NAMESPACE)
 
-rollout-pause: ## ⏸️ Pause rollout
+rollout-pause: ##  Pause rollout
 	@kubectl rollout pause deployment/$(APP_NAME) -n $(NAMESPACE)
-	@echo "⏸️ Rollout paused"
+	@echo " Rollout paused"
 
-rollout-resume: ## ▶️ Resume rollout
+rollout-resume: ## ▶ Resume rollout
 	@kubectl rollout resume deployment/$(APP_NAME) -n $(NAMESPACE)
-	@echo "▶️ Rollout resumed"
+	@echo "▶ Rollout resumed"
 ```
 
 ## Helm Chart Management and Customization
@@ -480,13 +480,13 @@ HELM_VALUES_FILE ?= helm/values-$(ENVIRONMENT).yaml
 .PHONY: helm-lint helm-template helm-install helm-upgrade helm-uninstall
 
 # Helm chart operations
-helm-lint: ## 📝 Lint Helm chart
-	@echo "📝 Linting Helm chart..."
+helm-lint: ##  Lint Helm chart
+	@echo " Linting Helm chart..."
 	@helm lint $(HELM_CHART)
-	@echo "✅ Helm chart is valid"
+	@echo " Helm chart is valid"
 
-helm-template: ## 📝 Generate templates from Helm chart
-	@echo "📝 Generating templates from Helm chart..."
+helm-template: ##  Generate templates from Helm chart
+	@echo " Generating templates from Helm chart..."
 	@mkdir -p $(MANIFESTS_DIR)
 	@helm template $(HELM_RELEASE_NAME) $(HELM_CHART) \
 		--values $(HELM_VALUES_FILE) \
@@ -494,10 +494,10 @@ helm-template: ## 📝 Generate templates from Helm chart
 		--set image.repository=$(REGISTRY)/$(APP_NAME) \
 		--namespace $(NAMESPACE) \
 		--output-dir $(MANIFESTS_DIR)
-	@echo "✅ Templates generated in $(MANIFESTS_DIR)/"
+	@echo " Templates generated in $(MANIFESTS_DIR)/"
 
-helm-dry-run: ## 🧪 Dry run Helm installation
-	@echo "🧪 Helm dry run..."
+helm-dry-run: ##  Dry run Helm installation
+	@echo " Helm dry run..."
 	@helm install $(HELM_RELEASE_NAME) $(HELM_CHART) \
 		--values $(HELM_VALUES_FILE) \
 		--set image.tag=$(VERSION) \
@@ -505,8 +505,8 @@ helm-dry-run: ## 🧪 Dry run Helm installation
 		--namespace $(NAMESPACE) \
 		--dry-run --debug
 
-helm-install: build push ## 🚀 Install with Helm
-	@echo "🚀 Installing with Helm..."
+helm-install: build push ##  Install with Helm
+	@echo " Installing with Helm..."
 	@$(MAKE) validate-environment
 	@helm install $(HELM_RELEASE_NAME) $(HELM_CHART) \
 		--values $(HELM_VALUES_FILE) \
@@ -516,10 +516,10 @@ helm-install: build push ## 🚀 Install with Helm
 		--create-namespace \
 		--wait --timeout=300s
 	@$(MAKE) verify-helm-deployment
-	@echo "✅ Helm installation completed"
+	@echo " Helm installation completed"
 
-helm-upgrade: build push ## 🔄 Upgrade with Helm
-	@echo "🔄 Upgrading with Helm..."
+helm-upgrade: build push ##  Upgrade with Helm
+	@echo " Upgrading with Helm..."
 	@helm upgrade $(HELM_RELEASE_NAME) $(HELM_CHART) \
 		--values $(HELM_VALUES_FILE) \
 		--set image.tag=$(VERSION) \
@@ -527,24 +527,24 @@ helm-upgrade: build push ## 🔄 Upgrade with Helm
 		--namespace $(NAMESPACE) \
 		--wait --timeout=300s
 	@$(MAKE) verify-helm-deployment
-	@echo "✅ Helm upgrade completed"
+	@echo " Helm upgrade completed"
 
-helm-uninstall: ## 🗑️ Uninstall Helm release
-	@echo "⚠️ Type the release name '$(HELM_RELEASE_NAME)' to confirm uninstall: " && read confirm && [ "$$confirm" = "$(HELM_RELEASE_NAME)" ]
+helm-uninstall: ##  Uninstall Helm release
+	@echo " Type the release name '$(HELM_RELEASE_NAME)' to confirm uninstall: " && read confirm && [ "$$confirm" = "$(HELM_RELEASE_NAME)" ]
 	@helm uninstall $(HELM_RELEASE_NAME) -n $(NAMESPACE)
-	@echo "✅ Helm release uninstalled"
+	@echo " Helm release uninstalled"
 
 # Helm utilities
-helm-status: ## 📊 Show Helm release status
+helm-status: ##  Show Helm release status
 	@helm status $(HELM_RELEASE_NAME) -n $(NAMESPACE)
 
-helm-get-values: ## 📋 Show Helm values
+helm-get-values: ##  Show Helm values
 	@helm get values $(HELM_RELEASE_NAME) -n $(NAMESPACE)
 
-helm-history: ## 📋 Show Helm release history
+helm-history: ##  Show Helm release history
 	@helm history $(HELM_RELEASE_NAME) -n $(NAMESPACE)
 
-helm-rollback: ## 🔄 Rollback Helm release
+helm-rollback: ##  Rollback Helm release
 	@echo "Available revisions:"
 	@helm history $(HELM_RELEASE_NAME) -n $(NAMESPACE)
 	@echo ""
@@ -556,12 +556,12 @@ helm-rollback: ## 🔄 Rollback Helm release
 	fi; \
 	$(MAKE) verify-helm-deployment
 
-verify-helm-deployment: ## ✅ Verify Helm deployment
-	@echo "✅ Verifying Helm deployment..."
+verify-helm-deployment: ##  Verify Helm deployment
+	@echo " Verifying Helm deployment..."
 	@helm status $(HELM_RELEASE_NAME) -n $(NAMESPACE) | grep -q "STATUS: deployed" || \
-		(echo "❌ Helm deployment not in deployed state" && exit 1)
+		(echo " Helm deployment not in deployed state" && exit 1)
 	@$(MAKE) verify-deployment-health
-	@echo "✅ Helm deployment verification completed"
+	@echo " Helm deployment verification completed"
 ```
 
 ### Advanced Helm Workflows
@@ -574,21 +574,21 @@ Create sophisticated Helm workflows with dependency management and multi-chart d
 # =============================================================================
 
 # Helm dependencies
-helm-dep-update: ## 📦 Update Helm dependencies
-	@echo "📦 Updating Helm dependencies..."
+helm-dep-update: ##  Update Helm dependencies
+	@echo " Updating Helm dependencies..."
 	@helm dependency update $(HELM_CHART)
-	@echo "✅ Helm dependencies updated"
+	@echo " Helm dependencies updated"
 
 # Multi-chart deployment for complex applications
-deploy-full-stack: ## 🚀 Deploy full application stack with Helm
-	@echo "🚀 Deploying full application stack..."
+deploy-full-stack: ##  Deploy full application stack with Helm
+	@echo " Deploying full application stack..."
 	@$(MAKE) helm-install-infrastructure
 	@$(MAKE) helm-install-database
 	@$(MAKE) helm-install-app
-	@echo "✅ Full stack deployment completed"
+	@echo " Full stack deployment completed"
 
-helm-install-infrastructure: ## 🏗️ Install infrastructure components
-	@echo "🏗️ Installing infrastructure components..."
+helm-install-infrastructure: ##  Install infrastructure components
+	@echo " Installing infrastructure components..."
 	@if [ -d "helm/infrastructure" ]; then \
 		helm upgrade --install $(APP_NAME)-infra helm/infrastructure \
 			--namespace $(NAMESPACE)-infra \
@@ -596,11 +596,11 @@ helm-install-infrastructure: ## 🏗️ Install infrastructure components
 			--values helm/infrastructure/values-$(ENVIRONMENT).yaml \
 			--wait --timeout=600s; \
 	else \
-		echo "⚠️ No infrastructure chart found, skipping"; \
+		echo " No infrastructure chart found, skipping"; \
 	fi
 
-helm-install-database: ## 🗄️ Install database components
-	@echo "🗄️ Installing database components..."
+helm-install-database: ##  Install database components
+	@echo " Installing database components..."
 	@if [ -d "helm/database" ]; then \
 		helm upgrade --install $(APP_NAME)-db helm/database \
 			--namespace $(NAMESPACE) \
@@ -608,34 +608,34 @@ helm-install-database: ## 🗄️ Install database components
 			--values helm/database/values-$(ENVIRONMENT).yaml \
 			--wait --timeout=300s; \
 	else \
-		echo "⚠️ No database chart found, skipping"; \
+		echo " No database chart found, skipping"; \
 	fi
 
-helm-install-app: helm-install-database ## 🚀 Install application (depends on database)
+helm-install-app: helm-install-database ##  Install application (depends on database)
 	@$(MAKE) helm-upgrade
 
 # Helm testing
-helm-test: ## 🧪 Run Helm tests
-	@echo "🧪 Running Helm tests..."
+helm-test: ##  Run Helm tests
+	@echo " Running Helm tests..."
 	@helm test $(HELM_RELEASE_NAME) -n $(NAMESPACE) --timeout=300s
 
 # Environment-specific Helm workflows
-helm-deploy: helm-deploy-$(ENVIRONMENT) ## 🚀 Environment-specific Helm deployment
+helm-deploy: helm-deploy-$(ENVIRONMENT) ##  Environment-specific Helm deployment
 
-helm-deploy-development: helm-lint helm-install ## 🚀 Development Helm deployment
+helm-deploy-development: helm-lint helm-install ##  Development Helm deployment
 
-helm-deploy-staging: helm-lint helm-dry-run helm-upgrade helm-test ## 🚀 Staging Helm deployment
+helm-deploy-staging: helm-lint helm-dry-run helm-upgrade helm-test ##  Staging Helm deployment
 
-helm-deploy-production: helm-lint helm-dry-run backup-current-state helm-upgrade helm-test ## 🚀 Production Helm deployment
+helm-deploy-production: helm-lint helm-dry-run backup-current-state helm-upgrade helm-test ##  Production Helm deployment
 	@$(MAKE) extended-health-monitoring
-	@echo "✅ Production Helm deployment completed"
+	@echo " Production Helm deployment completed"
 
 # Backup current state before deployment
-backup-current-state: ## 💾 Backup current Kubernetes state
-	@echo "💾 Backing up current state..."
+backup-current-state: ##  Backup current Kubernetes state
+	@echo " Backing up current state..."
 	@mkdir -p backups/$(ENVIRONMENT)
-	@kubectl get all -n $(NAMESPACE) -o yaml > backups/$(ENVIRONMENT)/backup-$(shell date +%Y%m%d-%H%M%S).yaml 2>/dev/null || echo "⚠️ Namespace $(NAMESPACE) not found"
-	@echo "✅ Backup completed"
+	@kubectl get all -n $(NAMESPACE) -o yaml > backups/$(ENVIRONMENT)/backup-$(shell date +%Y%m%d-%H%M%S).yaml 2>/dev/null || echo " Namespace $(NAMESPACE) not found"
+	@echo " Backup completed"
 ```
 
 ## Basic Operations and Troubleshooting
@@ -652,8 +652,8 @@ Provide essential operations that every team member needs:
 .PHONY: status logs shell debug restart scale
 
 # Status and monitoring
-status: ## 📊 Show deployment status
-	@echo "📊 Deployment Status for $(APP_NAME) in $(ENVIRONMENT)"
+status: ##  Show deployment status
+	@echo " Deployment Status for $(APP_NAME) in $(ENVIRONMENT)"
 	@echo "================================================="
 	@echo ""
 	@echo "Namespace:"
@@ -671,21 +671,21 @@ status: ## 📊 Show deployment status
 	@echo "Ingress:"
 	@kubectl get ingress -n $(NAMESPACE) 2>/dev/null || echo "  No ingress found"
 
-logs: ## 📋 Show application logs
-	@echo "📋 Showing logs for $(APP_NAME) in $(ENVIRONMENT)..."
+logs: ##  Show application logs
+	@echo " Showing logs for $(APP_NAME) in $(ENVIRONMENT)..."
 	@kubectl logs -f deployment/$(APP_NAME) -n $(NAMESPACE) --tail=100
 
-logs-previous: ## 📋 Show previous pod logs
-	@echo "📋 Showing previous logs for $(APP_NAME)..."
+logs-previous: ##  Show previous pod logs
+	@echo " Showing previous logs for $(APP_NAME)..."
 	@kubectl logs deployment/$(APP_NAME) -n $(NAMESPACE) --previous --tail=100
 
 # Interactive operations
-shell: ## 🐚 Get shell in application pod
-	@echo "🐚 Getting shell in $(APP_NAME) pod..."
+shell: ##  Get shell in application pod
+	@echo " Getting shell in $(APP_NAME) pod..."
 	@kubectl exec -it deployment/$(APP_NAME) -n $(NAMESPACE) -- /bin/bash
 
-debug: ## 🐛 Debug deployment issues
-	@echo "🐛 Debugging deployment issues for $(APP_NAME)..."
+debug: ##  Debug deployment issues
+	@echo " Debugging deployment issues for $(APP_NAME)..."
 	@echo ""
 	@echo "=== Deployment Status ==="
 	@kubectl describe deployment $(APP_NAME) -n $(NAMESPACE)
@@ -697,29 +697,29 @@ debug: ## 🐛 Debug deployment issues
 	@kubectl get events -n $(NAMESPACE) --sort-by=.metadata.creationTimestamp | tail -10
 
 # Operational commands
-restart: ## 🔄 Restart deployment
-	@echo "🔄 Restarting $(APP_NAME) deployment..."
+restart: ##  Restart deployment
+	@echo " Restarting $(APP_NAME) deployment..."
 	@kubectl rollout restart deployment/$(APP_NAME) -n $(NAMESPACE)
 	@kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=300s
-	@echo "✅ Restart completed"
+	@echo " Restart completed"
 
-scale: ## 📊 Scale deployment
+scale: ##  Scale deployment
 	@echo "Current replicas: $$(kubectl get deployment $(APP_NAME) -n $(NAMESPACE) -o jsonpath='{.spec.replicas}')"
 	@read -p "New replica count: " NEW_REPLICAS; \
-	echo "📊 Scaling $(APP_NAME) to $$NEW_REPLICAS replicas..."; \
+	echo " Scaling $(APP_NAME) to $$NEW_REPLICAS replicas..."; \
 	kubectl scale deployment/$(APP_NAME) -n $(NAMESPACE) --replicas=$$NEW_REPLICAS; \
 	kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=300s; \
-	echo "✅ Scaling completed"
+	echo " Scaling completed"
 
 # Port forwarding for local access
-port-forward: ## 🔗 Port forward to application
-	@echo "🔗 Port forwarding $(APP_NAME) to localhost:8080..."
+port-forward: ##  Port forward to application
+	@echo " Port forwarding $(APP_NAME) to localhost:8080..."
 	@kubectl port-forward service/$(APP_NAME) 8080:80 -n $(NAMESPACE)
 
 # Resource usage
-resource-usage: ## 📊 Show resource usage
-	@echo "📊 Resource usage for $(APP_NAME):"
-	@kubectl top pods -n $(NAMESPACE) -l app=$(APP_NAME) 2>/dev/null || echo "⚠️ Metrics server not available"
+resource-usage: ##  Show resource usage
+	@echo " Resource usage for $(APP_NAME):"
+	@kubectl top pods -n $(NAMESPACE) -l app=$(APP_NAME) 2>/dev/null || echo " Metrics server not available"
 ```
 
 ### Environment Management
@@ -731,19 +731,19 @@ Create and manage environments easily:
 # Environment Management
 # =============================================================================
 
-create-environment: ## 🏗️ Create new environment
-	@echo "🏗️ Creating environment: $(ENVIRONMENT)"
+create-environment: ##  Create new environment
+	@echo " Creating environment: $(ENVIRONMENT)"
 	@kubectl create namespace $(NAMESPACE) --dry-run=client -o yaml | kubectl apply -f -
 	@kubectl label namespace $(NAMESPACE) environment=$(ENVIRONMENT) --overwrite
-	@echo "✅ Environment $(ENVIRONMENT) created"
+	@echo " Environment $(ENVIRONMENT) created"
 
-destroy-environment: ## 💥 Destroy environment
-	@echo "⚠️ Type the environment name '$(ENVIRONMENT)' to confirm destruction: " && read confirm && [ "$confirm" = "$(ENVIRONMENT)" ]
-	@echo "💥 Destroying environment: $(ENVIRONMENT)"
+destroy-environment: ##  Destroy environment
+	@echo " Type the environment name '$(ENVIRONMENT)' to confirm destruction: " && read confirm && [ "$confirm" = "$(ENVIRONMENT)" ]
+	@echo " Destroying environment: $(ENVIRONMENT)"
 	@kubectl delete namespace $(NAMESPACE) --wait=true
-	@echo "✅ Environment $(ENVIRONMENT) destroyed"
+	@echo " Environment $(ENVIRONMENT) destroyed"
 
-list-environments: ## 📋 List all environments for this app
-	@echo "📋 Environments for $(APP_NAME):"
+list-environments: ##  List all environments for this app
+	@echo " Environments for $(APP_NAME):"
 	@kubectl get namespaces -l app=$(APP_NAME) -o custom-columns=NAME:.metadata.name,ENVIRONMENT:.metadata.labels.environment,AGE:.metadata.creationTimestamp 2>/dev/null || echo "No environments found"
 ```
