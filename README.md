@@ -129,5 +129,5 @@ This book covers not only how to use Make, but why it matters for team productiv
 - [Detailed writing plan, research, blog/article links](plan.md)
 - [Pandoc Manual](http://pandoc.org/MANUAL.html)
 - [Official GNU Make Manual](https://www.gnu.org/software/make/manual/)
-- [Why DevOps Is Killing Innovation?](https://medium.com/%40jeromedecinco/why-devops-is-killing-innovation-in-software-development-e7ed617f5798)
-- Academic/industry sources: see bottom of [plan.md](plan.md)  
+- [Managaing Projects with GNU Make (O'Reilly)](https://learning.oreilly.com/library/view/managing-projects-with/0596006101/pt01.html)
+- Academic/industry sources: see bottom of [plan.md](plan.md)
