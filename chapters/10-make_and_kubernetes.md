@@ -1615,4 +1615,6 @@ helm-deploy-production: helm-lint helm-dry-run backup-current-state helm-upgrade
 
 ## Service Mesh Configuration and Monitoring Setup
 
-ASK Claude to pick up at this part of Chapter 10
+🚧 WORK IN PROGRESS 🚧 
+We will trim this chapter down a bit, it's getting too long. Some content will
+move to other chapters, some will get tossed out completely.
