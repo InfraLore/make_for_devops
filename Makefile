@@ -81,16 +81,29 @@ clean:
 	$(RMDIR_CMD) $(BUILD)
 
 ####################################################################################################
+# Utilities
+####################################################################################################
+
+validate:
+	@echo "Validating chapter contents..."
+	@if grep -Ei '\btribal\b' $(CHAPTERS); then \
+		echo '\nERROR: Forbidden word "tribal" found in chapters. Please fix before building.\n'; \
+		exit 1; \
+	else \
+		echo "Validation passed."; \
+	fi
+
+####################################################################################################
 # File builders
 ####################################################################################################
 
-epub:	$(BUILD)/epub/$(OUTPUT_FILENAME).epub
+epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub
 
-html:	$(BUILD)/html/$(OUTPUT_FILENAME).html
+html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html
 
-pdf:	$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+pdf:	validate $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
 
-docx:	$(BUILD)/docx/$(OUTPUT_FILENAME).docx
+docx:	validate $(BUILD)/docx/$(OUTPUT_FILENAME).docx
 
 $(BUILD)/epub/$(OUTPUT_FILENAME).epub:	$(EPUB_DEPENDENCIES)
 	$(ECHO_BUILDING)

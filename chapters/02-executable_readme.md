@@ -1,15 +1,29 @@
 # Chapter 2 - The Executable README
-_Transforming the traditional README from static documentation into an interactive, always-current guide to your project's capabilities._
+_Transforming the traditional README from static documentation into an
+interactive, always-current guide to your project's capabilities._
 
-Every developer has experienced the frustration: you clone a promising repository, eager to try it out, only to find a README that's either woefully out of date, impossibly vague, or completely missing. The instructions reference commands that no longer exist, environment variables that were renamed months ago, or dependencies that have evolved beyond recognition. After thirty minutes of archaeological detective work, you either give up or cobble together a working setup through trial and error.
+Every developer has experienced the frustration: you clone a promising
+repository, eager to try it out, only to find a README that's either woefully
+out of date, impossibly vague, or completely missing. The instructions reference
+commands that no longer exist, environment variables that were renamed months
+ago, or dependencies that have evolved beyond recognition. After thirty minutes
+of archaeological detective work, you either give up or cobble together a
+working setup through trial and error.
 
-This scenario plays out thousands of times daily across engineering teams worldwide, and it represents a fundamental failure of traditional documentation approaches. Static documentation—whether in README files, wiki pages, or elaborate documentation sites—suffers from an incurable disease: **documentation drift**. The moment you write down how to do something, that documentation begins to decay as the underlying system evolves.
+This scenario plays out thousands of times daily across engineering teams
+worldwide, and it represents a fundamental failure of traditional documentation
+approaches. Static documentation—whether in README files, wiki pages, or
+elaborate documentation sites—suffers from an incurable disease: **documentation
+drift**. The moment you write down how to do something, that documentation
+begins to decay as the underlying system evolves.
 
-The Executable README concept offers a radical solution: **what if your documentation could run itself?**
+The Executable README concept offers a radical solution: **what if your
+documentation could run itself?**
 
 ## Moving Beyond Static Documentation
 
-Traditional project documentation follows a predictable pattern. A well-meaning developer creates a comprehensive README with detailed setup instructions:
+Traditional project documentation follows a predictable pattern. A well-meaning
+developer creates a comprehensive README with detailed setup instructions:
 
 ```markdown
 # MyApp Setup
@@ -31,22 +45,30 @@ Traditional project documentation follows a predictable pattern. A well-meaning 
 Run the test suite with `pytest tests/` and `npm test`.
 
 ## Deployment
-Deploy to staging with `kubectl apply -f k8s/staging/` then update the image with `kubectl set image deployment/myapp app=myapp:latest`.
+Deploy to staging with `kubectl apply -f k8s/staging/` then update the image with
+`kubectl set image deployment/myapp app=myapp:latest`.
 ```
 
 This looks comprehensive and helpful. The problem emerges over time:
 
 - Node.js gets upgraded to 16.x, but the README still says 14.x
-- The database initialization process changes, requiring additional environment variables
+- The database initialization process changes, requiring additional environment
+  variables
 - The migration command evolves into a more complex multi-step process
 - The deployment process gains new prerequisites and safety checks
 - New team members join and can't get the system running
 
-Six months later, this helpful README has become a liability. New developers waste hours trying to follow outdated instructions, and experienced team members bypass the README entirely, relying on tribal knowledge that's never written down.
+Six months later, this helpful README has become a liability. New developers
+waste hours trying to follow outdated instructions, and experienced team members
+bypass the README entirely, relying on institutional knowledge that's never written
+down.
 
 ## The Philosophy of the Executable README
 
-The Executable README approach flips this model entirely. Instead of documenting what to do, you create executable targets that **do the things directly**. Your README becomes a menu of available actions rather than a set of instructions to follow manually.
+The Executable README approach flips this model entirely. Instead of documenting
+what to do, you create executable targets that **do the things directly**. Your
+README becomes a menu of available actions rather than a set of instructions to
+follow manually.
 
 Here's how the same project might look with an Executable README approach:
 
@@ -133,11 +155,17 @@ clean: ## Clean up development environment
 	@echo "Cleanup complete!"
 ````
 
-Notice what's happened here. The README is now incredibly simple—it doesn't try to document complex processes, it just points to executable commands. The Makefile contains the actual implementation of each workflow, with built-in validation, error handling, and helpful output.
+Notice what's happened here. The README is now incredibly simple—it doesn't try
+to document complex processes, it just points to executable commands. The
+Makefile contains the actual implementation of each workflow, with built-in
+validation, error handling, and helpful output.
 
 ## Designing Make Targets as Self-Describing Interfaces
 
-The key to successful Executable READMEs lies in designing Make targets that are **immediately understandable and safely executable**. This requires thinking like an API designer: your targets are the public interface to your project's capabilities.
+The key to successful Executable READMEs lies in designing Make targets that are
+**immediately understandable and safely executable**. This requires thinking
+like an API designer: your targets are the public interface to your project's
+capabilities.
 
 ### The Principle of Obvious Intent
 
@@ -159,7 +187,8 @@ sync          # Sync what with what?
 
 ### The Principle of Safe Defaults
 
-Targets should be safe to run without parameters and should validate their prerequisites:
+Targets should be safe to run without parameters and should validate their
+prerequisites:
 
 ```makefile
 # Good: Safe with clear validation
@@ -205,7 +234,8 @@ setup:
 
 ## The Anatomy of a Discoverable Makefile
 
-A well-designed Executable README Makefile follows a predictable structure that makes it easy for newcomers to understand and use:
+A well-designed Executable README Makefile follows a predictable structure that
+makes it easy for newcomers to understand and use:
 
 ```makefile
 # ============================================================================
@@ -339,7 +369,10 @@ update-kubernetes:
 
 ## Creating Help Systems and Target Categorization
 
-The `help` target in the example above demonstrates a crucial pattern for Executable READMEs: **self-documenting interfaces**. The help system automatically generates documentation from comments in the Makefile itself, ensuring that the help text stays synchronized with the actual targets.
+The `help` target in the example above demonstrates a crucial pattern for
+Executable READMEs: **self-documenting interfaces**. The help system
+automatically generates documentation from comments in the Makefile itself,
+ensuring that the help text stays synchronized with the actual targets.
 
 ### Advanced Help Systems
 
@@ -435,7 +468,8 @@ what-can-i-do: ##   Suggest what to do based on current state
 
 - `dev-*` - Development-specific targets (`dev-logs`, `dev-reset`)
 - `test-*` - Testing-specific targets (`test-unit`, `test-integration`)
-- `deploy-*` - Deployment-specific targets (`deploy-staging`, `deploy-production`)
+- `deploy-*` - Deployment-specific targets (`deploy-staging`,
+  `deploy-production`)
 
 **Utility Actions**:
 
@@ -487,7 +521,8 @@ backend-test: test-python test-api
 
 ## Real-World Example: Transforming a Legacy Project
 
-Let's look at how to transform a typical legacy project with poor documentation into an Executable README approach.
+Let's look at how to transform a typical legacy project with poor documentation
+into an Executable README approach.
 
 **Before: Traditional README**
 
@@ -545,7 +580,8 @@ Run `make help` for all available commands.
 ## Requirements
 
 - Docker (for database and deployment)
-- Node.js 14+ and Python 3.8+ (installed automatically if using `make setup-system`)
+- Node.js 14+ and Python 3.8+ (installed automatically if using `make
+  setup-system`)
 
 ## Configuration
 
@@ -709,25 +745,38 @@ shell: ##   Get shell in running container
 	kubectl exec -it deployment/$(APP_NAME) -- /bin/bash
 ````
 
-The transformation is dramatic. What was once a multi-step, error-prone setup process becomes:
+The transformation is dramatic. What was once a multi-step, error-prone setup
+process becomes:
 
 1. `make setup` - Installs everything, creates configuration, sets up database
-2. `make dev` - Starts all services with proper coordination and shutdown handling
+2. `make dev` - Starts all services with proper coordination and shutdown
+   handling
 3. `make test` - Runs comprehensive test suite
 4. `make deploy` - Builds, tests, and deploys safely
 
-New team members can be productive in minutes rather than hours, and the Makefile serves as both documentation and implementation of the project's workflows.
+New team members can be productive in minutes rather than hours, and the
+Makefile serves as both documentation and implementation of the project's
+workflows.
 
 ## Key Takeaways
 
-The Executable README concept represents a fundamental shift from documenting what to do to encoding how to do it. This approach offers several crucial benefits:
+The Executable README concept represents a fundamental shift from documenting
+what to do to encoding how to do it. This approach offers several crucial
+benefits:
 
-1. **Always Current**: Since the documentation is executable, it can't drift out of sync with reality
-2. **Immediately Useful**: New team members can be productive without understanding complex setup procedures
-3. **Self-Validating**: The Make targets include prerequisite checks and error handling
+1. **Always Current**: Since the documentation is executable, it can't drift out
+   of sync with reality
+2. **Immediately Useful**: New team members can be productive without
+   understanding complex setup procedures
+3. **Self-Validating**: The Make targets include prerequisite checks and error
+   handling
 4. **Discoverable**: The help system reveals all available capabilities
 5. **Testable**: The workflows themselves can be tested and validated
 
-The key to success with Executable READMEs is thinking like an API designer. Your Make targets are the public interface to your project—they should be intuitive, well-named, safe to execute, and thoroughly tested.
+The key to success with Executable READMEs is thinking like an API designer.
+Your Make targets are the public interface to your project—they should be
+intuitive, well-named, safe to execute, and thoroughly tested.
 
-In the next chapter, we'll dive deeper into Make's fundamental features and how they can be leveraged specifically for DevOps workflows, building on this foundation of discoverability and executable documentation.
+In the next chapter, we'll dive deeper into Make's fundamental features and how
+they can be leveraged specifically for DevOps workflows, building on this
+foundation of discoverability and executable documentation.

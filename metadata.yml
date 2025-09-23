@@ -6,18 +6,11 @@ lang: en-US
 mainlang: english
 otherlang: english
 tags: [pandoc, book, my-book, etc]
-abstract: |
-  _Make for DevOps_ reveals how Make can serve as the universal "glue" that transforms your project 
-  into a self-documenting, discoverable system where every automation task, dependency, and 
-  workflow step becomes immediately visible and executable through simple, standardized commands. 
-  By treating the Makefile as an executable README and comprehensive workflow registry, this book 
-  demonstrates how Make can bridge the gap between complex infrastructure code and human 
-  understanding, creating DevOps workflows that are not only powerful but also transparent, 
-  maintainable, and accessible to every team member.
 mainfont: Open Sans
 monofont: JetBrainsMono Nerd Font Mono
 sansfont: Open Sans
 fontsize: 10pt
+documentclass: book
 papersize: letter
 # Filter preferences:
 # - pandoc-crossref

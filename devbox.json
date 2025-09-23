@@ -7,13 +7,24 @@
     "texlivePackages.xelatex-dev@latest",
     "python310Full@latest",
     "python310Packages.pip@latest",
-    "poppler_utils@latest"
+    "poppler_utils@latest",
+    "python@latest"
   ],
   "env": {
     "VENV_DIR": ".venv"
   },
   "shell": {
-    "init_hook": ". $VENV_DIR/bin/activate",
+  "init_hook": [
+    "if [ ! -d \"$VENV_DIR\" ]; then",
+    "  python -m venv \"$VENV_DIR\";",
+    "  . \"$VENV_DIR/bin/activate\";",
+    "  pip install --upgrade pip;",
+    "  pip install -r requirements.txt || true;",
+    "else",
+    "  . \"$VENV_DIR/bin/activate\";",
+    "  pip install -r requirements.txt || true;",
+    "fi"
+  ],
     "scripts": {
       "test": [
         "echo \"Error: no test specified\" && exit 1"

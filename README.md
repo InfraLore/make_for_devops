@@ -19,7 +19,7 @@ This repo holds:
 
 ## Why "Make for DevOps"?
 
-DevOps teams are plagued by _institutional knowledge loss_—the real "how" and "why" of systems drifts into tribal memory, fragile chat history, and out-of-date wikis. Most books and tools treat Make as only a build tool for code; **we show how it can be the backbone of workflow documentation, discoverability, and team onboarding**.
+DevOps teams face a persistent challenge with undocumented system expertise--the practical details of how systems work and the reasoning behind design decisions often remain locked in informal channels, scattered across temporary chat logs and outdated documentation. Most books and tools treat Make as only a build tool for code; **we show how it can be the backbone of workflow documentation, discoverability, and team onboarding**.
 
 See [proposal.md](proposal.md) and [plan.md](plan.md) for:
 - Audience and technical level
@@ -42,7 +42,7 @@ See full details in [proposal.md](proposal.md); a brief version:
 
 - **DevOps, SRE, Platform Engineers** (2–5 years’ experience)
 - Teams scaling infra and onboarding, using or interested in Make beyond C/C++ builds
-- Anyone facing the "Tribal Knowledge" crisis or using/maintaining complex automation workflows
+- Anyone facing the "Institutional Knowledge" crisis or using/maintaining complex automation workflows
 
 ---
 
