@@ -1,5 +1,3 @@
-# Chapter 1 - Why Make for DevOps?
-
 # Chapter 1: Why Make for DevOps?
 Examining the hidden crisis of undocumented institutional knowledge and introducing Make as the solution for discoverable, self-documenting DevOps processes.
 

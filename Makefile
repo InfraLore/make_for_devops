@@ -24,10 +24,13 @@ CONTENT_FILTERS = tee # Use this to add sed filters or other piped commands
 
 # DEBUG_ARGS = --verbose
 
-# Pandoc filtes - uncomment the following variable to enable cross references filter. For more
+# Pandoc filters - uncomment the following variable to enable cross references filter. For more
 # information, check the "Cross references" section on the README.md file.
 
 # FILTER_ARGS = --filter pandoc-crossref
+
+# use the codeblock-border.lua filter to add borders to code blocks
+FILTER_ARGS = --lua-filter=codeblock-border.lua
 
 # Combined arguments
 
@@ -40,7 +43,7 @@ PANDOC_COMMAND = pandoc
 DOCX_ARGS = --standalone --reference-doc templates/docx.docx
 EPUB_ARGS = --template templates/epub.html --epub-cover-image $(COVER_IMAGE)
 HTML_ARGS = --template templates/html.html --standalone --to html5
-PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex
+PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex --no-highlight
 
 # Per-format file dependencies
 
@@ -86,8 +89,12 @@ clean:
 
 validate:
 	@echo "Validating chapter contents..."
-	@if grep -Ei '\btribal\b' $(CHAPTERS); then \
-		echo '\nERROR: Forbidden word "tribal" found in chapters. Please fix before building.\n'; \
+	@result=$$(grep -Ein '\btribal\b' $(CHAPTERS)); \
+	if [ -n "$$result" ]; then \
+		echo ""; \
+		echo "ERROR: Forbidden word \"tribal\" found in chapters:"; \
+		echo "$$result"; \
+		echo ""; \
 		exit 1; \
 	else \
 		echo "Validation passed."; \

@@ -124,6 +124,7 @@ $endif$
 $if(monofont)$
   \setmonofont[$for(monofontoptions)$$monofontoptions$$sep$,$endfor$]{$monofont$}
 $endif$
+\newfontfamily\LatoFont{Lato}
 $for(fontfamilies)$
   \newfontfamily{$fontfamilies.name$}[$for(fontfamilies.options)$$fontfamilies.options$$sep$,$endfor$]{$fontfamilies.font$}
 $endfor$
@@ -402,6 +403,57 @@ $if(logo)$
 \logo{\includegraphics{$logo$}}
 $endif$
 $endif$
+
+% Use Lato for headings
+\usepackage{sectsty}
+\allsectionsfont{\LatoFont}
+
+% and for chapters, too:
+\chapterfont{\LatoFont}
+
+% and for the title:
+\makeatletter
+\renewcommand{\maketitle}{
+  \thispagestyle{empty}
+  \begin{center}
+    {\LatoFont\huge \@title \par} % title
+    \vskip 0.5em
+    $if(subtitle)$
+      {\LatoFont\Large \@subtitle \par} % subtitle
+      \vskip 0.5em
+    $endif$
+    $if(author)$
+      {\LatoFont\large \@author \par} % author
+      \vskip 0.5em
+    $endif$
+    $if(date)$
+      {\LatoFont\large \@date \par} % date
+    $endif$
+    $if(logo)$
+      \vskip 1em
+      \includegraphics{$logo$} % logo
+    $endif$
+  \end{center}
+  \vskip 1.5em
+}
+% fancyhdr config
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhead{}
+% Use Lato for headers!
+\fancyhead[LO]{\LatoFont\rightmark}
+\fancyhead[RE]{\LatoFont\leftmark}
+
+\usepackage[most]{tcolorbox}
+\newtcblisting{mycodeblock}{
+  colback=white,
+  colframe=gray!70!black,
+  boxrule=0.5pt,
+  arc=2pt,
+  left=4pt, right=4pt, top=4pt, bottom=4pt,
+  fontupper=\ttfamily,
+  listing only,
+}
 
 \begin{document}
 $if(has-frontmatter)$
