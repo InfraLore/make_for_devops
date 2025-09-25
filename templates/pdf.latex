@@ -439,21 +439,28 @@ $endif$
 % fancyhdr config
 \usepackage{fancyhdr}
 \pagestyle{fancy}
-\fancyhead{}
-% Use Lato for headers!
+\fancyhead{}           % Clear all header fields
 \fancyhead[LO]{\LatoFont\rightmark}
 \fancyhead[RE]{\LatoFont\leftmark}
+\fancyhead[RO]{\LatoFont\thepage} % Page number on right, odd pages
+\fancyhead[LE]{\LatoFont\thepage} % Page number on left, even pages
+\fancyfoot{}           % Clear all footer fields
 
 \usepackage[most]{tcolorbox}
 \newtcblisting{mycodeblock}{
   colback=white,
   colframe=gray!70!black,
-  boxrule=0.5pt,
+  boxrule=0.7pt,
   arc=2pt,
-  left=4pt, right=4pt, top=4pt, bottom=4pt,
-  fontupper=\ttfamily,
+  left=6pt, right=6pt, top=6pt, bottom=6pt,
+  fontupper=\ttfamily\footnotesize,
+  shadow={1mm}{-1mm}{0mm}{gray!60!white},
   listing only,
+  breakable=false,
+  enhanced,
 }
+
+\usepackage{needspace}
 
 \begin{document}
 $if(has-frontmatter)$

@@ -116,6 +116,14 @@ This book covers not only how to use Make, but why it matters for team productiv
 
 ---
 
+## Helpful commands for editing
+
+```bash
+ack "[a-z] make" # we should always capitalize the proper noun Make, find outliers
+```
+
+---
+
 ## Acknowledgments
 
 - Original template © Daniel Herzog, [wikiti/pandoc-book-template](https://github.com/wikiti/pandoc-book-template), MIT License

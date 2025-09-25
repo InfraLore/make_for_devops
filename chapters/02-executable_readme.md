@@ -70,10 +70,10 @@ what to do, you create executable targets that **do the things directly**. Your
 README becomes a menu of available actions rather than a set of instructions to
 follow manually.
 
+\pagebreak
 Here's how the same project might look with an Executable README approach:
 
-**README.md:**
-
+### README.md
 ````markdown
 # MyApp
 
@@ -86,9 +86,16 @@ make setup    # Set up development environment
 make dev      # Start development servers
 make test     # Run all tests
 make deploy   # Deploy to staging
+```
+Run `make help` to see all available commands.
 ````
 
-Run `make help` to see all available commands.
+Notice what's happened here. The README is now incredibly simple—it doesn't try
+to document complex processes, it just points to executable commands. The
+Makefile contains the actual implementation of each workflow, with built-in
+validation, error handling, and helpful output. On the next page, I'll show you
+the Makefile to which this README refers. It's not a working Makefile, you'll
+have to read on for working examples.
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -108,47 +115,21 @@ help: ## Show this help message
 
 setup: ## Set up development environment
 	@echo "Setting up MyApp development environment..."
-	@command -v node >/dev/null || \
-		(echo "Please install Node.js $(NODE_VERSION)" && exit 1)
-	@command -v python3 >/dev/null || \
-		(echo "Please install Python $(PYTHON_VERSION)" && exit 1)
-	@command -v docker >/dev/null || \
-		(echo "Please install Docker" && exit 1)
-	npm install
-	pip install -r requirements.txt
-	@$(MAKE) db-setup
-	@echo "Setup complete! Run 'make dev' to start development."
+	# ... implementation
 
 db-setup: ## Initialize database
 	@echo "Starting database..."
-	@docker run -d --name myapp-db -p 5432:5432 \
-		-e POSTGRES_DB=myapp -e POSTGRES_PASSWORD=dev \
-		$(DB_IMAGE) >/dev/null 2>&1 || true
-	@echo "Waiting for database to be ready..."
-	@timeout 30 bash -c \
-		'until docker exec myapp-db pg_isready; do sleep 1; done'
-	python manage.py migrate
+	# ... implementation
 	@echo "Database ready!"
 
 dev: ## Start development servers
 	@echo "Starting MyApp in development mode..."
-	@trap 'kill %1 %2' INT; \
-	npm start & \
-	python worker.py & \
-	wait
+	# ... implementation
 
 test: ## Run all tests
 	@echo "Running test suite..."
 	pytest tests/ -v
 	npm test
-
-deploy: check-kubectl ## Deploy to staging
-	@echo "Deploying to staging..."
-	kubectl apply -f k8s/staging/ -n $(KUBE_NAMESPACE)
-	kubectl set image deployment/myapp \
-		app=myapp:$$(git rev-parse --short HEAD) -n $(KUBE_NAMESPACE)
-	kubectl rollout status deployment/myapp -n $(KUBE_NAMESPACE)
-	@echo "Deployment complete!"
 
 check-kubectl: ## Verify kubectl is configured
 	@kubectl cluster-info >/dev/null || \
@@ -156,15 +137,9 @@ check-kubectl: ## Verify kubectl is configured
 
 clean: ## Clean up development environment
 	@echo "Cleaning up..."
-	docker stop myapp-db >/dev/null 2>&1 || true
-	docker rm myapp-db >/dev/null 2>&1 || true
+	# ... implementation
 	@echo "Cleanup complete!"
 ```
-
-Notice what's happened here. The README is now incredibly simple—it doesn't try
-to document complex processes, it just points to executable commands. The
-Makefile contains the actual implementation of each workflow, with built-in
-validation, error handling, and helpful output.
 
 ## Designing Make Targets as Self-Describing Interfaces
 
@@ -190,7 +165,7 @@ run           # Run what?
 push          # Push where?
 sync          # Sync what with what?
 ```
-
+\pagebreak
 ### The Principle of Safe Defaults
 
 Targets should be safe to run without parameters and should validate their
@@ -215,7 +190,7 @@ deploy:
 	kubectl delete -f k8s/production/  # Deletes production without warning!
 	kubectl apply -f k8s/production/
 ```
-
+\pagebreak
 ### The Principle of Helpful Output
 
 Make targets should provide clear, actionable feedback:
@@ -241,144 +216,54 @@ setup:
 	npm install
 	echo "done"
 ```
-
+\pagebreak
 ## The Anatomy of a Discoverable Makefile
-
 A well-designed Executable README Makefile follows a predictable structure that
 makes it easy for newcomers to understand and use:
-
 ```makefile
-# ============================================================================
-# MyApp Development Workflow
-# ============================================================================
-
-# Configuration section - all customizable values in one place
+#################### MyApp Development Workflow ###########################
+# Configuration - all customizable values in one place
 APP_NAME := myapp
 VERSION := $(shell git describe --tags --always --dirty)
-ENVIRONMENT ?= development
 DOCKER_REGISTRY ?= localhost:5000
-KUBE_NAMESPACE ?= $(APP_NAME)-$(ENVIRONMENT)
-
-# Default target - what happens when someone runs 'make' with no arguments
 .DEFAULT_GOAL := help
 
-# ============================================================================
-# Primary Workflows - The most common things developers need to do
-# ============================================================================
-
+######## Primary Workflows - The most common developer actions ############
 .PHONY: help setup dev test build deploy clean
 
 help: ##   Show available commands
 	@echo "$(APP_NAME) Development Commands"
 	@echo "================================"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ \
-	{ printf "  \033[36m%-12s\033[0m %s\n", $$1, \
-	substr($$2, 1, 65) (length($$2)>65?"...":"") }' $(MAKEFILE_LIST)
-
+	{ printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 setup: ##   Set up development environment
-	@echo "Setting up $(APP_NAME) for development..."
+	@echo "Setting up $(APP_NAME)..."
 	@$(MAKE) check-prerequisites
 	@$(MAKE) install-dependencies
-	@$(MAKE) init-database
-	@echo "  Setup complete! Run 'make dev' to start development."
+	@$(MAKE) start-database
+	@echo "  Setup complete! Run 'make dev' to start."
 
 dev: ##  Start development environment
-	@echo "Starting $(APP_NAME) development environment..."
-	@trap 'echo "\nShutting down..."; kill %1 %2; exit' INT; \
-	$(MAKE) start-services & \
-	$(MAKE) watch-files & \
-	wait
+	# ... implementation
 
 test: ##   Run all tests
-	@echo "Running $(APP_NAME) test suite..."
-	@$(MAKE) test-unit
-	@$(MAKE) test-integration
-	@echo "  All tests passed!"
-
-# ============================================================================
-# Build and Deployment
-# ============================================================================
-
-build: ##   Build application
-	@echo "Building $(APP_NAME) version $(VERSION)..."
-	docker build -t $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION) .
-	@echo "  Build complete: $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)"
-
-deploy: build test ##   Deploy to target environment
-	@echo "Deploying $(APP_NAME) to $(ENVIRONMENT)..."
-	@$(MAKE) validate-deployment-target
-	@$(MAKE) push-image
-	@$(MAKE) update-kubernetes
-	@echo "  Deployment complete!"
-
-# ============================================================================
-# Utility Targets - Supporting functionality
-# ============================================================================
-
-check-prerequisites: ## Check that required tools are installed
-	@echo "Checking prerequisites..."
-	@command -v docker >/dev/null || (echo "  Docker required" && exit 1)
-	@command -v kubectl >/dev/null || (echo "  kubectl required" && exit 1)
-	@command -v node >/dev/null || (echo "  Node.js required" && exit 1)
-	@echo "  All prerequisites met"
+	# ... implementation
+####################### Build and Deployment ##############################
+build: ##   Build Docker image
+	# ... implementation
+deploy: build test ##   Deploy to staging
+	# ... implementation
+clean: ##   Clean up development environment
+	# ... implementation
+################# Utility Targets - Supporting functionality ##############
+check-prerequisites: ## Check required tools
+	# ... implementation
 
 install-dependencies:
-	npm install --silent
-	pip install -r requirements.txt --quiet
-
-init-database:
-	@$(MAKE) start-database
-	@sleep 3  # Wait for database to be ready
-	python manage.py migrate
+	# ... implementation
 
 start-database:
-	@docker run -d --name $(APP_NAME)-db \
-		-e POSTGRES_DB=$(APP_NAME) \
-		-e POSTGRES_PASSWORD=dev \
-		-p 5432:5432 \
-		postgres:13 >/dev/null 2>&1 || echo "Database already running"
-
-clean: ##   Clean up development environment
-	@echo "Cleaning up $(APP_NAME) environment..."
-	-docker stop $(APP_NAME)-db
-	-docker rm $(APP_NAME)-db
-	-docker rmi $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)
-	@echo "  Cleanup complete"
-
-# ============================================================================
-# Advanced Targets - Less common but important functionality
-# ============================================================================
-
-logs: ##   Show application logs
-	kubectl logs -f deployment/$(APP_NAME) -n $(KUBE_NAMESPACE)
-
-shell: ##   Get a shell in the running application
-	kubectl exec -it deployment/$(APP_NAME) -n $(KUBE_NAMESPACE) -- /bin/bash
-
-debug: ##   Start application in debug mode
-	DEBUG=true $(MAKE) dev
-
-backup: ##   Backup application data
-	kubectl exec deployment/$(APP_NAME)-db -n $(KUBE_NAMESPACE) -- \
-		pg_dump $(APP_NAME) > backup-$(shell date +%Y%m%d-%H%M%S).sql
-
-# ============================================================================
-# Internal Targets - Implementation details, not meant for direct use
-# ============================================================================
-
-validate-deployment-target:
-	@test "$(ENVIRONMENT)" != "production" || \
-		(echo "Use 'make deploy-production' for production deployments" && exit 1)
-
-push-image:
-	docker push $(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION)
-
-update-kubernetes:
-	kubectl apply -f k8s/$(ENVIRONMENT)/ -n $(KUBE_NAMESPACE)
-	kubectl set image deployment/$(APP_NAME) \
-		app=$(DOCKER_REGISTRY)/$(APP_NAME):$(VERSION) \
-		-n $(KUBE_NAMESPACE)
-	kubectl rollout status deployment/$(APP_NAME) -n $(KUBE_NAMESPACE)
+	# ... implementation
 ```
 
 ## Creating Help Systems and Target Categorization
@@ -547,7 +432,7 @@ backend-test: test-python test-api
 Let's look at how to transform a typical legacy project with poor documentation
 into an Executable README approach.
 
-**Before: Traditional README**
+### Before: Traditional README**
 
 ```markdown
 # LegacyApp
@@ -579,10 +464,9 @@ into an Executable README approach.
 - Deploy: `kubectl apply -f k8s/`
 - Update image:  
 	`kubectl set image deployment/legacyapp app=registry.company.com/legacyapp:latest`
-
-**After: Executable README**
-
-**README.md:**
+```
+\pagebreak
+### After: Executable README
 
 ````markdown
 # LegacyApp
@@ -596,8 +480,7 @@ make setup    # One-time setup (installs everything)
 make dev      # Start development (API + frontend + worker)
 make test     # Run all tests
 make deploy   # Deploy to staging
-````
-
+```
 Run `make help` for all available commands.
 
 ## Requirements

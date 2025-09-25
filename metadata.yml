@@ -20,6 +20,18 @@ header-includes:
   - \widowpenalty=10000
   - \clubpenalty=10000
   - \usepackage[most]{tcolorbox}
-  - \newtcblisting{codeblock}{colback=white, colframe=gray!70!black, boxrule=0.5pt, arc=2pt, left=4pt, right=4pt, top=4pt, bottom=4pt, fontupper=\ttfamily}
+  - |
+    \newtcblisting{codeblock}{
+      colback=white,
+      colframe=gray!70!black,
+      boxrule=0.5pt,
+      arc=2pt,
+      left=4pt,
+      right=4pt,
+      top=4pt,
+      bottom=4pt,
+        fontupper=\ttfamily\fontsize{8}{10}\selectfont
+    }
+  - \usepackage{needspace}
 ---
 

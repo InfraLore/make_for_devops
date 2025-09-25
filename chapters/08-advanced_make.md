@@ -283,7 +283,7 @@ clean-all: ## Clean all projects
 
 ### Parallel Recursive Make
 
-Execute recursive make operations in parallel for better performance:
+Execute recursive Make operations in parallel for better performance:
 
 ```makefile
 # =============================================================================
@@ -359,14 +359,14 @@ build-with-config: ## Build all with shared configuration
 		$(MAKE) -C $$dir build VERSION=$(VERSION) REGISTRY=$(REGISTRY); \
 	done
 
-# Pass specific variables to child makes
+# Pass specific variables to child Makes
 deploy-with-environment: ## Deploy all with environment configuration
 	@echo "  Deploying to $(ENVIRONMENT)..."
 	@for dir in $(SERVICES); do \
 		$(MAKE) -C $$dir deploy ENVIRONMENT=$(ENVIRONMENT) VERSION=$(VERSION); \
 	done
 
-# Collect results from child makes
+# Collect results from child Makes
 status-all: ## Show status of all projects
 	@echo "  Status Summary:"
 	@for dir in $(SERVICES); do \

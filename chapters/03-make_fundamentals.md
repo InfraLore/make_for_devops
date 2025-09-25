@@ -1,9 +1,9 @@
 # Chapter 3 - Make Fundamentals for the DevOps Engineer
-_A practical primer on make syntax, focusing on the features most relevant to DevOps workflows rather than traditional compilation._
+_A practical primer on Make syntax, focusing on the features most relevant to DevOps workflows rather than traditional compilation._
 
-If you've encountered make before, it was probably in the context of compiling C or C++ code. You might have run `make install` on a Linux system or struggled through a university computer science course where Makefiles seemed like an arcane ritual of tabs and cryptic syntax. This chapter will help you forget everything you think you know about make and see it through fresh eyes—as a powerful orchestration tool perfectly suited for modern DevOps workflows.
+If you've encountered Make before, it was probably in the context of compiling C or C++ code. You might have run `make install` on a Linux system or struggled through a university computer science course where Makefiles seemed like an arcane ritual of tabs and cryptic syntax. This chapter will help you forget everything you think you know about Make and see it through fresh eyes—as a powerful orchestration tool perfectly suited for modern DevOps workflows.
 
-The beauty of make for DevOps lies not in its ability to compile code, but in its capacity to define, document, and execute complex operational workflows with remarkable simplicity. While other tools require you to learn new domain-specific languages or complex configuration formats, make leverages concepts you already understand: commands, dependencies, and variables.
+The beauty of Make for DevOps lies not in its ability to compile code, but in its capacity to define, document, and execute complex operational workflows with remarkable simplicity. While other tools require you to learn new domain-specific languages or complex configuration formats, Make leverages concepts you already understand: commands, dependencies, and variables.
 
 ## Essential Make Syntax for DevOps Use Cases
 
@@ -16,15 +16,15 @@ deploy:
 	kubectl apply -f k8s/
 ```
 
-This defines a target called `deploy` that runs a single command. When you run `make deploy`, make executes `kubectl apply -f k8s/`. Simple, right? But there's already more happening here than meets the eye.
+This defines a target called `deploy` that runs a single command. When you run `make deploy`, Make executes `kubectl apply -f k8s/`. Simple, right? But there's already more happening here than meets the eye.
 
-First, notice the **tab character** before the `kubectl` command. This isn't optional—make requires commands to be indented with a literal tab character, not spaces. This is one of make's most notorious quirks, but modern editors can handle this automatically.
+First, notice the **tab character** before the `kubectl` command. This isn't optional-—Make requires commands to be indented with a literal tab character, not spaces. This is one of Make's most notorious quirks, but modern editors can handle this automatically.
 
-Second, make is doing something subtle but powerful: it's providing a **standardized interface** to your infrastructure. Instead of team members needing to remember `kubectl apply -f k8s/`, they just run `make deploy`. This might seem trivial, but it's the foundation of discoverability.
+Second, Make is doing something subtle but powerful: it's providing a **standardized interface** to your infrastructure. Instead of team members needing to remember `kubectl apply -f k8s/`, they just run `make deploy`. This might seem trivial, but it's the foundation of discoverability.
 
 ### Building Complex Workflows with Prerequisites
 
-The real power of make emerges when you start defining **prerequisites**—targets that must run before other targets. Consider this expanded deployment workflow:
+The real power of Make emerges when you start defining **prerequisites**—targets that must run before other targets. Consider this expanded deployment workflow:
 
 ```makefile
 deploy: test build push
@@ -43,7 +43,7 @@ push:
 	docker push my-app:$(VERSION)
 ```
 
-Now when someone runs `make deploy`, make automatically ensures that `test`, `build`, and `push` run first, in the correct order. If any step fails, the entire process stops. This creates a **reliable, repeatable deployment pipeline** that's self-documenting.
+Now when someone runs `make deploy`, Make automatically ensures that `test`, `build`, and `push` run first, in the correct order. If any step fails, the entire process stops. This creates a **reliable, repeatable deployment pipeline** that's self-documenting.
 
 ### Multiple Prerequisites and Parallel Execution
 
@@ -73,7 +73,7 @@ Make is smart about dependencies. It will run `lint` first, then `build`, then b
 
 ### Variables: Configuration Made Discoverable
 
-Variables in make serve a crucial role in DevOps workflows: they make configuration **visible and modifiable** without editing the workflow logic. Here are the most common patterns:
+Variables in Make serve a crucial role in DevOps workflows: they make configuration **visible and modifiable** without editing the workflow logic. Here are the most common patterns:
 
 ```makefile
 # Environment-specific configuration
@@ -194,7 +194,7 @@ force-deploy:
 
 ### When to Use Phony Targets
 
-Most DevOps tasks should use **phony targets**—targets that don't correspond to actual files. This tells make to always run these targets:
+Most DevOps tasks should use **phony targets**—targets that don't correspond to actual files. This tells Make to always run these targets:
 
 ```makefile
 .PHONY: deploy test clean logs status
@@ -237,7 +237,7 @@ k8s/deployment.yaml: templates/deployment.yaml.j2 config/values.yaml
 Make provides several debugging options that are invaluable when developing complex workflows:
 
 ```bash
-# See what make would do without doing it
+# See what Make would do without doing it
 make -n deploy
 
 # Print extra debugging information
@@ -249,7 +249,7 @@ make -p
 
 ### Echoing Commands and Variables
 
-By default, make doesn't print the commands it runs (it just prints the target name). For DevOps workflows, you usually want to see what's happening:
+By default, Make doesn't print the commands it runs (it just prints the target name). For DevOps workflows, you usually want to see what's happening:
 
 ```makefile
 # Default: commands are hidden
