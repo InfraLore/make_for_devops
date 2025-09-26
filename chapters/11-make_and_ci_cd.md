@@ -26,7 +26,7 @@ Make. We'll explore the core design principles and create pipeline-friendly
 targets that work identically everywhere. Advanced optimizations, platform
 integrations, and scaling strategies are covered in Chapter 12.
 
-> **🚀 Make Your CI/CD Commands Identical to Local Development**
+> **Make Your CI/CD Commands Identical to Local Development**
 > 
 > Use the exact same Make commands locally and in CI/CD pipelines:
 > 
@@ -180,33 +180,33 @@ VERSION ?= $(shell git describe --tags --always --dirty)
 .PHONY: setup test build deploy clean help
 
 # These targets work identically everywhere
-setup: ## 🚀 Set up development environment
+setup: ## Set up development environment
 	@$(MAKE) install-dependencies
 	@$(MAKE) setup-services
-	@echo "✅ Setup completed"
+	@echo "Setup completed"
 
-test: ## 🧪 Run all tests  
+test: ## Run all tests  
 	@$(MAKE) test-unit
 	@$(MAKE) test-integration
-	@echo "✅ All tests passed"
+	@echo "All tests passed"
 
-build: ## 🔨 Build application
+build: ## Build application
 	@$(MAKE) compile-app
 	@$(MAKE) build-container
-	@echo "✅ Build completed"
+	@echo "Build completed"
 
-deploy: ## 🚀 Deploy application
+deploy: ## Deploy application
 	@$(MAKE) verify-environment
 	@$(MAKE) push-artifacts
 	@$(MAKE) update-deployment
-	@echo "✅ Deployment completed"
+	@echo "Deployment completed"
 
-clean: ## 🧹 Clean up resources
+clean: ## Clean up resources
 	@$(MAKE) clean-containers
 	@$(MAKE) clean-artifacts
-	@echo "✅ Cleanup completed"
+	@echo "Cleanup completed"
 
-help: ## 📋 Show available commands
+help: ## Show available commands
 	@echo "Available commands:"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
 		printf "  %-15s %s\n", $$1, $$2 \
@@ -284,14 +284,14 @@ ARTIFACTS_DIR = artifacts
 BUILD_ID ?= $(shell date +%Y%m%d-%H%M%S)
 
 # Build artifacts that work in any environment
-build-artifacts: ## 📦 Generate deployment artifacts
-	@echo "📦 Generating deployment artifacts..."
+build-artifacts: ## Generate deployment artifacts
+	@echo "Generating deployment artifacts..."
 	@mkdir -p $(ARTIFACTS_DIR)
 	@$(MAKE) compile-application
 	@$(MAKE) package-application  
 	@$(MAKE) generate-manifests
 	@$(MAKE) create-deployment-info
-	@echo "✅ Artifacts created in $(ARTIFACTS_DIR)/"
+	@echo "Artifacts created in $(ARTIFACTS_DIR)/"
 
 compile-application: # implementation
 	@echo "Compiling application..."
@@ -323,14 +323,14 @@ create-deployment-info: # implementation
 EOF
 
 # Deploy from pre-built artifacts
-deploy-from-artifacts: ## 🚀 Deploy from artifacts
-	@echo "🚀 Deploying from pre-built artifacts..."
+deploy-from-artifacts: ## Deploy from artifacts
+	@echo "Deploying from pre-built artifacts..."
 	@test -d $(ARTIFACTS_DIR) || \
-		(echo "❌ No artifacts found" && exit 1)
+		(echo "No artifacts found" && exit 1)
 	kubectl apply -f $(ARTIFACTS_DIR)/deployment.yaml
 	kubectl apply -f $(ARTIFACTS_DIR)/service.yaml
 	@$(MAKE) verify-deployment
-	@echo "✅ Artifact deployment completed"
+	@echo "Artifact deployment completed"
 ```
 
 ### Pattern 4: Fast Feedback Loops
@@ -343,22 +343,22 @@ Structure targets for optimal developer experience with quick validation:
 # =============================================================================
 
 # Quick validation for immediate feedback
-quick-check: ## ⚡ Quick validation (< 30 seconds)
-	@echo "⚡ Running quick validation..."
+quick-check: ## Quick validation (< 30 seconds)
+	@echo "Running quick validation..."
 	@$(MAKE) lint-quick
 	@$(MAKE) test-unit-quick
 	@$(MAKE) build-check
-	@echo "✅ Quick validation passed"
+	@echo "Quick validation passed"
 
 # Comprehensive validation for CI
-full-validation: ## 🔬 Full validation (complete)
-	@echo "🔬 Running comprehensive validation..."
+full-validation: ## Full validation (complete)
+	@echo "Running comprehensive validation..."
 	@$(MAKE) lint-full
 	@$(MAKE) test-unit-full
 	@$(MAKE) test-integration
 	@$(MAKE) test-security
 	@$(MAKE) build-full
-	@echo "✅ Full validation completed"
+	@echo "Full validation completed"
 
 # Implementation targets for different speeds
 lint-quick: # implementation
@@ -379,12 +379,12 @@ test-unit-full: # implementation
 build-check: # implementation
 	@echo "Checking build prerequisites..."
 	@command -v npm >/dev/null || \
-		(echo "❌ npm not found" && exit 1)
+		(echo "npm not found" && exit 1)
 	@command -v docker >/dev/null || \
-		(echo "❌ docker not found" && exit 1)
+		(echo "docker not found" && exit 1)
 
 # Auto-select validation level
-validate: ## 🔍 Smart validation (adapts to context)
+validate: ## Smart validation (adapts to context)
 ifeq ($(CI),true)
 	@$(MAKE) full-validation
 else  
@@ -402,19 +402,19 @@ Make security checks part of standard workflows, not afterthoughts:
 # =============================================================================
 
 # Security scanning integrated into build process
-build-secure: ## 🔒 Build with security scanning
-	@echo "🔒 Building with security scanning..."
+build-secure: ## Build with security scanning
+	@echo "Building with security scanning..."
 	@$(MAKE) security-scan-code
 	@$(MAKE) security-scan-dependencies
 	@$(MAKE) build-container
 	@$(MAKE) security-scan-container
-	@echo "✅ Secure build completed"
+	@echo "Secure build completed"
 
 # Different security scans
 security-scan-code: # implementation
 	@echo "Scanning source code for vulnerabilities..."
 	@command -v bandit >/dev/null && bandit -r src/ || \
-		echo "⚠️ bandit not available, skipping code scan"
+		echo "bandit not available, skipping code scan"
 
 security-scan-dependencies: # implementation
 	@echo "Scanning dependencies for vulnerabilities..."
@@ -424,15 +424,15 @@ security-scan-container: # implementation
 	@echo "Scanning container for vulnerabilities..."
 	@command -v trivy >/dev/null && \
 		trivy image $(IMAGE_TAG) || \
-		echo "⚠️ trivy not available, skipping container scan"
+		echo "trivy not available, skipping container scan"
 
 # Security-focused testing
-test-security: ## 🔐 Security testing
-	@echo "🔐 Running security tests..."
+test-security: ## Security testing
+	@echo "Running security tests..."
 	@$(MAKE) test-auth
 	@$(MAKE) test-input-validation
 	@$(MAKE) test-access-control
-	@echo "✅ Security tests passed"
+	@echo "Security tests passed"
 
 test-auth: # implementation
 	@echo "Testing authentication mechanisms..."
@@ -481,41 +481,41 @@ endif
 
 .PHONY: help setup test build deploy clean
 
-help: ## 📋 Show available commands
+help: ## Show available commands
 	@echo "$(APP_NAME) Development Workflow ($(BUILD_ENV) mode)"
 	@echo "============================================="
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
 		printf "  %-15s %s\n", $$1, $$2 \
 	}' $(MAKEFILE_LIST)
 
-setup: ## 🚀 Set up development environment
-	@echo "🚀 Setting up $(APP_NAME) for $(BUILD_ENV)..."
+setup: ## Set up development environment
+	@echo "Setting up $(APP_NAME) for $(BUILD_ENV)..."
 	@$(MAKE) check-prerequisites
 	@$(MAKE) install-dependencies
 	@$(MAKE) setup-environment
 	@$(MAKE) verify-setup
-	@echo "✅ Setup completed successfully"
+	@echo "Setup completed successfully"
 
-test: ## 🧪 Run all tests
-	@echo "🧪 Running tests in $(BUILD_ENV) mode..."
+test: ## Run all tests
+	@echo "Running tests in $(BUILD_ENV) mode..."
 	@$(MAKE) install-dependencies
 ifeq ($(CI),true)
 	@$(MAKE) test-comprehensive
 else
 	@$(MAKE) test-fast
 endif
-	@echo "✅ All tests completed successfully"
+	@echo "All tests completed successfully"
 
-build: ## 🔨 Build application
-	@echo "🔨 Building $(APP_NAME) for $(BUILD_ENV)..."
+build: ## Build application
+	@echo "Building $(APP_NAME) for $(BUILD_ENV)..."
 	@$(MAKE) install-dependencies
 	@$(MAKE) compile-application
 	@$(MAKE) build-container
 	@$(MAKE) verify-build
-	@echo "✅ Build completed: $(IMAGE_TAG)"
+	@echo "Build completed: $(IMAGE_TAG)"
 
-deploy: build test ## 🚀 Deploy application
-	@echo "🚀 Deploying $(APP_NAME) from $(BUILD_ENV)..."
+deploy: build test ## Deploy application
+	@echo "Deploying $(APP_NAME) from $(BUILD_ENV)..."
 	@$(MAKE) verify-deployment-ready
 ifeq ($(CI),true)
 	@$(MAKE) deploy-from-ci
@@ -523,14 +523,14 @@ else
 	@$(MAKE) deploy-from-local
 endif
 	@$(MAKE) verify-deployment
-	@echo "✅ Deployment completed successfully"
+	@echo "Deployment completed successfully"
 
-clean: ## 🧹 Clean up resources
-	@echo "🧹 Cleaning up $(APP_NAME) resources..."
+clean: ## Clean up resources
+	@echo "Cleaning up $(APP_NAME) resources..."
 	@$(MAKE) clean-containers
 	@$(MAKE) clean-artifacts
 	@$(MAKE) clean-test-results
-	@echo "✅ Cleanup completed"
+	@echo "Cleanup completed"
 
 # =============================================================================
 # Implementation Targets
@@ -539,11 +539,11 @@ clean: ## 🧹 Clean up resources
 check-prerequisites: # implementation
 	@echo "Checking prerequisites..."
 	@command -v node >/dev/null || \
-		(echo "❌ Node.js required" && exit 1)
+		(echo "Node.js required" && exit 1)
 	@command -v docker >/dev/null || \
-		(echo "❌ Docker required" && exit 1)
+		(echo "Docker required" && exit 1)
 	@command -v kubectl >/dev/null || \
-		(echo "❌ kubectl required" && exit 1)
+		(echo "kubectl required" && exit 1)
 
 install-dependencies: # implementation
 ifeq ($(CI),true)
@@ -595,9 +595,9 @@ verify-build: # implementation
 verify-deployment-ready: # implementation
 	@echo "Verifying deployment readiness..."
 	@test -n "$(VERSION)" || \
-		(echo "❌ VERSION not set" && exit 1)
+		(echo "VERSION not set" && exit 1)
 	docker inspect $(IMAGE_TAG) >/dev/null || \
-		(echo "❌ Image not found: $(IMAGE_TAG)" && exit 1)
+		(echo "Image not found: $(IMAGE_TAG)" && exit 1)
 
 deploy-from-local: # implementation
 	@echo "Deploying from local environment..."
@@ -642,17 +642,17 @@ clean-test-results: # implementation
 # Utility Targets
 # =============================================================================
 
-status: ## 📊 Show deployment status  
-	@echo "📊 $(APP_NAME) Status:"
+status: ## Show deployment status  
+	@echo "$(APP_NAME) Status:"
 	@kubectl get pods,services -l app=$(APP_NAME)
 
-logs: ## 📋 Show application logs
+logs: ## Show application logs
 	@kubectl logs -f deployment/$(APP_NAME) --tail=100
 
-shell: ## 🐚 Get shell in running container
+shell: ## Get shell in running container
 	@kubectl exec -it deployment/$(APP_NAME) -- /bin/bash
 
-info: ## ℹ️ Show build information
+info: ## ℹShow build information
 	@echo "Application: $(APP_NAME)"
 	@echo "Version: $(VERSION)"  
 	@echo "Environment: $(BUILD_ENV)"
