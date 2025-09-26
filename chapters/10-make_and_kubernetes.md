@@ -85,7 +85,7 @@ generate-manifests: ##  Generate Kubernetes manifests
 generate-deployment: ## Generate deployment manifest
 	@echo "Generating deployment manifest..."
 	@envsubst < $(TEMPLATES_DIR)/deployment.yaml.template > $(MANIFESTS_DIR)/deployment.yaml
-	@echo "  Deployment: $(REPLICAS) replicas, $(IMAGE_TAG)"
+	@echo " Deployment: $(REPLICAS) replicas, $(IMAGE_TAG)"
 
 generate-service: ## Generate service manifest
 	@echo "Generating service manifest..."
@@ -657,19 +657,19 @@ status: ##  Show deployment status
 	@echo "================================================="
 	@echo ""
 	@echo "Namespace:"
-	@kubectl get namespace $(NAMESPACE) 2>/dev/null || echo "  Namespace not found"
+	@kubectl get namespace $(NAMESPACE) 2>/dev/null || echo " Namespace not found"
 	@echo ""
 	@echo "Deployments:"
-	@kubectl get deployments -n $(NAMESPACE) -o wide 2>/dev/null || echo "  No deployments found"
+	@kubectl get deployments -n $(NAMESPACE) -o wide 2>/dev/null || echo " No deployments found"
 	@echo ""
 	@echo "Pods:"
-	@kubectl get pods -n $(NAMESPACE) -o wide 2>/dev/null || echo "  No pods found"
+	@kubectl get pods -n $(NAMESPACE) -o wide 2>/dev/null || echo " No pods found"
 	@echo ""
 	@echo "Services:"
-	@kubectl get services -n $(NAMESPACE) 2>/dev/null || echo "  No services found"
+	@kubectl get services -n $(NAMESPACE) 2>/dev/null || echo " No services found"
 	@echo ""
 	@echo "Ingress:"
-	@kubectl get ingress -n $(NAMESPACE) 2>/dev/null || echo "  No ingress found"
+	@kubectl get ingress -n $(NAMESPACE) 2>/dev/null || echo " No ingress found"
 
 logs: ##  Show application logs
 	@echo " Showing logs for $(APP_NAME) in $(ENVIRONMENT)..."

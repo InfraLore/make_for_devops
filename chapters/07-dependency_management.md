@@ -181,7 +181,7 @@ deploy-production: validate-production-readiness backup-production lint build te
 
 # Production-specific validations
 validate-production-readiness: validate-version validate-changelog validate-approval
-	@echo "  Production deployment validated"
+	@echo " Production deployment validated"
 
 backup-production:
 	kubectl exec deployment/database -- pg_dump myapp > backups/pre-deploy-$(shell date +%Y%m%d-%H%M%S).sql
@@ -215,7 +215,7 @@ k8s/deployment.yaml: k8s/deployment.yaml.template config/$(ENVIRONMENT).env
 
 # Configuration files trigger rebuilds
 config/$(ENVIRONMENT).env: config/$(ENVIRONMENT).env.template
-	@echo "    Configuration template updated. Please review config/$(ENVIRONMENT).env"
+	@echo " Configuration template updated. Please review config/$(ENVIRONMENT).env"
 	@cp config/$(ENVIRONMENT).env.template config/$(ENVIRONMENT).env
 ```
 
@@ -295,7 +295,7 @@ Some dependencies can only be determined at runtime:
 
 # Determine what needs to be deployed based on what's changed
 deploy-changed: $(shell $(MAKE) -s detect-changes)
-	@echo "  Deployed all changed components"
+	@echo " Deployed all changed components"
 
 # Detect what components have changed
 detect-changes:
@@ -345,18 +345,18 @@ check-deployment-state:
 
 # Different deployment strategies based on current state
 deploy-fresh: build test push
-	@echo "  Fresh deployment"
+	@echo " Fresh deployment"
 	kubectl apply -f k8s/
 	kubectl wait --for=condition=available deployment/$(APP_NAME) --timeout=300s
 
 deploy-scale-up: push
-	@echo "  Scaling up existing deployment"
+	@echo " Scaling up existing deployment"
 	kubectl scale deployment/$(APP_NAME) --replicas=3
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
 	kubectl wait --for=condition=available deployment/$(APP_NAME) --timeout=300s
 
 deploy-update: build test push
-	@echo "  Rolling update"
+	@echo " Rolling update"
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s
 ```
@@ -408,7 +408,7 @@ Make automatically identifies opportunities for parallel execution:
 
 # These can all run in parallel (no interdependencies)
 all-checks: lint security-scan type-check format-check license-check
-	@echo "  All checks completed"
+	@echo " All checks completed"
 
 # Run with: make -j4 all-checks
 lint:
@@ -460,19 +460,19 @@ test-all-services: ## Test all services (high parallelism)
 
 # Mixed workload (balanced parallelism)
 ci-pipeline: ## Complete CI pipeline with optimal parallelism
-	@echo "  Starting CI pipeline..."
+	@echo " Starting CI pipeline..."
 	@$(MAKE) -j4 lint security-scan type-check format-check
 	@$(MAKE) -j2 build-api-image build-frontend-image
 	@$(MAKE) -j4 test-unit test-integration test-e2e
-	@echo "  CI pipeline completed"
+	@echo " CI pipeline completed"
 
 # Resource-constrained environments
 ci-pipeline-resource-constrained:
-	@echo "  Starting resource-constrained CI pipeline..."
+	@echo " Starting resource-constrained CI pipeline..."
 	@$(MAKE) lint security-scan  # Sequential
 	@$(MAKE) build-api-image     # Sequential
 	@$(MAKE) test-unit test-integration  # Limited parallel
-	@echo "  Resource-constrained CI pipeline completed"
+	@echo " Resource-constrained CI pipeline completed"
 ```
 
 ### Parallel Deployment Strategies
@@ -489,19 +489,19 @@ deploy-multi-env: ## Deploy to dev, staging, and test in parallel
 	@$(MAKE) -j3 deploy-to-dev deploy-to-staging deploy-to-test
 
 deploy-to-dev:
-	@echo "  Deploying to development..."
+	@echo " Deploying to development..."
 	@ENVIRONMENT=development $(MAKE) deploy
-	@echo "  Development deployment complete"
+	@echo " Development deployment complete"
 
 deploy-to-staging:
-	@echo "  Deploying to staging..."
+	@echo " Deploying to staging..."
 	@ENVIRONMENT=staging $(MAKE) deploy
-	@echo "  Staging deployment complete"
+	@echo " Staging deployment complete"
 
 deploy-to-test:
-	@echo "  Deploying to test..."
+	@echo " Deploying to test..."
 	@ENVIRONMENT=test $(MAKE) deploy
-	@echo "  Test deployment complete"
+	@echo " Test deployment complete"
 
 # Deploy microservices in parallel (with dependency management)
 deploy-microservices: deploy-shared-services deploy-application-services
@@ -530,26 +530,26 @@ Handle failures gracefully with recovery mechanisms:
 deploy-with-rollback: backup-current-state deploy-new-version || rollback-on-failure
 
 backup-current-state:
-	@echo "  Creating backup of current state..."
+	@echo " Creating backup of current state..."
 	kubectl get deployment $(APP_NAME) -o yaml > backups/deployment-backup-$(shell date +%Y%m%d-%H%M%S).yaml
 	@touch .backup-created
 
 deploy-new-version: build test push
-	@echo "  Deploying new version..."
+	@echo " Deploying new version..."
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s
-	@$(MAKE) verify-deployment || (echo "  Deployment verification failed" && exit 1)
+	@$(MAKE) verify-deployment || (echo " Deployment verification failed" && exit 1)
 
 rollback-on-failure:
-	@echo "  Rolling back due to deployment failure..."
+	@echo " Rolling back due to deployment failure..."
 	kubectl rollout undo deployment/$(APP_NAME)
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s
-	@echo "  Rollback completed"
+	@echo " Rollback completed"
 
 verify-deployment:
-	@echo "  Verifying deployment..."
+	@echo " Verifying deployment..."
 	@timeout 60 bash -c 'until curl -f http://$(APP_NAME).example.com/health; do sleep 5; done'
-	@echo "  Deployment verified"
+	@echo " Deployment verified"
 ```
 
 ### Partial Completion Handling
@@ -565,21 +565,21 @@ Handle scenarios where some operations succeed and others fail:
 deploy-resilient: deploy-critical-components deploy-optional-components
 
 deploy-critical-components:
-	@echo "  Deploying critical components..."
+	@echo " Deploying critical components..."
 	@$(MAKE) deploy-database || exit 1
 	@$(MAKE) deploy-api || exit 1
-	@echo "  Critical components deployed"
+	@echo " Critical components deployed"
 
 deploy-optional-components:
-	@echo "  Deploying optional components..."
-	@$(MAKE) deploy-monitoring || echo "   Monitoring deployment failed, continuing..."
-	@$(MAKE) deploy-analytics || echo "   Analytics deployment failed, continuing..."
-	@$(MAKE) deploy-logging || echo "   Logging deployment failed, continuing..."
-	@echo "  Optional components deployment attempted"
+	@echo " Deploying optional components..."
+	@$(MAKE) deploy-monitoring || echo " Monitoring deployment failed, continuing..."
+	@$(MAKE) deploy-analytics || echo " Analytics deployment failed, continuing..."
+	@$(MAKE) deploy-logging || echo " Logging deployment failed, continuing..."
+	@echo " Optional components deployment attempted"
 
 # Track partial completion state
 deploy-with-state-tracking:
-	@echo "  Starting deployment with state tracking..."
+	@echo " Starting deployment with state tracking..."
 	@rm -f .deploy-state-*
 	@$(MAKE) deploy-database && touch .deploy-state-database || true
 	@$(MAKE) deploy-api && touch .deploy-state-api || true
@@ -587,22 +587,22 @@ deploy-with-state-tracking:
 	@$(MAKE) check-deployment-completeness
 
 check-deployment-completeness:
-	@echo "  Checking deployment completeness..."
+	@echo " Checking deployment completeness..."
 	@FAILED=""; \
 	[ -f .deploy-state-database ] || FAILED="$$FAILED database"; \
 	[ -f .deploy-state-api ] || FAILED="$$FAILED api"; \
 	[ -f .deploy-state-frontend ] || FAILED="$$FAILED frontend"; \
 	if [ -n "$$FAILED" ]; then \
-		echo "  Failed components:$$FAILED"; \
-		echo "  Run 'make deploy-failed-components' to retry failed components"; \
+		echo " Failed components:$$FAILED"; \
+		echo " Run 'make deploy-failed-components' to retry failed components"; \
 		exit 1; \
 	else \
-		echo "  All components deployed successfully"; \
+		echo " All components deployed successfully"; \
 		rm -f .deploy-state-*; \
 	fi
 
 deploy-failed-components:
-	@echo "  Retrying failed components..."
+	@echo " Retrying failed components..."
 	@[ -f .deploy-state-database ] || $(MAKE) deploy-database
 	@[ -f .deploy-state-api ] || $(MAKE) deploy-api
 	@[ -f .deploy-state-frontend ] || $(MAKE) deploy-frontend
@@ -623,19 +623,19 @@ deploy-protected: check-circuit-breaker deploy-with-monitoring
 check-circuit-breaker:
 	@if [ -f .circuit-breaker-open ]; then \
 		echo " Circuit breaker is open due to recent failures"; \
-		echo "  Last opened: $$(stat -c %y .circuit-breaker-open)"; \
-		echo "  Run 'make reset-circuit-breaker' to manually reset"; \
+		echo " Last opened: $$(stat -c %y .circuit-breaker-open)"; \
+		echo " Run 'make reset-circuit-breaker' to manually reset"; \
 		exit 1; \
 	fi
 
 deploy-with-monitoring: build test push
-	@echo "  Deploying with failure monitoring..."
+	@echo " Deploying with failure monitoring..."
 	@START_TIME=$$(date +%s); \
 	if kubectl apply -f k8s/ && $(MAKE) verify-deployment-health; then \
-		echo "  Deployment successful"; \
+		echo " Deployment successful"; \
 		rm -f .circuit-breaker-open .deploy-failure-count; \
 	else \
-		echo "  Deployment failed"; \
+		echo " Deployment failed"; \
 		$(MAKE) increment-failure-count; \
 		$(MAKE) check-failure-threshold; \
 		exit 1; \
@@ -645,32 +645,32 @@ increment-failure-count:
 	@COUNT=$$(cat .deploy-failure-count 2>/dev/null || echo 0); \
 	COUNT=$$((COUNT + 1)); \
 	echo $$COUNT > .deploy-failure-count; \
-	echo "  Deployment failure count: $$COUNT"
+	echo " Deployment failure count: $$COUNT"
 
 check-failure-threshold:
 	@COUNT=$$(cat .deploy-failure-count 2>/dev/null || echo 0); \
 	if [ $$COUNT -ge 3 ]; then \
 		echo " Failure threshold reached, opening circuit breaker"; \
 		touch .circuit-breaker-open; \
-		echo "  Circuit breaker opened at $$(date)"; \
+		echo " Circuit breaker opened at $$(date)"; \
 	fi
 
 reset-circuit-breaker: ## Reset deployment circuit breaker
-	@echo "  Resetting circuit breaker..."
+	@echo " Resetting circuit breaker..."
 	@rm -f .circuit-breaker-open .deploy-failure-count
-	@echo "  Circuit breaker reset"
+	@echo " Circuit breaker reset"
 
 verify-deployment-health:
-	@echo "  Verifying deployment health..."
+	@echo " Verifying deployment health..."
 	@for i in $$(seq 1 10); do \
 		if curl -sf http://$(APP_NAME).example.com/health; then \
-			echo "  Health check passed"; \
+			echo " Health check passed"; \
 			exit 0; \
 		fi; \
-		echo "  Health check failed, attempt $$i/10"; \
+		echo " Health check failed, attempt $$i/10"; \
 		sleep 10; \
 	done; \
-	echo "  Health check failed after 10 attempts"; \
+	echo " Health check failed after 10 attempts"; \
 	exit 1
 ```
 
@@ -698,19 +698,19 @@ deploy: validate-$(ENVIRONMENT) build test push
 	kubectl apply -f k8s/$(ENVIRONMENT)/
 
 validate-development:
-	@echo "  Development validation (minimal)"
+	@echo " Development validation (minimal)"
 
 validate-staging:
 	@$(MAKE) validate-development
 	@$(MAKE) check-staging-resources
-	@echo "  Staging validation complete"
+	@echo " Staging validation complete"
 
 validate-production:
 	@$(MAKE) validate-staging
 	@$(MAKE) security-audit
 	@$(MAKE) backup-database
 	@$(MAKE) notify-deployment-start
-	@echo "  Production validation complete"
+	@echo " Production validation complete"
 ```
 
 ### Pattern Rules for Scalable Dependencies
@@ -736,7 +736,7 @@ deploy-to-%: validate-% build test push
 # Pattern rule for database migrations
 migrate-%-db: backup-%-db
 	kubectl exec deployment/$*-db -- /usr/local/bin/migrate-up.sh
-	@echo "  $* database migrated"
+	@echo " $* database migrated"
 
 # Use the patterns
 deploy-all-services: deploy-user-service deploy-order-service deploy-payment-service deploy-notification-service

@@ -134,7 +134,7 @@ Add checkmake validation to your Makefile:
 lint-makefile: ## Validate Makefile syntax and style
 	@echo "Linting Makefile..."
 	checkmake Makefile
-	@echo "  Makefile passes all checks"
+	@echo " Makefile passes all checks"
 
 # Include in CI pipeline
 ci-test: lint-makefile test-targets
@@ -174,7 +174,7 @@ test-syntax: ## Test all targets for syntax errors
 		echo "Testing $$target..."; \
 		make -n $$target >/dev/null || (echo "FAIL: $$target has syntax errors" && exit 1); \
 	done
-	@echo "  All targets pass syntax validation"
+	@echo " All targets pass syntax validation"
 
 # Define testable targets
 TARGETS := build test deploy clean setup
@@ -184,7 +184,7 @@ test-dependencies: ## Validate target dependency chains
 	@echo "Testing dependency resolution..."
 	@make -n deploy | grep -q "make.*test" || (echo "FAIL: deploy should depend on test" && exit 1)
 	@make -n deploy | grep -q "make.*build" || (echo "FAIL: deploy should depend on build" && exit 1)
-	@echo "  Dependency chains are correct"
+	@echo " Dependency chains are correct"
 
 # Test variable expansion
 test-variables: ## Test variable expansion and substitution
@@ -192,7 +192,7 @@ test-variables: ## Test variable expansion and substitution
 	@test -n "$(VERSION)" || (echo "FAIL: VERSION not defined" && exit 1)
 	@test -n "$(ENVIRONMENT)" || (echo "FAIL: ENVIRONMENT not defined" && exit 1)
 	@make -n deploy | grep -q "$(VERSION)" || (echo "FAIL: VERSION not expanded in deploy" && exit 1)
-	@echo "  Variable expansion works correctly"
+	@echo " Variable expansion works correctly"
 ```
 
 ### Validating Command Generation
@@ -206,7 +206,7 @@ test-deploy-commands:
 	@COMMANDS=$$(make -n deploy 2>/dev/null | grep kubectl); \
 	echo "$$COMMANDS" | grep -q "kubectl apply" || (echo "FAIL: Missing kubectl apply" && exit 1); \
 	echo "$$COMMANDS" | grep -q "namespace $(NAMESPACE)" || (echo "FAIL: Missing namespace" && exit 1); \
-	echo "  Deploy generates correct commands"
+	echo " Deploy generates correct commands"
 
 # Test environment-specific command generation
 test-environment-commands:
@@ -215,7 +215,7 @@ test-environment-commands:
 		COMMANDS=$$(ENVIRONMENT=$$env make -n deploy 2>/dev/null); \
 		echo "$$COMMANDS" | grep -q "$$env" || (echo "FAIL: Environment $$env not in commands" && exit 1); \
 	done
-	@echo "  Environment-specific commands work correctly"
+	@echo " Environment-specific commands work correctly"
 ```
 
 ## Common Testing Patterns and Strategies
@@ -241,7 +241,7 @@ test-build: ## Unit test for build target
 	
 	# Cleanup
 	@docker rmi myapp:test-* >/dev/null 2>&1 || true
-	@echo "  Build target unit test passed"
+	@echo " Build target unit test passed"
 
 test-database-setup: ## Unit test for database setup
 	@echo "Unit testing database setup..."
@@ -256,7 +256,7 @@ test-database-setup: ## Unit test for database setup
 	
 	# Cleanup
 	@make db-stop >/dev/null 2>&1
-	@echo "  Database setup unit test passed"
+	@echo " Database setup unit test passed"
 ```
 
 ### Integration Testing Target Chains
@@ -282,7 +282,7 @@ test-full-deployment-chain: ## Integration test for complete deployment
 	
 	# Cleanup
 	@make clean-deployment ENVIRONMENT=test >/dev/null 2>&1 || true
-	@echo "  Full deployment chain integration test passed"
+	@echo " Full deployment chain integration test passed"
 
 test-development-workflow: ## Integration test for development workflow
 	@echo "Integration testing development workflow..."
@@ -297,7 +297,7 @@ test-development-workflow: ## Integration test for development workflow
 	curl -f http://localhost:8080/health || (kill $$DEV_PID; echo "FAIL: Dev server not responding" && exit 1); \
 	kill $$DEV_PID
 	
-	@echo "  Development workflow integration test passed"
+	@echo " Development workflow integration test passed"
 ```
 
 ### Testing Variable Interpolation
@@ -323,7 +323,7 @@ test-variable-interpolation: ## Test variable expansion and defaults
 	@COMPUTED_VERSION=$$(make -n build | grep -o 'VERSION=[^[:space:]]*' | cut -d= -f2); \
 	test -n "$$COMPUTED_VERSION" || (echo "FAIL: VERSION not computed" && exit 1)
 	
-	@echo "  Variable interpolation tests passed"
+	@echo " Variable interpolation tests passed"
 
 # Test complex variable scenarios
 test-variable-edge-cases: ## Test edge cases in variable handling
@@ -338,7 +338,7 @@ test-variable-edge-cases: ## Test edge cases in variable handling
 	# Test variable precedence
 	@ENV_VAR=from_env make -n test-precedence MAKE_VAR=from_make | grep -q "from_make" || (echo "FAIL: Make variables should override environment" && exit 1)
 	
-	@echo "  Variable edge case tests passed"
+	@echo " Variable edge case tests passed"
 ```
 
 ### Testing Conditional Logic
@@ -363,7 +363,7 @@ test-conditional-logic: ## Test conditional execution paths
 		Linux) make -n setup | grep -q "apt\|yum" || (echo "FAIL: Linux logic not working" && exit 1) ;; \
 	esac
 	
-	@echo "  Conditional logic tests passed"
+	@echo " Conditional logic tests passed"
 
 # Test file-based conditionals
 test-file-conditionals: ## Test conditional logic based on file existence
@@ -377,7 +377,7 @@ test-file-conditionals: ## Test conditional logic based on file existence
 	# Test behavior when config files don't exist
 	@make -n setup | grep -q "creating.*config" || (echo "FAIL: Should create missing config" && exit 1)
 	
-	@echo "  File conditional tests passed"
+	@echo " File conditional tests passed"
 ```
 
 ## Validation Tools and Frameworks
@@ -412,7 +412,7 @@ test-make-internals: ## Test Make's internal variable and rule database
 	@make -p | grep -q "^build:" || (echo "FAIL: build rule missing" && exit 1)
 	@make -p | grep -q "^deploy:" || (echo "FAIL: deploy rule missing" && exit 1)
 	
-	@echo "  Make internals test passed"
+	@echo " Make internals test passed"
 ```
 
 ### Shellcheck Integration for Shell Commands
@@ -428,7 +428,7 @@ test-shell-commands: ## Validate shell commands with shellcheck
 	@shellcheck -x .makefile-commands.sh || (echo "FAIL: Shell command issues found" && exit 1)
 	@rm .makefile-commands.sh
 	
-	@echo "  Shell commands validation passed"
+	@echo " Shell commands validation passed"
 
 # Test specific shell patterns
 test-shell-patterns: ## Test common shell patterns in Make targets
@@ -441,7 +441,7 @@ test-shell-patterns: ## Test common shell patterns in Make targets
 	# Test that safe patterns are used
 	@grep -q 'set -e' Makefile || echo "WARNING: Consider using 'set -e' in shell commands"
 	
-	@echo "  Shell pattern tests passed"
+	@echo " Shell pattern tests passed"
 ```
 
 ### Custom Validation Scripts
@@ -461,10 +461,10 @@ FAILED_TESTS=()
 cleanup() {
     rm -rf "$TEMP_DIR"
     if [ ${#FAILED_TESTS[@]} -gt 0 ]; then
-        echo "  Failed tests: ${FAILED_TESTS[*]}"
+        echo " Failed tests: ${FAILED_TESTS[*]}"
         exit 1
     else
-        echo "  All Makefile validations passed"
+        echo " All Makefile validations passed"
     fi
 }
 
@@ -474,9 +474,9 @@ test_syntax() {
     echo "Testing Makefile syntax..."
     if ! make -f "$MAKEFILE" -n help >/dev/null 2>&1; then
         FAILED_TESTS+=("syntax")
-        echo "  Syntax test failed"
+        echo " Syntax test failed"
     else
-        echo "  Syntax test passed"
+        echo " Syntax test passed"
     fi
 }
 
@@ -487,12 +487,12 @@ test_required_targets() {
     for target in "${REQUIRED_TARGETS[@]}"; do
         if ! make -f "$MAKEFILE" -n "$target" >/dev/null 2>&1; then
             FAILED_TESTS+=("required-target-$target")
-            echo "  Required target '$target' missing or invalid"
+            echo " Required target '$target' missing or invalid"
         fi
     done
     
     if [[ ! " ${FAILED_TESTS[*]} " =~ required-target ]]; then
-        echo "  Required targets test passed"
+        echo " Required targets test passed"
     fi
 }
 
@@ -505,9 +505,9 @@ test_phony_declarations() {
     
     if [ -n "$MISSING_PHONY" ]; then
         FAILED_TESTS+=("phony")
-        echo "  Missing .PHONY declarations for: $MISSING_PHONY"
+        echo " Missing .PHONY declarations for: $MISSING_PHONY"
     else
-        echo "  .PHONY declarations test passed"
+        echo " .PHONY declarations test passed"
     fi
 }
 
@@ -515,9 +515,9 @@ test_help_system() {
     echo "Testing help system..."
     if ! make -f "$MAKEFILE" help | grep -q "Available\|Commands\|Usage"; then
         FAILED_TESTS+=("help-system")
-        echo "  Help system test failed"
+        echo " Help system test failed"
     else
-        echo "  Help system test passed"
+        echo " Help system test passed"
     fi
 }
 
@@ -541,7 +541,7 @@ self-validate: ## Self-validate this Makefile
 	@$(MAKE) test-syntax
 	@$(MAKE) test-variables
 	@$(MAKE) test-dependencies
-	@echo "  All validations passed"
+	@echo " All validations passed"
 ```
 
 ## Continuous Testing of Makefiles in CI Pipelines
@@ -692,7 +692,7 @@ deploy-prod: ## Deploy to production
 deploy-test: ## Deploy with mocked kubectl
 	@echo "MOCK: kubectl apply -f k8s/production/"
 	@echo "MOCK: kubectl rollout status deployment/myapp"
-	@echo "  Mock deployment successful"
+	@echo " Mock deployment successful"
 
 # Conditional mocking based on environment
 deploy: 
@@ -729,7 +729,7 @@ test-env-vars: ## Test environment variable handling
 	# Test variable validation
 	@ENVIRONMENT=invalid $(MAKE) validate-environment 2>&1 | grep -q "invalid" || (echo "FAIL: Should reject invalid environment" && exit 1)
 	
-	@echo "  Environment variable tests passed"
+	@echo " Environment variable tests passed"
 
 check-required-env:
 	@test -n "$(ENV_TEST)" || (echo "ENV_TEST is required" && exit 1)
@@ -768,7 +768,7 @@ test-file-dependencies: ## Test file-based dependency logic
 	
 	# Cleanup
 	@rm -rf test-deps
-	@echo "  File dependency tests passed"
+	@echo " File dependency tests passed"
 
 test-target: test-deps/target.txt
 
@@ -798,7 +798,7 @@ performance-test: ## Test Makefile performance
 	@echo "Testing dependency resolution..."
 	@time make -n complex-target >/dev/null
 	
-	@echo "  Performance tests completed"
+	@echo " Performance tests completed"
 
 show-all-vars:
 	@echo "VERSION: $(VERSION)"
@@ -831,12 +831,12 @@ Putting it all together, here's how to create a comprehensive test suite for you
 
 # Main test target
 test: ## Run standard test suite
-	@echo "  Running Makefile test suite..."
+	@echo " Running Makefile test suite..."
 	@$(MAKE) test-syntax
 	@$(MAKE) test-lint
 	@$(MAKE) test-variables
 	@$(MAKE) test-dependencies
-	@echo "  All standard tests passed!"
+	@echo " All standard tests passed!"
 
 # Comprehensive test suite
 test-all: ## Run comprehensive test suite
@@ -850,36 +850,36 @@ test-all: ## Run comprehensive test suite
 	@$(MAKE) test-shell-commands
 	@$(MAKE) test-file-dependencies
 	@$(MAKE) performance-test
-	@echo "  All comprehensive tests passed!"
+	@echo " All comprehensive tests passed!"
 
 # Fast smoke test for development
 test-quick: ## Quick smoke test
 	@echo " Running quick tests..."
 	@$(MAKE) test-syntax
 	@$(MAKE) test-lint
-	@echo "  Quick tests passed!"
+	@echo " Quick tests passed!"
 
 # Test in CI environment
 test-ci: ## Run tests suitable for CI environment
-	@echo "  Running CI test suite..."
+	@echo " Running CI test suite..."
 	@$(MAKE) test-syntax
 	@$(MAKE) test-lint
 	@$(MAKE) test-variables
 	@$(MAKE) test-dependencies
 	@$(MAKE) test-shell-commands
-	@echo "  CI tests passed!"
+	@echo " CI tests passed!"
 
 # Test specific aspects
 test-syntax: ## Test Makefile syntax
 	@echo "Testing syntax..."
-	@make -n help >/dev/null 2>&1 || (echo "  Syntax errors found" && exit 1)
-	@echo "  Syntax test passed"
+	@make -n help >/dev/null 2>&1 || (echo " Syntax errors found" && exit 1)
+	@echo " Syntax test passed"
 
 test-lint: ## Lint Makefile with checkmake
 	@echo "Linting Makefile..."
-	@command -v checkmake >/dev/null || (echo "   checkmake not installed, skipping lint" && exit 0)
+	@command -v checkmake >/dev/null || (echo " checkmake not installed, skipping lint" && exit 0)
 	@checkmake Makefile
-	@echo "  Lint test passed"
+	@echo " Lint test passed"
 
 # Generate test report
 test-report: ## Generate comprehensive test report
@@ -896,26 +896,26 @@ test-report: ## Generate comprehensive test report
 	@echo "- Total targets: $(grep -c '^[a-zA-Z][a-zA-Z0-9_-]*:' Makefile)" >> test-report.md
 	@echo "- Phony targets: $(grep -c '\.PHONY:' Makefile)" >> test-report.md
 	@echo "- Variables defined: $(grep -c '^[A-Z_][A-Z0-9_]* [?:]=' Makefile)" >> test-report.md
-	@echo "  Test report generated: test-report.md"
+	@echo " Test report generated: test-report.md"
 
 # Watch for changes and re-test
 test-watch: ## Watch for Makefile changes and re-test
 	@echo " Watching for Makefile changes..."
 	@while true; do \
 		inotifywait -q -e modify Makefile 2>/dev/null || sleep 1; \
-		echo "  Makefile changed, running tests..."; \
-		$(MAKE) test-quick || echo "  Tests failed"; \
+		echo " Makefile changed, running tests..."; \
+		$(MAKE) test-quick || echo " Tests failed"; \
 		echo "---"; \
 	done
 
 # Clean up test artifacts
 test-clean: ## Clean up test artifacts
-	@echo "  Cleaning up test artifacts..."
+	@echo " Cleaning up test artifacts..."
 	@rm -f test-report.md
 	@rm -f makefile-violations.txt
 	@rm -f .makefile-commands.sh
 	@rm -rf test-deps/
-	@echo "  Test cleanup complete"
+	@echo " Test cleanup complete"
 ```
 
 ## Advanced Testing Strategies
@@ -934,15 +934,15 @@ test-property-phony-no-files: ## Test that phony targets don't create files
 		BEFORE=$(find . -name "$target" 2>/dev/null | wc -l); \
 		$(MAKE) -n $target >/dev/null 2>&1 || continue; \
 		AFTER=$(find . -name "$target" 2>/dev/null | wc -l); \
-		test $BEFORE -eq $AFTER || (echo "  Phony target $target might create files" && exit 1); \
+		test $BEFORE -eq $AFTER || (echo " Phony target $target might create files" && exit 1); \
 	done
-	@echo "  Phony targets property test passed"
+	@echo " Phony targets property test passed"
 
 # Property: All targets with prerequisites should fail if prerequisites fail
 test-property-dependency-failure-propagation: ## Test that dependency failures propagate
 	@echo "Testing property: dependency failures propagate..."
 	@echo "This would involve creating failing mock dependencies and ensuring targets fail appropriately"
-	@echo "  Dependency failure propagation test passed"
+	@echo " Dependency failure propagation test passed"
 
 # Property: Variable expansion should be consistent
 test-property-variable-consistency: ## Test that variables expand consistently
@@ -950,9 +950,9 @@ test-property-variable-consistency: ## Test that variables expand consistently
 	@for var in VERSION ENVIRONMENT REGISTRY; do \
 		VALUE1=$(make -s -n deploy | grep "$var=" | head -1 | cut -d= -f2); \
 		VALUE2=$(make -s -n build | grep "$var=" | head -1 | cut -d= -f2); \
-		test "$VALUE1" = "$VALUE2" || echo "    Variable $var has inconsistent values"; \
+		test "$VALUE1" = "$VALUE2" || echo " Variable $var has inconsistent values"; \
 	done
-	@echo "  Variable consistency test passed"
+	@echo " Variable consistency test passed"
 ```
 
 ### Fuzzing Make Targets
@@ -965,18 +965,18 @@ test-fuzz-inputs: ## Fuzz test targets with various inputs
 	@echo "Fuzzing target inputs..."
 	
 	# Test with empty variables
-	@ENVIRONMENT="" VERSION="" $(MAKE) -n deploy 2>&1 | grep -q "error\|fail\|empty" && echo "  Correctly rejects empty vars" || echo "   May not validate empty vars"
+	@ENVIRONMENT="" VERSION="" $(MAKE) -n deploy 2>&1 | grep -q "error\|fail\|empty" && echo " Correctly rejects empty vars" || echo " May not validate empty vars"
 	
 	# Test with malformed variables
-	@ENVIRONMENT="test/../../../etc" $(MAKE) -n deploy 2>&1 | grep -q "error\|invalid" && echo "  Rejects path traversal" || echo "   May allow path traversal"
+	@ENVIRONMENT="test/../../../etc" $(MAKE) -n deploy 2>&1 | grep -q "error\|invalid" && echo " Rejects path traversal" || echo " May allow path traversal"
 	
 	# Test with special characters
-	@ENVIRONMENT='$(rm -rf /)' $(MAKE) -n deploy 2>&1 | grep -q "error\|invalid" && echo "  Rejects command injection" || echo "   May allow command injection"
+	@ENVIRONMENT='$(rm -rf /)' $(MAKE) -n deploy 2>&1 | grep -q "error\|invalid" && echo " Rejects command injection" || echo " May allow command injection"
 	
 	# Test with very long inputs
-	@LONG_STRING=$(printf 'a%.0s' {1..1000}); ENVIRONMENT="$LONG_STRING" $(MAKE) -n deploy >/dev/null 2>&1 && echo "   Accepts very long input" || echo "  Rejects very long input"
+	@LONG_STRING=$(printf 'a%.0s' {1..1000}); ENVIRONMENT="$LONG_STRING" $(MAKE) -n deploy >/dev/null 2>&1 && echo " Accepts very long input" || echo " Rejects very long input"
 	
-	@echo "  Fuzz testing completed"
+	@echo " Fuzz testing completed"
 ```
 
 ### Regression Testing
@@ -992,25 +992,25 @@ create-test-baseline: ## Create baseline for regression testing
 	@make -n build > test-baselines/build-output.txt
 	@make -n test > test-baselines/test-output.txt
 	@make help > test-baselines/help-output.txt
-	@echo "  Baselines created"
+	@echo " Baselines created"
 
 # Compare current output with baseline
 test-regression: ## Run regression tests against baseline
 	@echo "Running regression tests..."
-	@test -d test-baselines || (echo "  No baselines found. Run 'make create-test-baseline' first" && exit 1)
+	@test -d test-baselines || (echo " No baselines found. Run 'make create-test-baseline' first" && exit 1)
 	
 	@for target in deploy build test; do \
 		echo "Testing $target regression..."; \
 		make -n $target > test-baselines/$target-current.txt; \
 		if ! diff -u test-baselines/$target-output.txt test-baselines/$target-current.txt > test-baselines/$target-diff.txt; then \
-			echo "    Regression detected in $target (see test-baselines/$target-diff.txt)"; \
+			echo " Regression detected in $target (see test-baselines/$target-diff.txt)"; \
 		else \
-			echo "  No regression in $target"; \
+			echo " No regression in $target"; \
 			rm test-baselines/$target-current.txt test-baselines/$target-diff.txt; \
 		fi; \
 	done
 	
-	@echo "  Regression testing completed"
+	@echo " Regression testing completed"
 ```
 
 ### Testing Documentation and Help Systems
@@ -1022,24 +1022,24 @@ test-documentation: ## Test documentation and help systems
 	@echo "Testing documentation systems..."
 	
 	# Test that help target works
-	@$(MAKE) help | grep -q "Available\|Commands\|Usage" || (echo "  Help system not working" && exit 1)
+	@$(MAKE) help | grep -q "Available\|Commands\|Usage" || (echo " Help system not working" && exit 1)
 	
 	# Test that all documented targets actually exist
 	@DOCUMENTED_TARGETS=$($(MAKE) help | grep -E '^\s+[a-z]' | awk '{print $1}'); \
 	for target in $DOCUMENTED_TARGETS; do \
-		$(MAKE) -n $target >/dev/null 2>&1 || (echo "  Documented target $target doesn't exist" && exit 1); \
+		$(MAKE) -n $target >/dev/null 2>&1 || (echo " Documented target $target doesn't exist" && exit 1); \
 	done
 	
 	# Test that all major targets are documented
 	@MAJOR_TARGETS="build test deploy clean setup"; \
 	for target in $MAJOR_TARGETS; do \
-		$(MAKE) help | grep -q "$target" || echo "   Target $target not documented in help"; \
+		$(MAKE) help | grep -q "$target" || echo " Target $target not documented in help"; \
 	done
 	
 	# Test help formatting
-	@$(MAKE) help | grep -E '^[[:space:]]+[a-z-]+[[:space:]]+' >/dev/null || (echo "  Help formatting issues" && exit 1)
+	@$(MAKE) help | grep -E '^[[:space:]]+[a-z-]+[[:space:]]+' >/dev/null || (echo " Help formatting issues" && exit 1)
 	
-	@echo "  Documentation tests passed"
+	@echo " Documentation tests passed"
 
 # Test that examples in documentation work
 test-documentation-examples: ## Test that code examples in comments work
@@ -1049,10 +1049,10 @@ test-documentation-examples: ## Test that code examples in comments work
 	@grep -n '# Example:' Makefile | while IFS=':' read -r line_num comment; do \
 		example=$(echo "$comment" | sed 's/.*Example: *//'); \
 		echo "Testing example: $example"; \
-		eval "$example" >/dev/null 2>&1 || echo "   Example on line $line_num may not work: $example"; \
+		eval "$example" >/dev/null 2>&1 || echo " Example on line $line_num may not work: $example"; \
 	done
 	
-	@echo "  Documentation examples test completed"
+	@echo " Documentation examples test completed"
 ```
 
 ## Integration with Development Workflow
@@ -1062,21 +1062,21 @@ Make your testing part of the natural development workflow:
 ```makefile
 # Pre-commit hook target
 pre-commit: test-quick ## Run quick tests before commit
-	@echo "  Running pre-commit checks..."
+	@echo " Running pre-commit checks..."
 	@$(MAKE) test-syntax
 	@$(MAKE) test-lint
 	@git add -A && git status --porcelain | grep -q '^M.*Makefile' && $(MAKE) test-variables || true
-	@echo "  Pre-commit checks passed"
+	@echo " Pre-commit checks passed"
 
 # Pre-push hook target
 pre-push: test ## Run full tests before push
-	@echo "  Running pre-push checks..."
+	@echo " Running pre-push checks..."
 	@$(MAKE) test
-	@echo "  Pre-push checks passed"
+	@echo " Pre-push checks passed"
 
 # Development feedback loop
 dev-test: ## Continuous testing during development
-	@echo "  Starting development test loop..."
+	@echo " Starting development test loop..."
 	@$(MAKE) test-syntax
 	@echo "Syntax   - Ready for development"
 	@echo "Run 'make test-watch' to monitor changes"
@@ -1090,7 +1090,7 @@ install-hooks: ## Install git hooks for automatic testing
 	@echo '#!/bin/bash' > .git/hooks/pre-push
 	@echo 'make pre-push' >> .git/hooks/pre-push
 	@chmod +x .git/hooks/pre-push
-	@echo "  Git hooks installed"
+	@echo " Git hooks installed"
 ```
 
 ## Key Takeaways

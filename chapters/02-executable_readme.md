@@ -198,17 +198,17 @@ Make targets should provide clear, actionable feedback:
 ```makefile
 # Good: Informative and helpful
 setup:
-	@echo "  Setting up MyApp development environment"
+	@echo " Setting up MyApp development environment"
 	@echo "Checking prerequisites..."
 	@command -v node >/dev/null && \
-		echo "  Node.js found" || \
-		(echo "  Node.js required" && exit 1)
+		echo " Node.js found" || \
+		(echo " Node.js required" && exit 1)
 	@command -v docker >/dev/null && \
-		echo "  Docker found" || \
-		(echo "  Docker required" && exit 1)
+		echo " Docker found" || \
+		(echo " Docker required" && exit 1)
 	@echo "Installing dependencies..."
 	npm install --silent
-	@echo "  Setup complete! Try 'make dev' to start development."
+	@echo " Setup complete! Try 'make dev' to start development."
 
 # Bad: Silent or confusing
 setup:
@@ -241,7 +241,7 @@ setup: ##   Set up development environment
 	@$(MAKE) check-prerequisites
 	@$(MAKE) install-dependencies
 	@$(MAKE) start-database
-	@echo "  Setup complete! Run 'make dev' to start."
+	@echo " Setup complete! Run 'make dev' to start."
 
 dev: ##  Start development environment
 	# ... implementation
@@ -282,19 +282,19 @@ help: ##   Show available commands
 	@echo "MyApp Development Commands"
 	@echo "========================="
 	@echo
-	@echo "  Getting Started:"
+	@echo " Getting Started:"
 		@awk '/^##@ Getting Started/,/^##@ / { \
 			if(/^[a-zA-Z_-]+:.*##/) \
 				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
 		}' $(MAKEFILE_LIST)
 		@echo
-		@echo "  Development:"
+		@echo " Development:"
 		@awk '/^##@ Development/,/^##@ / { \
 			if(/^[a-zA-Z_-]+:.*##/) \
 				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
 		}' $(MAKEFILE_LIST)
 		@echo
-		@echo "  Deployment:"
+		@echo " Deployment:"
 		@awk '/^##@ Deployment/,/^##@ / { \
 			if(/^[a-zA-Z_-]+:.*##/) \
 				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
@@ -529,7 +529,7 @@ setup: ##   Complete project setup
 	@$(MAKE) create-env-file
 	@$(MAKE) install-dependencies
 	@$(MAKE) setup-database
-	@echo "  Setup complete! Run 'make dev' to start development."
+	@echo " Setup complete! Run 'make dev' to start development."
 
 setup-system: ##   Install system requirements (Node.js, Python)
 	@echo "Installing system requirements..."
@@ -551,14 +551,14 @@ dev: ##  Start development environment
 	python app.py & \
 	npm start & \
 	python worker.py & \
-	echo "  All services started. Press Ctrl+C to stop."; \
+	echo " All services started. Press Ctrl+C to stop."; \
 	wait
 
 test: ##   Run all tests
 	@echo "Running LegacyApp test suite..."
 	@$(MAKE) test-backend
 	@$(MAKE) test-frontend
-	@echo "  All tests passed!"
+	@echo " All tests passed!"
 
 test-backend: ##  Run Python tests
 	pytest -v
@@ -572,7 +572,7 @@ build: ##   Build Docker image
 	@echo "Building $(IMAGE_NAME):$(VERSION)..."
 	docker build -t $(IMAGE_NAME):$(VERSION) .
 	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo "  Build complete"
+	@echo " Build complete"
 
 deploy: build test ##   Deploy to staging
 	@echo "Deploying $(APP_NAME) version $(VERSION)..."
@@ -580,19 +580,19 @@ deploy: build test ##   Deploy to staging
 	kubectl apply -f k8s/
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_NAME):$(VERSION)
 	kubectl rollout status deployment/$(APP_NAME)
-	@echo "  Deployment complete!"
+	@echo " Deployment complete!"
 
 ##@ Utilities
 
 check-system-requirements: ##   Verify system requirements
 	@echo "Checking system requirements..."
 	@command -v node >/dev/null || \
-		(echo "  Node.js required. Run 'make setup-system'" && exit 1)
+		(echo " Node.js required. Run 'make setup-system'" && exit 1)
 	@command -v python3 >/dev/null || \
-		(echo "  Python 3 required. Run 'make setup-system'" && exit 1)
+		(echo " Python 3 required. Run 'make setup-system'" && exit 1)
 	@command -v docker >/dev/null || \
-		(echo "  Docker required. Please install Docker." && exit 1)
-	@echo "  All system requirements met"
+		(echo " Docker required. Please install Docker." && exit 1)
+	@echo " All system requirements met"
 
 create-env-file: ##  Create .env configuration file
 	@if [ ! -f .env ]; then \
@@ -600,7 +600,7 @@ create-env-file: ##  Create .env configuration file
 		echo "DATABASE_URL=$(DATABASE_URL)" > .env; \
 		echo "SECRET_KEY=$$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" >> .env; \
 		echo "API_KEY=your-api-key-here" >> .env; \
-		echo "    Please edit .env and set your API_KEY"; \
+		echo " Please edit .env and set your API_KEY"; \
 	else \
 		echo ".env file already exists"; \
 	fi
@@ -609,7 +609,7 @@ install-dependencies: ##   Install all dependencies
 	@echo "Installing dependencies..."
 	npm install --silent
 	pip install -r requirements.txt --quiet
-	@echo "  Dependencies installed"
+	@echo " Dependencies installed"
 
 setup-database: ##    Set up development database
 	@echo "Setting up database..."
@@ -617,7 +617,7 @@ setup-database: ##    Set up development database
 	@echo "Waiting for database to be ready..."
 	@timeout 30 bash -c 'until docker exec legacyapp-db pg_isready -U legacyapp; do sleep 1; done'
 	python manage.py migrate
-	@echo "  Database ready"
+	@echo " Database ready"
 
 start-database: ## ▶  Start PostgreSQL database
 	@docker run -d --name legacyapp-db \
@@ -634,15 +634,15 @@ config-help: ##   Show configuration help
 	@echo "LegacyApp Configuration"
 	@echo "====================="
 	@echo "Environment variables (set in .env file):"
-	@echo "  DATABASE_URL  - PostgreSQL connection string"
-	@echo "  SECRET_KEY    - Application secret (auto-generated)"
-	@echo "  API_KEY       - External service API key (required)"
+	@echo " DATABASE_URL  - PostgreSQL connection string"
+	@echo " SECRET_KEY    - Application secret (auto-generated)"
+	@echo " API_KEY       - External service API key (required)"
 	@echo ""
 	@echo "Current configuration:"
-	@echo "  DATABASE_URL: $(DATABASE_URL)"
-	@echo "  SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | \
+	@echo " DATABASE_URL: $(DATABASE_URL)"
+	@echo " SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | \
 sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
-	@echo "  API_KEY: $$(test -f .env && grep API_KEY .env | cut -d= -f2 | \
+	@echo " API_KEY: $$(test -f .env && grep API_KEY .env | cut -d= -f2 | \
 sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
 
 clean: ##   Clean up development environment
@@ -650,7 +650,7 @@ clean: ##   Clean up development environment
 	-docker stop legacyapp-db
 	-docker rm legacyapp-db
 	-docker rmi $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo "  Cleanup complete"
+	@echo " Cleanup complete"
 
 logs: ##   Show application logs (in Kubernetes)
 	kubectl logs -f deployment/$(APP_NAME)

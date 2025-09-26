@@ -77,10 +77,10 @@ deploy-production:
 
 # Use a pattern rule:
 deploy-%: validate-% ## Deploy to specified environment
-	@echo "  Deploying to $* environment..."
+	@echo " Deploying to $* environment..."
 	kubectl apply -f k8s/base/ -f k8s/overlays/$*/
 	kubectl rollout status deployment/$(APP_NAME) -n $(APP_NAME)-$* --timeout=300s
-	@echo "  Deployment to $* completed"
+	@echo " Deployment to $* completed"
 
 # Now you can use: make deploy-development, make deploy-staging, make deploy-production
 ```
@@ -98,11 +98,11 @@ Create sophisticated environment-aware workflows:
 
 # Validation patterns for different environments
 validate-development: ## Minimal validation for development
-	@echo "  Development validation (minimal checks)"
-	@command -v kubectl >/dev/null || (echo "  kubectl required" && exit 1)
+	@echo " Development validation (minimal checks)"
+	@command -v kubectl >/dev/null || (echo " kubectl required" && exit 1)
 
 validate-staging: validate-development ## Enhanced validation for staging
-	@echo "  Staging validation (enhanced checks)"
+	@echo " Staging validation (enhanced checks)"
 	@$(MAKE) check-staging-resources
 	@$(MAKE) validate-staging-data
 
@@ -114,23 +114,23 @@ validate-production: validate-staging ## Maximum validation for production
 
 # Pattern rule that uses environment-specific validation
 deploy-%: validate-% build test push
-	@echo "  Deploying $(APP_NAME) to $* environment"
+	@echo " Deploying $(APP_NAME) to $* environment"
 	kubectl config use-context $*-cluster
 	kubectl apply -f k8s/base/ -f k8s/overlays/$*/
 	kubectl rollout status deployment/$(APP_NAME) -n $(APP_NAME)-$* --timeout=300s
-	@$(MAKE) post-deploy-$* 2>/dev/null || echo "   No post-deployment tasks for $*"
+	@$(MAKE) post-deploy-$* 2>/dev/null || echo " No post-deployment tasks for $*"
 
 # Pattern rule for post-deployment tasks
 post-deploy-%:
-	@echo "  Running post-deployment tasks for $*..."
+	@echo " Running post-deployment tasks for $*..."
 
 # Specific post-deployment implementations
 post-deploy-staging: ## Run staging-specific post-deployment tasks
-	@echo "  Running staging smoke tests..."
+	@echo " Running staging smoke tests..."
 	@$(MAKE) smoke-test ENVIRONMENT=staging
 
 post-deploy-production: ## Run production-specific post-deployment tasks
-	@echo "  Running production health checks..."
+	@echo " Running production health checks..."
 	@$(MAKE) health-check ENVIRONMENT=production
 	@$(MAKE) notify-deployment-success ENVIRONMENT=production
 ```
@@ -146,25 +146,25 @@ Handle multiple services with consistent patterns:
 
 # Pattern rule for building service Docker images
 build-%-service: ## Build Docker image for specified service
-	@echo "  Building $* service..."
-	@test -d services/$* || (echo "  Service $* not found" && exit 1)
+	@echo " Building $* service..."
+	@test -d services/$* || (echo " Service $* not found" && exit 1)
 	docker build -t $(REGISTRY)/$*-service:$(VERSION) services/$*/
 	docker tag $(REGISTRY)/$*-service:$(VERSION) $(REGISTRY)/$*-service:latest
-	@echo "  $* service built"
+	@echo " $* service built"
 
 # Pattern rule for testing services
 test-%-service: build-%-service ## Run tests for specified service
-	@echo "  Testing $* service..."
+	@echo " Testing $* service..."
 	docker run --rm $(REGISTRY)/$*-service:$(VERSION) pytest tests/
-	@echo "  $* service tests passed"
+	@echo " $* service tests passed"
 
 # Pattern rule for deploying services
 deploy-%-service: test-%-service ## Deploy specified service
-	@echo "  Deploying $* service..."
+	@echo " Deploying $* service..."
 	docker push $(REGISTRY)/$*-service:$(VERSION)
 	kubectl apply -f k8s/$*-service/
 	kubectl rollout status deployment/$*-service --timeout=300s
-	@echo "  $* service deployed"
+	@echo " $* service deployed"
 
 # Pattern rule for service logs
 logs-%-service: ## Show logs for specified service
@@ -194,30 +194,30 @@ Handle database migrations across multiple databases:
 
 # Pattern rule for database migrations
 migrate-%-up: backup-%-db ## Run migrations up for specified database
-	@echo "  Migrating $* database up..."
+	@echo " Migrating $* database up..."
 	kubectl exec deployment/$*-db -- /app/migrate -database $(DATABASE_$*_URL) -path /migrations up
-	@echo "  $* database migrated up"
+	@echo " $* database migrated up"
 
 migrate-%-down: backup-%-db ## Run migrations down for specified database  
 	@echo " Migrating $* database down..."
-	@echo "   This will roll back the last migration. Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo " This will roll back the last migration. Continue? [y/N]" && read ans && [ $$ans = y ]
 	kubectl exec deployment/$*-db -- /app/migrate -database $(DATABASE_$*_URL) -path /migrations down 1
-	@echo "  $* database migrated down"
+	@echo " $* database migrated down"
 
 # Pattern rule for database backups
 backup-%-db: ## Create backup for specified database
-	@echo "  Backing up $* database..."
+	@echo " Backing up $* database..."
 	@mkdir -p backups/$*
 	kubectl exec deployment/$*-db -- pg_dump $(DATABASE_$*_NAME) | gzip > backups/$*/backup-$(shell date +%Y%m%d-%H%M%S).sql.gz
-	@echo "  $* database backup created"
+	@echo " $* database backup created"
 
 # Pattern rule for database restore
 restore-%-db: ## Restore specified database from backup
-	@echo "  Restoring $* database..."
-	@echo "   This will overwrite the current database. Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo " Restoring $* database..."
+	@echo " This will overwrite the current database. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@ls -la backups/$*/ && echo -n "Enter backup filename: " && read backup
 	@zcat backups/$*/$$backup | kubectl exec -i deployment/$*-db -- psql $(DATABASE_$*_NAME)
-	@echo "  $* database restored"
+	@echo " $* database restored"
 
 # Database-specific URLs (could also come from external config)
 DATABASE_USER_URL = postgresql://user:password@user-db:5432/userdb
@@ -246,39 +246,39 @@ Recursive Make allows you to coordinate multiple related projects:
 
 # Coordinate builds across all projects
 build-all: ## Build all projects
-	@echo "  Building all projects..."
+	@echo " Building all projects..."
 	@$(MAKE) -C services/api build
 	@$(MAKE) -C services/frontend build
 	@$(MAKE) -C services/worker build
 	@$(MAKE) -C infrastructure plan
-	@echo "  All projects built"
+	@echo " All projects built"
 
 # Test all projects
 test-all: ## Test all projects
-	@echo "  Testing all projects..."
+	@echo " Testing all projects..."
 	@$(MAKE) -C services/api test
 	@$(MAKE) -C services/frontend test  
 	@$(MAKE) -C services/worker test
-	@echo "  All projects tested"
+	@echo " All projects tested"
 
 # Deploy all projects in correct order
 deploy-all: ## Deploy all projects
-	@echo "  Deploying all projects..."
+	@echo " Deploying all projects..."
 	@$(MAKE) -C infrastructure apply
 	@sleep 10  # Wait for infrastructure
 	@$(MAKE) -C services/api deploy
 	@$(MAKE) -C services/worker deploy
 	@$(MAKE) -C services/frontend deploy
-	@echo "  All projects deployed"
+	@echo " All projects deployed"
 
 # Clean all projects
 clean-all: ## Clean all projects
-	@echo "  Cleaning all projects..."
+	@echo " Cleaning all projects..."
 	@$(MAKE) -C services/api clean
 	@$(MAKE) -C services/frontend clean
 	@$(MAKE) -C services/worker clean
 	@$(MAKE) -C infrastructure destroy
-	@echo "  All projects cleaned"
+	@echo " All projects cleaned"
 ```
 
 ### Parallel Recursive Make
@@ -296,40 +296,40 @@ INFRASTRUCTURE = infrastructure
 
 # Build services in parallel (they're independent)
 build-services: ## Build all services in parallel
-	@echo "  Building services in parallel..."
+	@echo " Building services in parallel..."
 	@$(MAKE) -j3 $(SERVICES:%=build-%)
-	@echo "  All services built"
+	@echo " All services built"
 
 # Pattern rule for building individual services
 build-services/%: ## Build specific service
-	@echo "  Building $*..."
+	@echo " Building $*..."
 	@$(MAKE) -C $* build
 
 # Test services in parallel
 test-services: ## Test all services in parallel
-	@echo "  Testing services in parallel..."
+	@echo " Testing services in parallel..."
 	@$(MAKE) -j3 $(SERVICES:%=test-%)
-	@echo "  All services tested"
+	@echo " All services tested"
 
 # Pattern rule for testing individual services
 test-services/%: ## Test specific service
-	@echo "  Testing $*..."
+	@echo " Testing $*..."
 	@$(MAKE) -C $* test
 
 # Sequential deployment (infrastructure first, then services)
 deploy-orchestrated: ## Deploy with proper sequencing
-	@echo "  Orchestrated deployment..."
+	@echo " Orchestrated deployment..."
 	@$(MAKE) -C $(INFRASTRUCTURE) apply
-	@echo "  Waiting for infrastructure to be ready..."
+	@echo " Waiting for infrastructure to be ready..."
 	@sleep 30
 	@$(MAKE) build-services
 	@$(MAKE) test-services
 	@$(MAKE) -j3 $(SERVICES:%=deploy-%)
-	@echo "  Orchestrated deployment completed"
+	@echo " Orchestrated deployment completed"
 
 # Pattern rule for deploying individual services
 deploy-services/%: ## Deploy specific service
-	@echo "  Deploying $*..."
+	@echo " Deploying $*..."
 	@$(MAKE) -C $* deploy
 ```
 
@@ -353,7 +353,7 @@ include common.mk
 
 # Recursive targets with shared configuration
 build-with-config: ## Build all with shared configuration
-	@echo "  Building with shared config: $(APP_NAME) v$(VERSION)"
+	@echo " Building with shared config: $(APP_NAME) v$(VERSION)"
 	@for dir in $(SERVICES); do \
 		echo "Building $$dir..."; \
 		$(MAKE) -C $$dir build VERSION=$(VERSION) REGISTRY=$(REGISTRY); \
@@ -361,14 +361,14 @@ build-with-config: ## Build all with shared configuration
 
 # Pass specific variables to child Makes
 deploy-with-environment: ## Deploy all with environment configuration
-	@echo "  Deploying to $(ENVIRONMENT)..."
+	@echo " Deploying to $(ENVIRONMENT)..."
 	@for dir in $(SERVICES); do \
 		$(MAKE) -C $$dir deploy ENVIRONMENT=$(ENVIRONMENT) VERSION=$(VERSION); \
 	done
 
 # Collect results from child Makes
 status-all: ## Show status of all projects
-	@echo "  Status Summary:"
+	@echo " Status Summary:"
 	@for dir in $(SERVICES); do \
 		echo "=== $$dir ==="; \
 		$(MAKE) -C $$dir status 2>/dev/null || echo "No status target"; \
@@ -387,44 +387,44 @@ Handle failures gracefully across multiple projects:
 
 # Continue on error for non-critical operations
 test-all-continue: ## Test all projects, continue on failure
-	@echo "  Testing all projects (continue on failure)..."
+	@echo " Testing all projects (continue on failure)..."
 	@FAILED=""; \
 	for dir in $(SERVICES); do \
 		echo "Testing $$dir..."; \
 		if ! $(MAKE) -C $$dir test; then \
-			echo "  $$dir tests failed"; \
+			echo " $$dir tests failed"; \
 			FAILED="$$FAILED $$dir"; \
 		else \
-			echo "  $$dir tests passed"; \
+			echo " $$dir tests passed"; \
 		fi; \
 	done; \
 	if [ -n "$$FAILED" ]; then \
-		echo "   Failed projects:$$FAILED"; \
+		echo " Failed projects:$$FAILED"; \
 		exit 1; \
 	fi
 
 # Fail fast for critical operations
 deploy-fail-fast: ## Deploy all projects, fail on first error
-	@echo "  Deploying all projects (fail fast)..."
+	@echo " Deploying all projects (fail fast)..."
 	@set -e; \
 	for dir in $(SERVICES); do \
 		echo "Deploying $$dir..."; \
 		$(MAKE) -C $$dir deploy || exit 1; \
-		echo "  $$dir deployed successfully"; \
+		echo " $$dir deployed successfully"; \
 	done; \
-	echo "  All deployments successful"
+	echo " All deployments successful"
 
 # Rollback on partial failure
 deploy-with-rollback: ## Deploy all with rollback on failure
-	@echo "  Deploying with rollback capability..."
+	@echo " Deploying with rollback capability..."
 	@DEPLOYED=""; \
 	for dir in $(SERVICES); do \
 		echo "Deploying $$dir..."; \
 		if $(MAKE) -C $$dir deploy; then \
-			echo "  $$dir deployed"; \
+			echo " $$dir deployed"; \
 			DEPLOYED="$$DEPLOYED $$dir"; \
 		else \
-			echo "  $$dir deployment failed, rolling back..."; \
+			echo " $$dir deployment failed, rolling back..."; \
 			for rollback_dir in $$DEPLOYED; do \
 				echo "Rolling back $$rollback_dir..."; \
 				$(MAKE) -C $$rollback_dir rollback || true; \
@@ -432,7 +432,7 @@ deploy-with-rollback: ## Deploy all with rollback on failure
 			exit 1; \
 		fi; \
 	done; \
-	echo "  All deployments successful"
+	echo " All deployments successful"
 ```
 
 ## Integration with External Tools and APIs
@@ -448,18 +448,18 @@ Integrate with REST APIs and webhooks:
 
 # Notify deployment start/end via API
 notify-deployment-start: ## Notify deployment start
-	@echo "  Notifying deployment start..."
+	@echo " Notifying deployment start..."
 	@curl -X POST $(WEBHOOK_URL)/deployment/start \
 		-H "Content-Type: application/json" \
 		-d '{"app":"$(APP_NAME)","version":"$(VERSION)","environment":"$(ENVIRONMENT)","timestamp":"$(shell date -Iseconds)"}' \
-		|| echo "   Failed to notify deployment start"
+		|| echo " Failed to notify deployment start"
 
 notify-deployment-success: ## Notify deployment success
-	@echo "  Notifying deployment success..."
+	@echo " Notifying deployment success..."
 	@curl -X POST $(WEBHOOK_URL)/deployment/success \
 		-H "Content-Type: application/json" \
 		-d '{"app":"$(APP_NAME)","version":"$(VERSION)","environment":"$(ENVIRONMENT)","timestamp":"$(shell date -Iseconds)"}' \
-		|| echo "   Failed to notify deployment success"
+		|| echo " Failed to notify deployment success"
 
 # Get configuration from API
 fetch-config-from-api: ## Fetch configuration from API
@@ -467,20 +467,20 @@ fetch-config-from-api: ## Fetch configuration from API
 	@curl -s -H "Authorization: Bearer $(API_TOKEN)" \
 		$(CONFIG_API_URL)/config/$(APP_NAME)/$(ENVIRONMENT) \
 		| jq -r 'to_entries[] | "\(.key)=\(.value)"' > .env.api
-	@echo "  Configuration fetched"
+	@echo " Configuration fetched"
 
 # Deploy with API integration
 deploy-with-api: notify-deployment-start fetch-config-from-api deploy notify-deployment-success ## Full deployment with API integration
 
 # Check API health before deployment
 check-api-health: ## Check external API health
-	@echo "  Checking API health..."
+	@echo " Checking API health..."
 	@HEALTH=$$(curl -s $(API_BASE_URL)/health | jq -r '.status'); \
 	if [ "$$HEALTH" != "healthy" ]; then \
-		echo "  API is not healthy: $$HEALTH"; \
+		echo " API is not healthy: $$HEALTH"; \
 		exit 1; \
 	fi; \
-	echo "  API is healthy"
+	echo " API is healthy"
 ```
 
 ### Cloud Provider Integration
@@ -494,55 +494,55 @@ Integrate with cloud provider APIs:
 
 # AWS integration
 setup-aws-resources: ## Set up AWS resources
-	@echo "   Setting up AWS resources..."
+	@echo " Setting up AWS resources..."
 	@aws s3 mb s3://$(APP_NAME)-$(ENVIRONMENT)-storage || true
 	@aws secretsmanager create-secret \
 		--name $(APP_NAME)-$(ENVIRONMENT)-secrets \
 		--description "Secrets for $(APP_NAME) $(ENVIRONMENT)" \
 		--secret-string file://secrets.json || true
-	@echo "  AWS resources set up"
+	@echo " AWS resources set up"
 
 fetch-aws-secrets: ## Fetch secrets from AWS Secrets Manager
-	@echo "  Fetching secrets from AWS..."
+	@echo " Fetching secrets from AWS..."
 	@aws secretsmanager get-secret-value \
 		--secret-id $(APP_NAME)-$(ENVIRONMENT)-secrets \
 		--query SecretString --output text > .secrets.json
-	@echo "  Secrets fetched"
+	@echo " Secrets fetched"
 
 # Google Cloud integration
 setup-gcp-resources: ## Set up Google Cloud resources
-	@echo "   Setting up GCP resources..."
+	@echo " Setting up GCP resources..."
 	@gcloud storage buckets create gs://$(APP_NAME)-$(ENVIRONMENT)-storage \
 		--location=us-central1 || true
 	@gcloud secrets create $(APP_NAME)-$(ENVIRONMENT)-secrets \
 		--data-file=secrets.json || true
-	@echo "  GCP resources set up"
+	@echo " GCP resources set up"
 
 fetch-gcp-secrets: ## Fetch secrets from Google Secret Manager
-	@echo "  Fetching secrets from GCP..."
+	@echo " Fetching secrets from GCP..."
 	@gcloud secrets versions access latest \
 		--secret=$(APP_NAME)-$(ENVIRONMENT)-secrets > .secrets.json
-	@echo "  Secrets fetched"
+	@echo " Secrets fetched"
 
 # Multi-cloud deployment
 deploy-multicloud: ## Deploy to multiple cloud providers
-	@echo "  Multi-cloud deployment..."
+	@echo " Multi-cloud deployment..."
 	@$(MAKE) deploy-aws &
 	@$(MAKE) deploy-gcp &
 	@$(MAKE) deploy-azure &
 	@wait
-	@echo "  Multi-cloud deployment completed"
+	@echo " Multi-cloud deployment completed"
 
 deploy-aws: setup-aws-resources fetch-aws-secrets
-	@echo "  Deploying to AWS..."
+	@echo " Deploying to AWS..."
 	@CLOUD_PROVIDER=aws $(MAKE) deploy
 
 deploy-gcp: setup-gcp-resources fetch-gcp-secrets
-	@echo "  Deploying to GCP..."
+	@echo " Deploying to GCP..."
 	@CLOUD_PROVIDER=gcp $(MAKE) deploy
 
 deploy-azure: setup-azure-resources fetch-azure-secrets
-	@echo "  Deploying to Azure..."
+	@echo " Deploying to Azure..."
 	@CLOUD_PROVIDER=azure $(MAKE) deploy
 ```
 
@@ -557,21 +557,21 @@ Orchestrate complex tool chains:
 
 # Security tool chain
 security-pipeline: ## Run complete security pipeline
-	@echo "  Running security pipeline..."
+	@echo " Running security pipeline..."
 	@$(MAKE) security-lint
 	@$(MAKE) dependency-scan  
 	@$(MAKE) container-scan
 	@$(MAKE) secrets-scan
 	@$(MAKE) compliance-check
-	@echo "  Security pipeline completed"
+	@echo " Security pipeline completed"
 
 security-lint: ## Run security linting
-	@echo "  Security linting..."
+	@echo " Security linting..."
 	@bandit -r src/ -f json -o security-lint.json || true
 	@semgrep --config=auto src/ --json -o semgrep.json || true
 
 dependency-scan: ## Scan dependencies for vulnerabilities  
-	@echo "  Scanning dependencies..."
+	@echo " Scanning dependencies..."
 	@safety check --json --output safety.json || true
 	@npm audit --json > npm-audit.json || true
 
@@ -581,16 +581,16 @@ container-scan: build ## Scan container for vulnerabilities
 	@grype $(IMAGE_TAG) -o json > grype.json || true
 
 secrets-scan: ## Scan for secrets in code
-	@echo "  Scanning for secrets..."
+	@echo " Scanning for secrets..."
 	@gitleaks detect --source . --format json --report-path gitleaks.json || true
 
 compliance-check: ## Check compliance requirements
-	@echo "  Checking compliance..."
+	@echo " Checking compliance..."
 	@inspec exec compliance-profile/ --reporter json:compliance.json || true
 
 # Generate security report
 security-report: security-pipeline ## Generate security report
-	@echo "  Generating security report..."
+	@echo " Generating security report..."
 	@python scripts/generate-security-report.py \
 		--bandit security-lint.json \
 		--safety safety.json \
@@ -598,7 +598,7 @@ security-report: security-pipeline ## Generate security report
 		--gitleaks gitleaks.json \
 		--compliance compliance.json \
 		--output security-report.html
-	@echo "  Security report generated: security-report.html"
+	@echo " Security report generated: security-report.html"
 ```
 
 ## Conditional Execution Based on System State
@@ -627,33 +627,33 @@ detect-deployment-state: ## Detect current deployment state
 # Deploy based on current state
 deploy-smart: ## Deploy based on current system state
 	@STATE=$$($(MAKE) -s detect-deployment-state); \
-	echo "  Current state: $$STATE"; \
+	echo " Current state: $$STATE"; \
 	case $$STATE in \
 		fresh) $(MAKE) deploy-fresh ;; \
 		scaled-down) $(MAKE) deploy-scale-up ;; \
 		unhealthy) $(MAKE) deploy-heal ;; \
 		healthy) $(MAKE) deploy-update ;; \
-		*) echo "  Unknown state: $$STATE" && exit 1 ;; \
+		*) echo " Unknown state: $$STATE" && exit 1 ;; \
 	esac
 
 deploy-fresh: ## Fresh deployment
-	@echo "  Fresh deployment..."
+	@echo " Fresh deployment..."
 	@$(MAKE) build test push
 	kubectl apply -f k8s/
 	kubectl wait --for=condition=available deployment/$(APP_NAME) --timeout=300s
 
 deploy-scale-up: ## Scale up existing deployment
-	@echo "  Scaling up deployment..."
+	@echo " Scaling up deployment..."
 	kubectl scale deployment $(APP_NAME) --replicas=3
 	kubectl wait --for=condition=available deployment/$(APP_NAME) --timeout=300s
 
 deploy-heal: ## Heal unhealthy deployment
-	@echo "  Healing unhealthy deployment..."
+	@echo " Healing unhealthy deployment..."
 	kubectl rollout restart deployment/$(APP_NAME)
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s
 
 deploy-update: ## Update healthy deployment
-	@echo "  Updating healthy deployment..."
+	@echo " Updating healthy deployment..."
 	@$(MAKE) build test push
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s
@@ -678,22 +678,22 @@ deploy-by-branch: ## Deploy based on current Git branch
 		release/*) $(MAKE) deploy-staging ;; \
 		feature/*) $(MAKE) deploy-feature ;; \
 		hotfix/*) $(MAKE) deploy-hotfix ;; \
-		*) echo "   No deployment strategy for branch: $$BRANCH" ;; \
+		*) echo " No deployment strategy for branch: $$BRANCH" ;; \
 	esac
 
 # Check if working directory is clean
 check-git-clean: ## Ensure working directory is clean
 	@if [ -n "$$(git status --porcelain)" ]; then \
-		echo "  Working directory is not clean:"; \
+		echo " Working directory is not clean:"; \
 		git status --short; \
-		echo "  Commit or stash changes before deployment"; \
+		echo " Commit or stash changes before deployment"; \
 		exit 1; \
 	fi; \
-	echo "  Working directory is clean"
+	echo " Working directory is clean"
 
 # Deploy only if tests pass and branch is clean
 deploy-safe: check-git-clean ## Safe deployment with Git checks
-	@echo "  Safe deployment with Git validation..."
+	@echo " Safe deployment with Git validation..."
 	@$(MAKE) test
 	@$(MAKE) deploy-by-branch
 
@@ -701,16 +701,16 @@ deploy-safe: check-git-clean ## Safe deployment with Git checks
 create-release: ## Create release based on Git state
 	@BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
 	if [ "$$BRANCH" != "main" ] && [ "$$BRANCH" != "master" ]; then \
-		echo "  Releases must be created from main branch"; \
+		echo " Releases must be created from main branch"; \
 		exit 1; \
 	fi; \
 	VERSION=$$(git describe --tags --abbrev=0 | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'); \
-	echo "   Creating release: $$VERSION"; \
+	echo " Creating release: $$VERSION"; \
 	git tag $$VERSION; \
 	$(MAKE) build VERSION=$$VERSION; \
 	$(MAKE) test VERSION=$$VERSION; \
 	$(MAKE) package VERSION=$$VERSION; \
-	echo "  Release $$VERSION created"
+	echo " Release $$VERSION created"
 ```
 
 ### Resource-Based Conditional Execution
@@ -735,20 +735,20 @@ build-adaptive: ## Build with adaptive parallelism
 	CPU=$$(echo $$RESOURCES | grep -o 'cpu=[0-9]*' | cut -d= -f2); \
 	MEMORY=$$(echo $$RESOURCES | grep -o 'memory=[0-9]*' | cut -d= -f2); \
 	if [ $$CPU -ge 8 ] && [ $$MEMORY -ge 16 ]; then \
-		echo "  High-resource build (parallel)"; \
+		echo " High-resource build (parallel)"; \
 		$(MAKE) -j$$CPU build-parallel; \
 	elif [ $$CPU -ge 4 ] && [ $$MEMORY -ge 8 ]; then \
 		echo " Medium-resource build"; \
 		$(MAKE) -j4 build-standard; \
 	else \
-		echo "  Low-resource build (sequential)"; \
+		echo " Low-resource build (sequential)"; \
 		$(MAKE) build-sequential; \
 	fi
 
 # CI pipeline adaptation based on environment
 ci-pipeline-adaptive: ## Adaptive CI pipeline
 	@if [ -n "$$CI" ]; then \
-		echo "  CI environment detected"; \
+		echo " CI environment detected"; \
 		$(MAKE) ci-pipeline-optimized; \
 	else \
 		echo " Local environment detected"; \
@@ -765,7 +765,7 @@ ci-pipeline-local: ## Local CI pipeline (resource-conscious)
 	@$(MAKE) lint
 	@$(MAKE) build  
 	@$(MAKE) test-unit
-	@echo "   Skipping resource-intensive tests in local mode"
+	@echo " Skipping resource-intensive tests in local mode"
 ```
 
 ## Creating Extensible Workflow Frameworks
@@ -781,37 +781,37 @@ Create extensible workflows that teams can customize:
 
 # Core framework targets
 framework-build: ## Framework: build application
-	@echo "  Framework build starting..."
+	@echo " Framework build starting..."
 	@$(MAKE) pre-build-hooks
 	@$(MAKE) core-build
 	@$(MAKE) post-build-hooks
-	@echo "  Framework build completed"
+	@echo " Framework build completed"
 
 framework-test: ## Framework: test application
-	@echo "  Framework test starting..."
+	@echo " Framework test starting..."
 	@$(MAKE) pre-test-hooks
 	@$(MAKE) core-test  
 	@$(MAKE) post-test-hooks
-	@echo "  Framework test completed"
+	@echo " Framework test completed"
 
 framework-deploy: ## Framework: deploy application
-	@echo "  Framework deploy starting..."
+	@echo " Framework deploy starting..."
 	@$(MAKE) pre-deploy-hooks
 	@$(MAKE) core-deploy
 	@$(MAKE) post-deploy-hooks
-	@echo "  Framework deploy completed"
+	@echo " Framework deploy completed"
 
 # Core implementations (can be overridden)
 core-build:
-	@echo "  Core build implementation..."
+	@echo " Core build implementation..."
 	docker build -t $(IMAGE_TAG) .
 
 core-test:
-	@echo "  Core test implementation..."
+	@echo " Core test implementation..."
 	docker run --rm $(IMAGE_TAG) pytest tests/
 
 core-deploy:
-	@echo "  Core deploy implementation..."
+	@echo " Core deploy implementation..."
 	kubectl apply -f k8s/
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s
 
@@ -836,24 +836,24 @@ post-deploy-hooks: ## Framework hook: post-deploy
 
 # Hook execution system
 run-hooks:
-	@echo "  Running $(HOOK_TYPE) hooks..."
+	@echo " Running $(HOOK_TYPE) hooks..."
 	@for hook_file in hooks/$(HOOK_TYPE)/*.sh; do \
 		if [ -f "$hook_file" ]; then \
-			echo "  Executing $hook_file..."; \
+			echo " Executing $hook_file..."; \
 			bash "$hook_file" || exit 1; \
 		fi; \
 	done
 	@if [ -f "hooks/$(HOOK_TYPE).mk" ]; then \
-		echo "  Including hooks/$(HOOK_TYPE).mk..."; \
+		echo " Including hooks/$(HOOK_TYPE).mk..."; \
 		$(MAKE) -f hooks/$(HOOK_TYPE).mk; \
 	fi
 
 # Plugin discovery and loading
 load-plugins: ## Load available plugins
-	@echo "  Loading plugins..."
+	@echo " Loading plugins..."
 	@for plugin_dir in plugins/*/; do \
 		if [ -f "$plugin_dir/plugin.mk" ]; then \
-			echo "  Loading plugin: $(basename $plugin_dir)"; \
+			echo " Loading plugin: $(basename $plugin_dir)"; \
 			include $plugin_dir/plugin.mk; \
 		fi; \
 	done
@@ -888,7 +888,7 @@ new-project: ## Generate new project from template
 	$(MAKE) generate-project PROJECT_NAME=$PROJECT_NAME PROJECT_TYPE=$PROJECT_TYPE TARGET_ENV=$TARGET_ENV
 
 generate-project: ## Generate project structure
-	@echo "   Generating project: $(PROJECT_NAME)"
+	@echo " Generating project: $(PROJECT_NAME)"
 	@mkdir -p projects/$(PROJECT_NAME)
 	@cp -r templates/$(PROJECT_TYPE)/* projects/$(PROJECT_NAME)/
 	@cp -r templates/common/* projects/$(PROJECT_NAME)/
@@ -896,10 +896,10 @@ generate-project: ## Generate project structure
 		cp -r templates/$(TARGET_ENV)/* projects/$(PROJECT_NAME)/; \
 	fi
 	@$(MAKE) customize-project-template PROJECT_NAME=$(PROJECT_NAME)
-	@echo "  Project generated: projects/$(PROJECT_NAME)"
+	@echo " Project generated: projects/$(PROJECT_NAME)"
 
 customize-project-template: ## Customize generated project
-	@echo "  Customizing project template..."
+	@echo " Customizing project template..."
 	@find projects/$(PROJECT_NAME) -type f -exec sed -i 's/{{PROJECT_NAME}}/$(PROJECT_NAME)/g' {} \;
 	@find projects/$(PROJECT_NAME) -type f -exec sed -i 's/{{PROJECT_TYPE}}/$(PROJECT_TYPE)/g' {} \;
 	@find projects/$(PROJECT_NAME) -type f -exec sed -i 's/{{TARGET_ENV}}/$(TARGET_ENV)/g' {} \;
@@ -907,27 +907,27 @@ customize-project-template: ## Customize generated project
 
 # Validate project structure
 validate-project-structure: ## Validate project follows framework conventions
-	@echo "  Validating project structure..."
+	@echo " Validating project structure..."
 	@ERRORS=0; \
-	if [ ! -f "Makefile" ]; then echo "  Missing Makefile"; ERRORS=$((ERRORS+1)); fi; \
-	if [ ! -f "README.md" ]; then echo "  Missing README.md"; ERRORS=$((ERRORS+1)); fi; \
-	if [ ! -d "src" ] && [ ! -d "app" ]; then echo "  Missing source directory"; ERRORS=$((ERRORS+1)); fi; \
-	if [ ! -d "k8s" ] && [ ! -f "docker-compose.yml" ]; then echo "  Missing deployment configuration"; ERRORS=$((ERRORS+1)); fi; \
+	if [ ! -f "Makefile" ]; then echo " Missing Makefile"; ERRORS=$((ERRORS+1)); fi; \
+	if [ ! -f "README.md" ]; then echo " Missing README.md"; ERRORS=$((ERRORS+1)); fi; \
+	if [ ! -d "src" ] && [ ! -d "app" ]; then echo " Missing source directory"; ERRORS=$((ERRORS+1)); fi; \
+	if [ ! -d "k8s" ] && [ ! -f "docker-compose.yml" ]; then echo " Missing deployment configuration"; ERRORS=$((ERRORS+1)); fi; \
 	if [ $ERRORS -eq 0 ]; then \
-		echo "  Project structure validation passed"; \
+		echo " Project structure validation passed"; \
 	else \
-		echo "  Project structure validation failed ($ERRORS errors)"; \
+		echo " Project structure validation failed ($ERRORS errors)"; \
 		exit 1; \
 	fi
 
 # Update project to latest framework version
 update-framework: ## Update project to latest framework version
-	@echo "  Updating to latest framework version..."
-	@git submodule update --remote framework || echo "   Framework not a submodule"
+	@echo " Updating to latest framework version..."
+	@git submodule update --remote framework || echo " Framework not a submodule"
 	@if [ -f "framework/update-script.sh" ]; then \
 		bash framework/update-script.sh; \
 	fi
-	@echo "  Framework updated"
+	@echo " Framework updated"
 ```
 
 ### Configuration-Driven Workflows
@@ -942,10 +942,10 @@ Create workflows that adapt based on configuration files:
 # Load workflow configuration
 load-workflow-config: ## Load workflow configuration
 	@if [ -f "workflow-config.yaml" ]; then \
-		echo "  Loading workflow configuration..."; \
+		echo " Loading workflow configuration..."; \
 		$(eval WORKFLOW_CONFIG := $(shell yq e -o=json workflow-config.yaml)); \
 	else \
-		echo "   No workflow-config.yaml found, using defaults"; \
+		echo " No workflow-config.yaml found, using defaults"; \
 	fi
 
 # Dynamic target generation based on configuration
@@ -967,29 +967,29 @@ generate-dynamic-targets: load-workflow-config ## Generate targets from configur
 
 # Workflow execution based on configuration
 execute-workflow: load-workflow-config ## Execute workflow based on configuration
-	@echo "  Executing configured workflow..."
+	@echo " Executing configured workflow..."
 	@WORKFLOW=$(echo '$(WORKFLOW_CONFIG)' | jq -r '.workflow.type // "standard"'); \
 	case $WORKFLOW in \
 		standard) $(MAKE) workflow-standard ;; \
 		canary) $(MAKE) workflow-canary ;; \
 		blue-green) $(MAKE) workflow-blue-green ;; \
 		rolling) $(MAKE) workflow-rolling ;; \
-		*) echo "  Unknown workflow type: $WORKFLOW" && exit 1 ;; \
+		*) echo " Unknown workflow type: $WORKFLOW" && exit 1 ;; \
 	esac
 
 workflow-standard: ## Standard deployment workflow
-	@echo "  Standard deployment workflow"
+	@echo " Standard deployment workflow"
 	@$(MAKE) build test push deploy
 
 workflow-canary: ## Canary deployment workflow
-	@echo "  Canary deployment workflow"
+	@echo " Canary deployment workflow"
 	@$(MAKE) build test push
 	@$(MAKE) deploy-canary
 	@$(MAKE) monitor-canary
 	@$(MAKE) promote-canary || $(MAKE) rollback-canary
 
 workflow-blue-green: ## Blue-green deployment workflow
-	@echo "   Blue-green deployment workflow"
+	@echo " Blue-green deployment workflow"
 	@$(MAKE) build test push
 	@$(MAKE) deploy-green
 	@$(MAKE) test-green
@@ -1025,24 +1025,24 @@ Create systems that coordinate workflows across multiple teams:
 
 # Team coordination
 coordinate-teams: ## Coordinate deployment across teams
-	@echo "  Coordinating multi-team deployment..."
+	@echo " Coordinating multi-team deployment..."
 	@$(MAKE) notify-teams-start
 	@$(MAKE) -j3 deploy-team-backend deploy-team-frontend deploy-team-infrastructure
 	@$(MAKE) integration-tests-cross-team
 	@$(MAKE) notify-teams-complete
 
 deploy-team-backend: ## Deploy backend team components
-	@echo "  Deploying backend team components..."
+	@echo " Deploying backend team components..."
 	@$(MAKE) -C teams/backend deploy
 	@$(MAKE) register-deployment TEAM=backend
 
 deploy-team-frontend: ## Deploy frontend team components
-	@echo "  Deploying frontend team components..."
+	@echo " Deploying frontend team components..."
 	@$(MAKE) -C teams/frontend deploy
 	@$(MAKE) register-deployment TEAM=frontend
 
 deploy-team-infrastructure: ## Deploy infrastructure team components
-	@echo "   Deploying infrastructure team components..."
+	@echo " Deploying infrastructure team components..."
 	@$(MAKE) -C teams/infrastructure deploy
 	@$(MAKE) register-deployment TEAM=infrastructure
 
@@ -1055,19 +1055,19 @@ register-deployment: ## Register team deployment
 
 # Wait for all teams to complete
 wait-for-all-teams: ## Wait for all teams to complete deployment
-	@echo "  Waiting for all teams to complete..."
+	@echo " Waiting for all teams to complete..."
 	@TEAMS="backend frontend infrastructure"; \
 	while true; do \
 		ALL_DONE=true; \
 		for team in $TEAMS; do \
 			if [ ! -f ".deployment-registry/$team-deployed" ]; then \
 				ALL_DONE=false; \
-				echo "  Waiting for $team team..."; \
+				echo " Waiting for $team team..."; \
 				break; \
 			fi; \
 		done; \
 		if [ "$ALL_DONE" = "true" ]; then \
-			echo "  All teams completed deployment"; \
+			echo " All teams completed deployment"; \
 			break; \
 		fi; \
 		sleep 10; \
@@ -1082,20 +1082,20 @@ integration-tests-cross-team: wait-for-all-teams ## Run cross-team integration t
 
 # Notification system
 notify-teams-start: ## Notify teams that coordination is starting
-	@echo "  Notifying teams of deployment start..."
+	@echo " Notifying teams of deployment start..."
 	@curl -X POST $(SLACK_WEBHOOK) -H 'Content-type: application/json' \
 		--data '{"text":"  Multi-team deployment starting for $(APP_NAME) v$(VERSION)"}' \
-		|| echo "   Failed to send notification"
+		|| echo " Failed to send notification"
 
 notify-teams-complete: ## Notify teams that deployment is complete
-	@echo "  Notifying teams of deployment completion..."
+	@echo " Notifying teams of deployment completion..."
 	@curl -X POST $(SLACK_WEBHOOK) -H 'Content-type: application/json' \
 		--data '{"text":"  Multi-team deployment completed for $(APP_NAME) v$(VERSION)"}' \
-		|| echo "   Failed to send notification"
+		|| echo " Failed to send notification"
 
 # Cleanup coordination artifacts
 cleanup-coordination: ## Clean up coordination artifacts
-	@echo "  Cleaning up coordination artifacts..."
+	@echo " Cleaning up coordination artifacts..."
 	@rm -rf .deployment-registry
 	@rm -f .dynamic-targets.mk
 ```
@@ -1117,16 +1117,16 @@ retry-with-backoff: ## Execute command with exponential backoff retry
 	ATTEMPT=1; \
 	DELAY=1; \
 	while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do \
-		echo "  Attempt $ATTEMPT/$MAX_ATTEMPTS: $(RETRY_COMMAND)"; \
+		echo " Attempt $ATTEMPT/$MAX_ATTEMPTS: $(RETRY_COMMAND)"; \
 		if $(RETRY_COMMAND); then \
-			echo "  Command succeeded on attempt $ATTEMPT"; \
+			echo " Command succeeded on attempt $ATTEMPT"; \
 			exit 0; \
 		fi; \
 		if [ $ATTEMPT -eq $MAX_ATTEMPTS ]; then \
-			echo "  Command failed after $MAX_ATTEMPTS attempts"; \
+			echo " Command failed after $MAX_ATTEMPTS attempts"; \
 			exit 1; \
 		fi; \
-		echo "  Waiting $DELAY seconds before retry..."; \
+		echo " Waiting $DELAY seconds before retry..."; \
 		sleep $DELAY; \
 		DELAY=$((DELAY * 2)); \
 		ATTEMPT=$((ATTEMPT + 1)); \
@@ -1164,22 +1164,22 @@ Implement sophisticated rollback mechanisms:
 
 # Create deployment checkpoint
 create-checkpoint: ## Create deployment checkpoint for rollback
-	@echo "  Creating deployment checkpoint..."
+	@echo " Creating deployment checkpoint..."
 	@mkdir -p checkpoints
 	@CHECKPOINT_ID=$(date +%Y%m%d-%H%M%S); \
 	kubectl get deployment $(APP_NAME) -o yaml > checkpoints/deployment-$CHECKPOINT_ID.yaml; \
 	kubectl get configmap $(APP_NAME)-config -o yaml > checkpoints/configmap-$CHECKPOINT_ID.yaml 2>/dev/null || true; \
 	kubectl get secret $(APP_NAME)-secrets -o yaml > checkpoints/secrets-$CHECKPOINT_ID.yaml 2>/dev/null || true; \
 	echo $CHECKPOINT_ID > .last-checkpoint; \
-	echo "  Checkpoint created: $CHECKPOINT_ID"
+	echo " Checkpoint created: $CHECKPOINT_ID"
 
 # Deploy with automatic checkpoint
 deploy-with-checkpoint: create-checkpoint ## Deploy with automatic rollback checkpoint
-	@echo "  Deploying with checkpoint..."
+	@echo " Deploying with checkpoint..."
 	@if $(MAKE) deploy-attempt; then \
-		echo "  Deployment successful"; \
+		echo " Deployment successful"; \
 	else \
-		echo "  Deployment failed, initiating rollback..."; \
+		echo " Deployment failed, initiating rollback..."; \
 		$(MAKE) rollback-to-checkpoint; \
 		exit 1; \
 	fi
@@ -1187,41 +1187,41 @@ deploy-with-checkpoint: create-checkpoint ## Deploy with automatic rollback chec
 # Rollback to last checkpoint
 rollback-to-checkpoint: ## Rollback to last checkpoint
 	@if [ ! -f ".last-checkpoint" ]; then \
-		echo "  No checkpoint found"; \
+		echo " No checkpoint found"; \
 		exit 1; \
 	fi; \
 	CHECKPOINT_ID=$(cat .last-checkpoint); \
-	echo "  Rolling back to checkpoint: $CHECKPOINT_ID"; \
+	echo " Rolling back to checkpoint: $CHECKPOINT_ID"; \
 	kubectl apply -f checkpoints/deployment-$CHECKPOINT_ID.yaml; \
 	kubectl apply -f checkpoints/configmap-$CHECKPOINT_ID.yaml 2>/dev/null || true; \
 	kubectl apply -f checkpoints/secrets-$CHECKPOINT_ID.yaml 2>/dev/null || true; \
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s; \
-	echo "  Rollback completed"
+	echo " Rollback completed"
 
 # List available checkpoints
 list-checkpoints: ## List available rollback checkpoints
-	@echo "  Available checkpoints:"
+	@echo " Available checkpoints:"
 	@ls -la checkpoints/ | grep deployment- | awk '{print $9}' | sed 's/deployment-//' | sed 's/.yaml//' | sort -r
 
 # Rollback to specific checkpoint
 rollback-to-specific: ## Rollback to specific checkpoint ID
 	@read -p "Checkpoint ID: " CHECKPOINT_ID; \
 	if [ ! -f "checkpoints/deployment-$CHECKPOINT_ID.yaml" ]; then \
-		echo "  Checkpoint not found: $CHECKPOINT_ID"; \
+		echo " Checkpoint not found: $CHECKPOINT_ID"; \
 		exit 1; \
 	fi; \
-	echo "  Rolling back to checkpoint: $CHECKPOINT_ID"; \
+	echo " Rolling back to checkpoint: $CHECKPOINT_ID"; \
 	kubectl apply -f checkpoints/deployment-$CHECKPOINT_ID.yaml; \
 	kubectl rollout status deployment/$(APP_NAME) --timeout=300s; \
-	echo "  Rollback completed"
+	echo " Rollback completed"
 
 # Clean old checkpoints
 cleanup-checkpoints: ## Clean up old checkpoints (keep last 10)
-	@echo "  Cleaning up old checkpoints..."
+	@echo " Cleaning up old checkpoints..."
 	@ls -t checkpoints/deployment-*.yaml | tail -n +11 | xargs rm -f
 	@ls -t checkpoints/configmap-*.yaml 2>/dev/null | tail -n +11 | xargs rm -f 2>/dev/null || true
 	@ls -t checkpoints/secrets-*.yaml 2>/dev/null | tail -n +11 | xargs rm -f 2>/dev/null || true
-	@echo "  Checkpoint cleanup completed"
+	@echo " Checkpoint cleanup completed"
 ```
 
 ## Key Takeaways

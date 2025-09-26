@@ -285,13 +285,13 @@ update-k8s:     ## Update Kubernetes deployment
 
 # Composite workflows
 deploy-full: build-image run-tests push-image update-k8s ##   Full deployment pipeline
-	@echo "  Full deployment completed successfully"
+	@echo " Full deployment completed successfully"
 
 quick-deploy: build-image push-image update-k8s ##  Quick deployment (skip tests)
 	@echo " Quick deployment completed"
 
 ci-pipeline: build-image run-tests ##   CI pipeline (build and test only)
-	@echo "  CI pipeline completed"
+	@echo " CI pipeline completed"
 ```
 
 ### Parallel Composite Targets
@@ -316,11 +316,11 @@ security-scan:  ## Run security scan
 lint-all: ##   Run all linting (parallel)
 	@echo "Running all linting checks in parallel..."
 	@$(MAKE) -j4 lint-python lint-docker lint-yaml security-scan
-	@echo "  All linting completed"
+	@echo " All linting completed"
 
 # Sequential version for debugging
 lint-sequential: lint-python lint-docker lint-yaml security-scan ##   Run all linting (sequential)
-	@echo "  All linting completed sequentially"
+	@echo " All linting completed sequentially"
 ```
 
 ### Conditional Composite Targets
@@ -336,11 +336,11 @@ ifeq ($(ENVIRONMENT),production)
 	@$(MAKE) create-deployment-backup
 	@$(MAKE) deploy-with-rollback-plan
 else ifeq ($(ENVIRONMENT),staging)
-	@echo "  Staging deployment"
+	@echo " Staging deployment"
 	@$(MAKE) deploy-standard
 	@$(MAKE) run-smoke-tests
 else
-	@echo "  Development deployment"
+	@echo " Development deployment"
 	@$(MAKE) deploy-fast
 endif
 
@@ -354,7 +354,7 @@ endif
 ifdef ENABLE_PERFORMANCE_TESTS
 	@$(MAKE) test-performance
 endif
-	@echo "  All enabled tests completed"
+	@echo " All enabled tests completed"
 ```
 
 ## Target Dependencies for Enforcing Operational Prerequisites
@@ -395,16 +395,16 @@ Use dependencies to enforce validation steps:
 ```makefile
 # Validation targets
 validate-environment: ##   Validate environment configuration
-	@test -n "$(ENVIRONMENT)" || (echo "  ENVIRONMENT not set" && exit 1)
-	@test -n "$(VERSION)" || (echo "  VERSION not set" && exit 1)
+	@test -n "$(ENVIRONMENT)" || (echo " ENVIRONMENT not set" && exit 1)
+	@test -n "$(VERSION)" || (echo " VERSION not set" && exit 1)
 
 validate-secrets: ##   Validate required secrets
-	@test -n "$$DATABASE_PASSWORD" || (echo "  DATABASE_PASSWORD not set" && exit 1)
-	@test -n "$$API_KEY" || (echo "  API_KEY not set" && exit 1)
+	@test -n "$$DATABASE_PASSWORD" || (echo " DATABASE_PASSWORD not set" && exit 1)
+	@test -n "$$API_KEY" || (echo " API_KEY not set" && exit 1)
 
 validate-tools: ##   Validate required tools
-	@command -v docker >/dev/null || (echo "  Docker not found" && exit 1)
-	@command -v kubectl >/dev/null || (echo "  kubectl not found" && exit 1)
+	@command -v docker >/dev/null || (echo " Docker not found" && exit 1)
+	@command -v kubectl >/dev/null || (echo " kubectl not found" && exit 1)
 
 # Deployments require all validations
 deploy: validate-environment validate-secrets validate-tools build test ##   Deploy with validation
@@ -430,7 +430,7 @@ deploy: build test | validate-cluster ##   Deploy application
 # to re-run if validate-cluster is newer
 validate-cluster: ##   Validate cluster connectivity
 	kubectl cluster-info >/dev/null
-	@echo "  Cluster connectivity validated"
+	@echo " Cluster connectivity validated"
 ```
 
 ## Documentation Patterns for Self-Describing Targets
@@ -467,16 +467,16 @@ help: ##   Show available commands
 	@echo "$(APP_NAME) Operations"
 	@echo "====================="
 	@echo ""
-	@echo "  Getting Started:"
+	@echo " Getting Started:"
 	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
 	@echo " Development:"
 	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "  Deployment:"
+	@echo " Deployment:"
 	@awk '/^##@ Deployment/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "  Operations:"
+	@echo " Operations:"
 	@awk '/^##@ Operations/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 
 ##@ Getting Started
@@ -484,7 +484,7 @@ help: ##   Show available commands
 setup: ## Set up development environment
 	@$(MAKE) install-deps
 	@$(MAKE) setup-db
-	@echo "  Setup complete! Run 'make dev' to start development"
+	@echo " Setup complete! Run 'make dev' to start development"
 
 ##@ Development
 
@@ -544,15 +544,15 @@ help-interactive: ##   Interactive help system
 what-next: ##   Suggest what to do based on current state
 	@echo "Checking current state..."
 	@if [ ! -f "package.json" ] && [ ! -f "requirements.txt" ]; then \
-		echo "  New project detected. Run: make setup"; \
+		echo " New project detected. Run: make setup"; \
 	elif [ ! -d "node_modules" ] && [ ! -d "venv" ]; then \
-		echo "  Dependencies not installed. Run: make setup"; \
+		echo " Dependencies not installed. Run: make setup"; \
 	elif ! docker ps | grep -q $(APP_NAME); then \
-		echo "  Ready for development. Run: make dev"; \
+		echo " Ready for development. Run: make dev"; \
 	elif [ -n "$$(git status --porcelain)" ]; then \
-		echo "  Changes detected. Run: make test"; \
+		echo " Changes detected. Run: make test"; \
 	else \
-		echo "  Everything looks good! Try: make help-interactive"; \
+		echo " Everything looks good! Try: make help-interactive"; \
 	fi
 
 # Context-sensitive help
@@ -561,19 +561,19 @@ help-deploy: ##   Help with deployment options
 	@echo "==============="
 	@echo ""
 	@echo "Available deployment targets:"
-	@echo "  make deploy              # Deploy to development (default)"
-	@echo "  make deploy-staging      # Deploy to staging environment"
-	@echo "  make deploy-prod         # Deploy to production (with confirmation)"
+	@echo " make deploy              # Deploy to development (default)"
+	@echo " make deploy-staging      # Deploy to staging environment"
+	@echo " make deploy-prod         # Deploy to production (with confirmation)"
 	@echo ""
 	@echo "Environment-specific deployment:"
-	@echo "  make deploy ENVIRONMENT=dev        # Development"
-	@echo "  make deploy ENVIRONMENT=staging    # Staging"
-	@echo "  make deploy ENVIRONMENT=production # Production"
+	@echo " make deploy ENVIRONMENT=dev        # Development"
+	@echo " make deploy ENVIRONMENT=staging    # Staging"
+	@echo " make deploy ENVIRONMENT=production # Production"
 	@echo ""
 	@echo "Current configuration:"
-	@echo "  Environment: $(ENVIRONMENT)"
-	@echo "  Version: $(VERSION)"
-	@echo "  Image: $(IMAGE_TAG)"
+	@echo " Environment: $(ENVIRONMENT)"
+	@echo " Version: $(VERSION)"
+	@echo " Image: $(IMAGE_TAG)"
 ```
 
 ## Real-World Example: Complete Target Organization
@@ -602,16 +602,16 @@ help: ##   Show available commands
 	@echo "$(APP_NAME) DevOps Workflow"
 	@echo "============================="
 	@echo ""
-	@echo "  Quick Start:"
-	@echo "  make setup    # Set up development environment"
-	@echo "  make dev      # Start development"
-	@echo "  make test     # Run tests"
-	@echo "  make deploy   # Deploy to development"
+	@echo " Quick Start:"
+	@echo " make setup    # Set up development environment"
+	@echo " make dev      # Start development"
+	@echo " make test     # Run tests"
+	@echo " make deploy   # Deploy to development"
 	@echo ""
-	@echo "  All Commands:"
+	@echo " All Commands:"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "  Run 'make help-interactive' for guided assistance"
+	@echo " Run 'make help-interactive' for guided assistance"
 
 # =============================================================================
 # Setup and Development
@@ -625,7 +625,7 @@ setup: ##   Set up development environment
 	@$(MAKE) install-dependencies
 	@$(MAKE) setup-database
 	@$(MAKE) setup-config
-	@echo "  Setup complete! Run 'make dev' to start development"
+	@echo " Setup complete! Run 'make dev' to start development"
 
 dev: ##  Start development environment
 	@echo "Starting $(APP_NAME) development environment..."
@@ -635,14 +635,14 @@ dev: ##  Start development environment
 dev-stop: ##  Stop development environment
 	@echo "Stopping development environment..."
 	@docker-compose down
-	@echo "  Development environment stopped"
+	@echo " Development environment stopped"
 
 reset: ##   Reset development environment to clean state
-	@echo "    This will destroy all local data. Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo " This will destroy all local data. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@$(MAKE) dev-stop
 	@$(MAKE) clean-all
 	@$(MAKE) setup
-	@echo "  Environment reset complete"
+	@echo " Environment reset complete"
 
 # =============================================================================
 # Build and Package
@@ -653,7 +653,7 @@ reset: ##   Reset development environment to clean state
 build: lint ##   Build application
 	@echo "Building $(APP_NAME) version $(VERSION)..."
 	docker build -t $(IMAGE_TAG) .
-	@echo "  Build complete: $(IMAGE_TAG)"
+	@echo " Build complete: $(IMAGE_TAG)"
 
 build-dev: ##   Build for development (with debug info)
 	@echo "Building $(APP_NAME) for development..."
@@ -667,7 +667,7 @@ package: build ##   Package application for distribution
 	@echo "Creating distribution package..."
 	@mkdir -p dist
 	docker save $(IMAGE_TAG) | gzip > dist/$(APP_NAME)-$(VERSION).tar.gz
-	@echo "  Package created: dist/$(APP_NAME)-$(VERSION).tar.gz"
+	@echo " Package created: dist/$(APP_NAME)-$(VERSION).tar.gz"
 
 # =============================================================================
 # Testing
@@ -676,7 +676,7 @@ package: build ##   Package application for distribution
 .PHONY: test test-unit test-integration test-e2e lint security-scan
 
 test: test-unit test-integration ##   Run all tests
-	@echo "  All tests completed successfully"
+	@echo " All tests completed successfully"
 
 test-unit: build ##   Run unit tests
 	@echo "Running unit tests..."
@@ -721,7 +721,7 @@ security-scan: build ##   Run security scan
 deploy: validate-deployment build test push ##   Deploy to configured environment
 	@echo "Deploying $(APP_NAME) to $(ENVIRONMENT)..."
 	@$(MAKE) deploy-$(ENVIRONMENT)
-	@echo "  Deployment to $(ENVIRONMENT) completed"
+	@echo " Deployment to $(ENVIRONMENT) completed"
 
 deploy-dev: ##   Deploy to development
 	kubectl apply -f k8s/base/ -f k8s/overlays/development/
@@ -739,18 +739,18 @@ deploy-prod: ##   Deploy to production (requires confirmation)
 	@echo "Version: $(VERSION)"
 	@echo "Image: $(IMAGE_TAG)"
 	@echo ""
-	@echo "    This will deploy to PRODUCTION. Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo " This will deploy to PRODUCTION. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@$(MAKE) backup-production
 	kubectl apply -f k8s/base/ -f k8s/overlays/production/
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG) -n $(APP_NAME)-prod
 	kubectl rollout status deployment/$(APP_NAME) -n $(APP_NAME)-prod --timeout=600s
 	@$(MAKE) smoke-test ENVIRONMENT=production
-	@echo "  Production deployment completed"
+	@echo " Production deployment completed"
 
 push: build ##   Push image to registry
 	@echo "Pushing $(IMAGE_TAG)..."
 	docker push $(IMAGE_TAG)
-	@echo "  Image pushed successfully"
+	@echo " Image pushed successfully"
 
 # =============================================================================
 # Operations and Monitoring
@@ -773,19 +773,19 @@ backup: ##   Create backup
 	@echo "Creating backup for $(ENVIRONMENT)..."
 	kubectl exec deployment/$(APP_NAME)-db -n $(APP_NAME)-$(ENVIRONMENT) -- \
 		pg_dump $(APP_NAME) > backups/$(APP_NAME)-$(ENVIRONMENT)-$(shell date +%Y%m%d-%H%M%S).sql
-	@echo "  Backup created"
+	@echo " Backup created"
 
 backup-production: ##   Create production backup (special handling)
 	@echo "Creating PRODUCTION backup..."
 	@mkdir -p backups/production
 	kubectl exec deployment/$(APP_NAME)-db -n $(APP_NAME)-prod -- \
 		pg_dump $(APP_NAME) | gzip > backups/production/$(APP_NAME)-prod-$(shell date +%Y%m%d-%H%M%S).sql.gz
-	@echo "  Production backup created and compressed"
+	@echo " Production backup created and compressed"
 
 smoke-test: ##   Run smoke tests against deployed environment
 	@echo "Running smoke tests against $(ENVIRONMENT)..."
 	@timeout 60 bash -c 'until curl -f http://$(APP_NAME)-$(ENVIRONMENT).example.com/health; do sleep 5; done'
-	@echo "  Smoke tests passed"
+	@echo " Smoke tests passed"
 
 # =============================================================================
 # Maintenance and Cleanup
@@ -797,7 +797,7 @@ clean: ##   Clean development environment
 	@echo "Cleaning development environment..."
 	@$(MAKE) clean-containers
 	@$(MAKE) clean-images
-	@echo "  Cleanup complete"
+	@echo " Cleanup complete"
 
 clean-images: ##   Clean Docker images
 	@echo "Cleaning Docker images..."
@@ -809,10 +809,10 @@ clean-containers: ##   Clean Docker containers
 	@docker ps -a --filter "name=$(APP_NAME)" -q | xargs -r docker rm -f
 
 clean-all: clean ##   Clean everything (including data)
-	@echo "    This will delete ALL local data. Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo " This will delete ALL local data. Continue? [y/N]" && read ans && [ $$ans = y ]
 	@docker volume prune -f
 	@rm -rf dist/ backups/development/
-	@echo "  Complete cleanup finished"
+	@echo " Complete cleanup finished"
 
 # =============================================================================
 # Utilities and Validation
@@ -823,24 +823,24 @@ clean-all: clean ##   Clean everything (including data)
 
 validate-deployment: ##   Validate deployment prerequisites
 	@echo "Validating deployment prerequisites..."
-	@test -n "$(VERSION)" || (echo "  VERSION not set" && exit 1)
-	@test -n "$(ENVIRONMENT)" || (echo "  ENVIRONMENT not set" && exit 1)
-	@command -v kubectl >/dev/null || (echo "  kubectl not found" && exit 1)
-	@kubectl cluster-info >/dev/null || (echo "  kubectl not configured" && exit 1)
-	@echo "  Deployment validation passed"
+	@test -n "$(VERSION)" || (echo " VERSION not set" && exit 1)
+	@test -n "$(ENVIRONMENT)" || (echo " ENVIRONMENT not set" && exit 1)
+	@command -v kubectl >/dev/null || (echo " kubectl not found" && exit 1)
+	@kubectl cluster-info >/dev/null || (echo " kubectl not configured" && exit 1)
+	@echo " Deployment validation passed"
 
 check-prerequisites: ##   Check system prerequisites
 	@echo "Checking prerequisites..."
-	@command -v docker >/dev/null || (echo "  Docker required" && exit 1)
-	@command -v docker-compose >/dev/null || (echo "  docker-compose required" && exit 1)
-	@command -v kubectl >/dev/null || (echo "  kubectl required" && exit 1)
-	@echo "  All prerequisites met"
+	@command -v docker >/dev/null || (echo " Docker required" && exit 1)
+	@command -v docker-compose >/dev/null || (echo " docker-compose required" && exit 1)
+	@command -v kubectl >/dev/null || (echo " kubectl required" && exit 1)
+	@echo " All prerequisites met"
 
 install-dependencies: ##   Install application dependencies
 	@echo "Installing dependencies..."
 	@if [ -f "package.json" ]; then npm install; fi
 	@if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
-	@echo "  Dependencies installed"
+	@echo " Dependencies installed"
 
 setup-database: ##    Set up development database
 	@echo "Setting up database..."
@@ -848,7 +848,7 @@ setup-database: ##    Set up development database
 	@echo "Waiting for database to be ready..."
 	@timeout 30 bash -c 'until docker-compose exec -T database pg_isready; do sleep 1; done'
 	@docker-compose exec -T database psql -U postgres -c "CREATE DATABASE IF NOT EXISTS $(APP_NAME);"
-	@echo "  Database ready"
+	@echo " Database ready"
 
 setup-config: ##   Set up configuration files
 	@echo "Setting up configuration..."
@@ -856,7 +856,7 @@ setup-config: ##   Set up configuration files
 		cp .env.example .env; \
 		echo " Please edit .env with your configuration"; \
 	fi
-	@echo "  Configuration setup complete"
+	@echo " Configuration setup complete"
 
 # Advanced help systems
 help-interactive: ##   Interactive help system
@@ -864,27 +864,27 @@ help-interactive: ##   Interactive help system
 	@echo "============================"
 	@echo ""
 	@echo "What would you like to do?"
-	@echo "  1) Set up the project for the first time"
-	@echo "  2) Start development environment"  
-	@echo "  3) Run tests"
-	@echo "  4) Build and deploy to staging"
-	@echo "  5) Deploy to production"
-	@echo "  6) View logs and status"
-	@echo "  7) Create a backup"
-	@echo "  8) Clean up environment"
-	@echo "  9) Show all available commands"
+	@echo " 1) Set up the project for the first time"
+	@echo " 2) Start development environment"  
+	@echo " 3) Run tests"
+	@echo " 4) Build and deploy to staging"
+	@echo " 5) Deploy to production"
+	@echo " 6) View logs and status"
+	@echo " 7) Create a backup"
+	@echo " 8) Clean up environment"
+	@echo " 9) Show all available commands"
 	@echo ""
 	@echo -n "Choose [1-9]: "
 	@read choice; \
 	case $choice in \
-		1) echo ""; echo "For first-time setup, run:"; echo "  make setup"; echo "" ;; \
-		2) echo ""; echo "To start development, run:"; echo "  make dev"; echo "" ;; \
-		3) echo ""; echo "To run tests, run:"; echo "  make test"; echo "" ;; \
-		4) echo ""; echo "To deploy to staging, run:"; echo "  make deploy ENVIRONMENT=staging"; echo "" ;; \
-		5) echo ""; echo "To deploy to production, run:"; echo "  make deploy-prod"; echo "" ;; \
-		6) echo ""; echo "To view logs and status, run:"; echo "  make logs"; echo "  make status"; echo "" ;; \
-		7) echo ""; echo "To create a backup, run:"; echo "  make backup"; echo "" ;; \
-		8) echo ""; echo "To clean up, run:"; echo "  make clean"; echo "" ;; \
+		1) echo ""; echo "For first-time setup, run:"; echo " make setup"; echo "" ;; \
+		2) echo ""; echo "To start development, run:"; echo " make dev"; echo "" ;; \
+		3) echo ""; echo "To run tests, run:"; echo " make test"; echo "" ;; \
+		4) echo ""; echo "To deploy to staging, run:"; echo " make deploy ENVIRONMENT=staging"; echo "" ;; \
+		5) echo ""; echo "To deploy to production, run:"; echo " make deploy-prod"; echo "" ;; \
+		6) echo ""; echo "To view logs and status, run:"; echo " make logs"; echo " make status"; echo "" ;; \
+		7) echo ""; echo "To create a backup, run:"; echo " make backup"; echo "" ;; \
+		8) echo ""; echo "To clean up, run:"; echo " make clean"; echo "" ;; \
 		9) echo ""; $(MAKE) help ;; \
 		*) echo ""; echo "Invalid choice. Please run 'make help-interactive' again."; echo "" ;; \
 	esac
@@ -894,20 +894,20 @@ help-deploy: ##   Deployment help and options
 	@echo "==============="
 	@echo ""
 	@echo "Quick deployment options:"
-	@echo "  make deploy                    # Deploy to development"
-	@echo "  make deploy ENVIRONMENT=staging # Deploy to staging"  
-	@echo "  make deploy-prod              # Deploy to production (with confirmation)"
+	@echo " make deploy                    # Deploy to development"
+	@echo " make deploy ENVIRONMENT=staging # Deploy to staging"  
+	@echo " make deploy-prod              # Deploy to production (with confirmation)"
 	@echo ""
 	@echo "Step-by-step deployment:"
-	@echo "  make build                    # Build the application"
-	@echo "  make test                     # Run tests"
-	@echo "  make push                     # Push to registry"
-	@echo "  make deploy ENVIRONMENT=staging # Deploy to staging"
+	@echo " make build                    # Build the application"
+	@echo " make test                     # Run tests"
+	@echo " make push                     # Push to registry"
+	@echo " make deploy ENVIRONMENT=staging # Deploy to staging"
 	@echo ""
 	@echo "Current configuration:"
-	@echo "  Environment: $(ENVIRONMENT)"
-	@echo "  Version: $(VERSION)"
-	@echo "  Image: $(IMAGE_TAG)"
+	@echo " Environment: $(ENVIRONMENT)"
+	@echo " Version: $(VERSION)"
+	@echo " Image: $(IMAGE_TAG)"
 	@echo ""
 	@echo "For more help: make help-interactive"
 
@@ -915,29 +915,29 @@ what-next: ##   Suggest next actions based on current state
 	@echo "Analyzing current state..."
 	@if [ ! -f "package.json" ] && [ ! -f "requirements.txt" ] && [ ! -f "Cargo.toml" ]; then \
 		echo ""; \
-		echo "  This looks like a new project!"; \
-		echo "   Next step: make setup"; \
+		echo " This looks like a new project!"; \
+		echo " Next step: make setup"; \
 		echo ""; \
 	elif [ ! -f ".env" ]; then \
 		echo ""; \
-		echo "   Project needs configuration setup."; \
-		echo "   Next step: make setup"; \
+		echo " Project needs configuration setup."; \
+		echo " Next step: make setup"; \
 		echo ""; \
 	elif ! docker ps | grep -q $(APP_NAME) 2>/dev/null; then \
 		echo ""; \
 		echo " Ready to start development!"; \
-		echo "   Next step: make dev"; \
+		echo " Next step: make dev"; \
 		echo ""; \
 	elif [ -n "$(git status --porcelain 2>/dev/null)" ]; then \
 		echo ""; \
-		echo "  Code changes detected."; \
-		echo "   Consider: make test"; \
-		echo "   Then: make deploy ENVIRONMENT=staging"; \
+		echo " Code changes detected."; \
+		echo " Consider: make test"; \
+		echo " Then: make deploy ENVIRONMENT=staging"; \
 		echo ""; \
 	else \
 		echo ""; \
-		echo "  Everything looks good!"; \
-		echo "   Try: make help-interactive for guided options"; \
+		echo " Everything looks good!"; \
+		echo " Try: make help-interactive for guided options"; \
 		echo ""; \
 	fi
 
@@ -953,28 +953,28 @@ quick-start: ##  Quick start for experienced developers
 	@$(MAKE) dev
 
 fresh-start: ##   Fresh start (clean + setup + dev)
-	@echo "  Fresh start sequence..."
+	@echo " Fresh start sequence..."
 	@$(MAKE) clean-all 2>/dev/null || true
 	@$(MAKE) setup  
 	@$(MAKE) dev
 
 ci-pipeline: ##   Run CI pipeline locally
-	@echo "  Running CI pipeline..."
+	@echo " Running CI pipeline..."
 	@$(MAKE) lint
 	@$(MAKE) build
 	@$(MAKE) test
 	@$(MAKE) security-scan
-	@echo "  CI pipeline completed successfully"
+	@echo " CI pipeline completed successfully"
 
 release: ##   Create release (tag + build + test + package)
-	@echo "  Creating release..."
-	@test -n "$(TAG)" || (echo "  TAG required: make release TAG=v1.0.0" && exit 1)
+	@echo " Creating release..."
+	@test -n "$(TAG)" || (echo " TAG required: make release TAG=v1.0.0" && exit 1)
 	@git tag $(TAG)
 	@$(MAKE) build VERSION=$(TAG)
 	@$(MAKE) test
 	@$(MAKE) package VERSION=$(TAG)
-	@echo "  Release $(TAG) created successfully"
-	@echo "   To publish: git push origin $(TAG) && make push VERSION=$(TAG)"
+	@echo " Release $(TAG) created successfully"
+	@echo " To publish: git push origin $(TAG) && make push VERSION=$(TAG)"
 ```
 
 ## Advanced Target Organization Patterns
@@ -995,15 +995,15 @@ start: ## ▶  Start all services
 	@echo "Starting $(APP_NAME) services..."
 	@docker-compose up -d
 	@$(MAKE) wait-for-services
-	@echo "  All services started"
+	@echo " All services started"
 
 stop: ##    Stop all services
 	@echo "Stopping $(APP_NAME) services..."
 	@docker-compose down
-	@echo "  All services stopped"
+	@echo " All services stopped"
 
 restart: stop start ##   Restart all services
-	@echo "  All services restarted"
+	@echo " All services restarted"
 
 # State inspection
 status: ##   Show service status
@@ -1017,13 +1017,13 @@ health: ##   Check service health
 	@echo "Health Check Results:"
 	@for service in api database redis; do \
 		echo -n "$service: "; \
-		curl -sf http://localhost:8080/health/$service && echo "  Healthy" || echo "  Unhealthy"; \
+		curl -sf http://localhost:8080/health/$service && echo " Healthy" || echo " Unhealthy"; \
 	done
 
 wait-for-services: ##   Wait for services to be ready
 	@echo "Waiting for services to be ready..."
 	@timeout 60 bash -c 'until curl -sf http://localhost:8080/health; do sleep 2; done'
-	@echo "  Services are ready"
+	@echo " Services are ready"
 ```
 
 ### Environment-Aware Target Organization
@@ -1039,12 +1039,12 @@ Create targets that automatically adapt to different environments:
 deploy: deploy-$(ENVIRONMENT) ##   Deploy to configured environment
 
 deploy-development: ##   Development deployment (fast, minimal validation)
-	@echo "  Development deployment..."
+	@echo " Development deployment..."
 	@$(MAKE) build-dev
 	@docker-compose up -d --force-recreate
 
 deploy-staging: ##   Staging deployment (full validation)
-	@echo "  Staging deployment..."
+	@echo " Staging deployment..."
 	@$(MAKE) ci-pipeline
 	@$(MAKE) push
 	kubectl apply -f k8s/staging/
@@ -1056,7 +1056,7 @@ deploy-production: ##   Production deployment (maximum safety)
 	@$(MAKE) backup-production
 	@$(MAKE) ci-pipeline
 	@$(MAKE) push
-	@echo "    Deploy to PRODUCTION? [y/N]" && read ans && [ $ans = y ]
+	@echo " Deploy to PRODUCTION? [y/N]" && read ans && [ $ans = y ]
 	kubectl apply -f k8s/production/
 	kubectl rollout status deployment/$(APP_NAME) -n production --timeout=600s
 	@$(MAKE) smoke-test
@@ -1065,10 +1065,10 @@ deploy-production: ##   Production deployment (maximum safety)
 # Environment-specific validations
 validate-production-readiness: ##   Validate production deployment readiness
 	@echo "Validating production readiness..."
-	@test "$(VERSION)" != "latest" || (echo "  Production requires specific version" && exit 1)
-	@git diff --quiet || (echo "  Uncommitted changes detected" && exit 1)
+	@test "$(VERSION)" != "latest" || (echo " Production requires specific version" && exit 1)
+	@git diff --quiet || (echo " Uncommitted changes detected" && exit 1)
 	@$(MAKE) security-scan
-	@echo "  Production readiness validated"
+	@echo " Production readiness validated"
 ```
 
 ## Key Takeaways
