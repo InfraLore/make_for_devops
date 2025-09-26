@@ -1,31 +1,53 @@
 # Chapter 3 - Make Fundamentals for the DevOps Engineer
 
-\chaptersubtitle{A practical primer on Make syntax, focusing on the features most relevant to DevOps workflows rather than traditional compilation.}
+\chaptersubtitle{A practical primer on Make syntax, focusing on the features
+most relevant to DevOps workflows rather than traditional compilation.}
 
-If you've encountered Make before, it was probably in the context of compiling C or C++ code. You might have run `make install` on a Linux system or struggled through a university computer science course where Makefiles seemed like an arcane ritual of tabs and cryptic syntax. This chapter will help you forget everything you think you know about Make and see it through fresh eyes—as a powerful orchestration tool perfectly suited for modern DevOps workflows.
+If you've encountered Make before, it was probably in the context of compiling C
+or C++ code. You might have run `make install` on a Linux system or struggled
+through a university computer science course where Makefiles seemed like an
+arcane ritual of tabs and cryptic syntax. This chapter will help you forget
+everything you think you know about Make and see it through fresh eyes—as a
+powerful orchestration tool perfectly suited for modern DevOps workflows.
 
-The beauty of Make for DevOps lies not in its ability to compile code, but in its capacity to define, document, and execute complex operational workflows with remarkable simplicity. While other tools require you to learn new domain-specific languages or complex configuration formats, Make leverages concepts you already understand: commands, dependencies, and variables.
+The beauty of Make for DevOps lies not in its ability to compile code, but in
+its capacity to define, document, and execute complex operational workflows with
+remarkable simplicity. While other tools require you to learn new
+domain-specific languages or complex configuration formats, Make leverages
+concepts you already understand: commands, dependencies, and variables.
 
 ## Essential Make Syntax for DevOps Use Cases
 
 ### The Fundamental Structure: Targets, Prerequisites, and Commands
 
-Every Makefile is built around a simple concept: **targets**. In the compilation world, targets are usually files you want to create. In DevOps, targets represent **actions you want to perform**. Let's start with the most basic example:
+Every Makefile is built around a simple concept: **targets**. In the compilation
+world, targets are usually files you want to create. In DevOps, targets
+represent **actions you want to perform**. Let's start with the most basic
+example:
 
 ```makefile
 deploy:
 	kubectl apply -f k8s/
 ```
 
-This defines a target called `deploy` that runs a single command. When you run `make deploy`, Make executes `kubectl apply -f k8s/`. Simple, right? But there's already more happening here than meets the eye.
+This defines a target called `deploy` that runs a single command. When you run
+`make deploy`, Make executes `kubectl apply -f k8s/`. Simple, right? But there's
+already more happening here than meets the eye.
 
-First, notice the **tab character** before the `kubectl` command. This isn't optional-—Make requires commands to be indented with a literal tab character, not spaces. This is one of Make's most notorious quirks, but modern editors can handle this automatically.
+First, notice the **tab character** before the `kubectl` command. This isn't
+optional—Make requires commands to be indented with a literal tab character,
+not spaces. This is one of Make's most notorious quirks, but modern editors can
+handle this automatically.
 
-Second, Make is doing something subtle but powerful: it's providing a **standardized interface** to your infrastructure. Instead of team members needing to remember `kubectl apply -f k8s/`, they just run `make deploy`. This might seem trivial, but it's the foundation of discoverability.
+Second, Make is doing something subtle but powerful: it's providing a
+**standardized interface** to your infrastructure. Instead of team members
+needing to remember `kubectl apply -f k8s/`, they just run `make deploy`. This
+might seem trivial, but it's the foundation of discoverability.
 
 ### Building Complex Workflows with Prerequisites
 
-The real power of Make emerges when you start defining **prerequisites**—targets that must run before other targets. Consider this expanded deployment workflow:
+The real power of Make emerges when you start defining **prerequisites**—targets
+that must run before other targets. Consider this expanded deployment workflow:
 
 ```makefile
 deploy: test build push
@@ -44,7 +66,10 @@ push:
 	docker push my-app:$(VERSION)
 ```
 
-Now when someone runs `make deploy`, Make automatically ensures that `test`, `build`, and `push` run first, in the correct order. If any step fails, the entire process stops. This creates a **reliable, repeatable deployment pipeline** that's self-documenting.
+Now when someone runs `make deploy`, Make automatically ensures that `test`,
+`build`, and `push` run first, in the correct order. If any step fails, the
+entire process stops. This creates a **reliable, repeatable deployment
+pipeline** that's self-documenting.
 
 ### Multiple Prerequisites and Parallel Execution
 
@@ -68,13 +93,17 @@ lint:
 	black --check src/
 ```
 
-Make is smart about dependencies. It will run `lint` first, then `build`, then both `test` and `push` can run in parallel (since they don't depend on each other), and finally `deploy` runs after both complete.
+Make is smart about dependencies. It will run `lint` first, then `build`, then
+both `test` and `push` can run in parallel (since they don't depend on each
+other), and finally `deploy` runs after both complete.
 
 ## Variables, Functions, and Conditional Logic
 
 ### Variables: Configuration Made Discoverable
 
-Variables in Make serve a crucial role in DevOps workflows: they make configuration **visible and modifiable** without editing the workflow logic. Here are the most common patterns:
+Variables in Make serve a crucial role in DevOps workflows: they make
+configuration **visible and modifiable** without editing the workflow logic.
+Here are the most common patterns:
 
 ```makefile
 # Environment-specific configuration
@@ -92,7 +121,8 @@ deploy:
 	kubectl set image deployment/my-app app=$(IMAGE_TAG) -n $(NAMESPACE)
 ```
 
-The `?=` operator means "set this variable only if it's not already set," allowing users to override defaults:
+The `?=` operator means "set this variable only if it's not already set,"
+allowing users to override defaults:
 
 ```bash
 make deploy ENVIRONMENT=production VERSION=v1.2.3
@@ -100,7 +130,8 @@ make deploy ENVIRONMENT=production VERSION=v1.2.3
 
 ### Built-in Functions for Dynamic Configuration
 
-Make includes several built-in functions that are particularly useful for DevOps:
+Make includes several built-in functions that are particularly useful for
+DevOps:
 
 ```makefile
 # Get git information
@@ -125,7 +156,8 @@ endif
 
 ### Environment Variable Integration
 
-Make seamlessly integrates with environment variables, making it perfect for CI/CD systems:
+Make seamlessly integrates with environment variables, making it perfect for
+CI/CD systems:
 
 ```makefile
 # Use environment variables with fallbacks
@@ -151,7 +183,9 @@ deploy: check-env
 
 ### File-Based Dependencies for Infrastructure
 
-While DevOps workflows are often about executing commands rather than building files, file-based dependencies are still incredibly useful for tracking infrastructure state:
+While DevOps workflows are often about executing commands rather than building
+files, file-based dependencies are still incredibly useful for tracking
+infrastructure state:
 
 ```makefile
 # Track Terraform state
@@ -195,7 +229,8 @@ force-deploy:
 
 ### When to Use Phony Targets
 
-Most DevOps tasks should use **phony targets**—targets that don't correspond to actual files. This tells Make to always run these targets:
+Most DevOps tasks should use **phony targets**—targets that don't correspond to
+actual files. This tells Make to always run these targets:
 
 ```makefile
 .PHONY: deploy test clean logs status
@@ -235,7 +270,8 @@ k8s/deployment.yaml: templates/deployment.yaml.j2 config/values.yaml
 
 ### Verbose Output and Dry Runs
 
-Make provides several debugging options that are invaluable when developing complex workflows:
+Make provides several debugging options that are invaluable when developing
+complex workflows:
 
 ```bash
 # See what Make would do without doing it
@@ -250,7 +286,8 @@ make -p
 
 ### Echoing Commands and Variables
 
-By default, Make doesn't print the commands it runs (it just prints the target name). For DevOps workflows, you usually want to see what's happening:
+By default, Make doesn't print the commands it runs (it just prints the target
+name). For DevOps workflows, you usually want to see what's happening:
 
 ```makefile
 # Default: commands are hidden
@@ -264,7 +301,8 @@ deploy:
 	@echo "Deployment complete"
 ```
 
-The `@` prefix suppresses echoing for that specific command, useful for cosmetic messages.
+The `@` prefix suppresses echoing for that specific command, useful for cosmetic
+messages.
 
 ### Error Handling and Cleanup
 
@@ -315,9 +353,11 @@ deploy-safe:
 		 exit 1)
 ```
 
-## Putting It All Together: A Real-World Example
+## Putting It All Together: A (Mostly) Real-World Example
 
-Let's look at a complete Makefile that demonstrates these concepts in a realistic DevOps scenario:
+Let's look at a complete Makefile that demonstrates these concepts in a
+realistic-ish DevOps scenario (forgive the hand-wavy *implementation* parts,
+we're still pretty meta here):
 
 ```makefile
 # Configuration
@@ -334,23 +374,20 @@ NAMESPACE = $(APP_NAME)-$(ENVIRONMENT)
 
 help: ## Show this help message
 	@echo "Available targets:"
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} \
+	/^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } \
+	/^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' \
+	$(MAKEFILE_LIST)
 
 ##@ Development
 test: ## Run all tests
-	@echo "Running tests for $(APP_NAME)"
-	docker run --rm -v $(PWD):/app $(IMAGE_TAG)-test pytest --cov=src tests/
+	# ... implementation
 
 lint: ## Run code linting
-	@echo "Linting code"
-	flake8 src/
-	black --check src/
-	mypy src/
+	# ... implementation
 
 build: lint ## Build Docker image
-	@echo "Building $(IMAGE_TAG)"
-	docker build -t $(IMAGE_TAG) .
-	docker build -t $(IMAGE_TAG)-test -f Dockerfile.test .
+	# ... implementation
 
 ##@ Deployment
 push: build ## Push image to registry
@@ -358,27 +395,21 @@ push: build ## Push image to registry
 	docker push $(IMAGE_TAG)
 
 deploy: push check-namespace ## Deploy to Kubernetes
-	@echo "Deploying $(APP_NAME) version $(VERSION) to $(ENVIRONMENT)"
-	envsubst < k8s/deployment.yaml | kubectl apply -f - -n $(NAMESPACE)
-	kubectl rollout status deployment/$(APP_NAME) -n $(NAMESPACE) --timeout=300s
-	@echo "Deployment complete!"
+	# ... implementation
 
 ##@ Operations
 logs: ## Show application logs
 	kubectl logs -f deployment/$(APP_NAME) -n $(NAMESPACE)
 
 status: ## Show deployment status
-	kubectl get pods,services,ingress -n $(NAMESPACE)
-	kubectl describe deployment/$(APP_NAME) -n $(NAMESPACE)
+	# ... implementation
 
 clean: ## Clean up local Docker images
-	docker rmi -f $(IMAGE_TAG) $(IMAGE_TAG)-test 2>/dev/null || true
-	docker system prune -f
+	# ... implementation
 
 ##@ Utilities
 check-namespace: ## Ensure namespace exists
-	@kubectl get namespace $(NAMESPACE) >/dev/null 2>&1 || \
-		(echo "Creating namespace $(NAMESPACE)" && kubectl create namespace $(NAMESPACE))
+	# ... implementation
 
 shell: ## Get shell in running pod
 	kubectl exec -it deployment/$(APP_NAME) -n $(NAMESPACE) -- /bin/bash
@@ -389,16 +420,31 @@ export ENVIRONMENT VERSION IMAGE_TAG NAMESPACE
 
 This Makefile demonstrates several key principles:
 
-1. **Self-documenting**: The help target automatically generates documentation from comments
-2. **Environment-aware**: Different environments can be targeted with the same commands
-3. **Error-resistant**: Commands check prerequisites and handle failures gracefully
-4. **Discoverable**: Complex operations are exposed through simple, memorable target names
-5. **Debuggable**: Variables are clearly defined and can be overridden for testing
+1. **Self-documenting**: The help target automatically generates documentation
+   from comments
+2. **Environment-aware**: Different environments can be targeted with the same
+   commands
+3. **Error-resistant**: Commands check prerequisites and handle failures
+   gracefully
+4. **Discoverable**: Complex operations are exposed through simple, memorable
+   target names
+5. **Debuggable**: Variables are clearly defined and can be overridden for
+   testing
 
 ## Key Takeaways
 
-Make's syntax might seem intimidating at first, especially if you're coming from modern DevOps tools with YAML configurations or graphical interfaces. But this apparent complexity masks a powerful simplicity: Make provides a way to document, organize, and execute your DevOps workflows that is both human-readable and machine-executable.
+Make's syntax might seem intimidating at first, especially if you're coming from
+modern DevOps tools with YAML configurations or graphical interfaces. But this
+apparent complexity masks a powerful simplicity: Make provides a way to
+document, organize, and execute your DevOps workflows that is both
+human-readable and machine-executable.
 
-The fundamental concepts you've learned in this chapter—targets, prerequisites, variables, and debugging—are the building blocks for everything we'll explore in the rest of this book. Whether you're orchestrating Docker builds, managing Kubernetes deployments, or coordinating infrastructure provisioning, these patterns will serve you well.
+The fundamental concepts you've learned in this chapter—targets, prerequisites,
+variables, and debugging—are the building blocks for everything we'll explore in
+the rest of this book. Whether you're orchestrating Docker builds, managing
+Kubernetes deployments, or coordinating infrastructure provisioning, these
+patterns will serve you well.
 
-In the next chapter, we'll dive deeper into using Make's variable system to manage configuration across different environments, turning your Makefiles into flexible, reusable tools that can adapt to any deployment scenario.
+In the next chapter, we'll dive deeper into using Make's variable system to
+manage configuration across different environments, turning your Makefiles into
+flexible, reusable tools that can adapt to any deployment scenario.

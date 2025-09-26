@@ -50,7 +50,7 @@ go install github.com/mrtazz/checkmake/cmd/checkmake@latest
 brew install checkmake  # macOS
 apt-get install checkmake  # Ubuntu/Debian
 ```
-
+\pagebreak
 Run checkmake on your Makefiles:
 
 ```bash
@@ -447,103 +447,9 @@ test-shell-patterns: ## Test common shell patterns in Make targets
 
 ### Custom Validation Scripts
 
-Create reusable validation scripts for complex testing scenarios:
-
-```bash
-#!/bin/bash
-# validate-makefile.sh - Comprehensive Makefile validation
-
-set -euo pipefail
-
-MAKEFILE="${1:-Makefile}"
-TEMP_DIR=$(mktemp -d)
-FAILED_TESTS=()
-
-cleanup() {
-    rm -rf "$TEMP_DIR"
-    if [ ${#FAILED_TESTS[@]} -gt 0 ]; then
-        echo " Failed tests: ${FAILED_TESTS[*]}"
-        exit 1
-    else
-        echo " All Makefile validations passed"
-    fi
-}
-
-trap cleanup EXIT
-
-test_syntax() {
-    echo "Testing Makefile syntax..."
-    if ! make -f "$MAKEFILE" -n help >/dev/null 2>&1; then
-        FAILED_TESTS+=("syntax")
-        echo " Syntax test failed"
-    else
-        echo " Syntax test passed"
-    fi
-}
-
-test_required_targets() {
-    echo "Testing required targets..."
-    REQUIRED_TARGETS=("help" "build" "test" "clean")
-    
-    for target in "${REQUIRED_TARGETS[@]}"; do
-        if ! make -f "$MAKEFILE" -n "$target" >/dev/null 2>&1; then
-            FAILED_TESTS+=("required-target-$target")
-            echo " Required target '$target' missing or invalid"
-        fi
-    done
-    
-    if [[ ! " ${FAILED_TESTS[*]} " =~ required-target ]]; then
-        echo " Required targets test passed"
-    fi
-}
-
-test_phony_declarations() {
-    echo "Testing .PHONY declarations..."
-    PHONY_TARGETS=$(grep "^\.PHONY:" "$MAKEFILE" | sed 's/^\.PHONY: *//' | tr ' ' '\n' | sort)
-    ACTION_TARGETS=$(grep -E '^[a-z][a-z-]*:' "$MAKEFILE" | cut -d: -f1 | sort)
-    
-    MISSING_PHONY=$(comm -23 <(echo "$ACTION_TARGETS") <(echo "$PHONY_TARGETS"))
-    
-    if [ -n "$MISSING_PHONY" ]; then
-        FAILED_TESTS+=("phony")
-        echo " Missing .PHONY declarations for: $MISSING_PHONY"
-    else
-        echo " .PHONY declarations test passed"
-    fi
-}
-
-test_help_system() {
-    echo "Testing help system..."
-    if ! make -f "$MAKEFILE" help | grep -q "Available\|Commands\|Usage"; then
-        FAILED_TESTS+=("help-system")
-        echo " Help system test failed"
-    else
-        echo " Help system test passed"
-    fi
-}
-
-# Run all tests
-test_syntax
-test_required_targets
-test_phony_declarations
-test_help_system
-```
-
-Integrate this script into your Makefile:
-
-```makefile
-validate: ## Run comprehensive Makefile validation
-	@./scripts/validate-makefile.sh
-
-# Or inline validation
-self-validate: ## Self-validate this Makefile
-	@echo "Running comprehensive validation..."
-	@$(MAKE) lint-makefile
-	@$(MAKE) test-syntax
-	@$(MAKE) test-variables
-	@$(MAKE) test-dependencies
-	@echo " All validations passed"
-```
+You can actually write your own validation scripts for your Makefiles. You can
+find a few examples of such custom validation script in this books online
+companion repository (see Appendix D).
 
 ## Continuous Testing of Makefiles in CI Pipelines
 
