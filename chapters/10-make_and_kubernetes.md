@@ -1,6 +1,6 @@
 # Chapter 10: Make and Kubernetes - Orchestrating Cloud-Native Deployments
 
-*Simplifying Kubernetes complexity through Make-based deployment workflows that any team member can understand and execute.*
+\chaptersubtitle{Simplifying Kubernetes complexity through Make-based deployment workflows that any team member can understand and execute.}
 
 Kubernetes has become the foundation of modern cloud-native infrastructure, but its power comes with overwhelming complexity. YAML manifests, kubectl commands, namespace management, resource dependencies, health checks, rollback procedures—the cognitive load can be crushing. Teams often resort to complex shell scripts, struggle with inconsistent deployments, or rely on heavyweight platforms that obscure the underlying operations.
 

@@ -1,6 +1,6 @@
 # Chapter 11: Make and CI/CD Foundations
 
-*Bridging local and remote workflows with consistent, discoverable automation.*
+\chaptersubtitle{Bridging local and remote workflows with consistent, discoverable automation.}
 
 The most frustrating phrase in software development is "it works on my machine."
 This problem becomes exponentially worse in CI/CD pipelines, where developers

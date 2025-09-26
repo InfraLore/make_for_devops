@@ -1,5 +1,6 @@
 # Chapter 6 - Phony Targets and Task Organization
-_Mastering phony targets to create clear, discoverable interfaces for all operational tasks, from development to production deployment._
+
+\chaptersubtitle{Mastering phony targets to create clear, discoverable interfaces for all operational tasks, from development to production deployment.}
 
 In traditional Make usage, targets represent files that need to be built. But in DevOps workflows, most of our "targets" don't create files—they perform actions like deploying services, running tests, or cleaning up resources. This is where **phony targets** become crucial. They're the foundation of creating discoverable, well-organized Make workflows that serve as intuitive interfaces to your operational processes.
 

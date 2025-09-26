@@ -124,7 +124,7 @@ $endif$
 $if(monofont)$
   \setmonofont[$for(monofontoptions)$$monofontoptions$$sep$,$endfor$]{$monofont$}
 $endif$
-\newfontfamily\LatoFont{Lato}
+\newfontfamily\LatoFont[]{Lato}
 $for(fontfamilies)$
   \newfontfamily{$fontfamilies.name$}[$for(fontfamilies.options)$$fontfamilies.options$$sep$,$endfor$]{$fontfamilies.font$}
 $endfor$
@@ -461,6 +461,15 @@ $endif$
 }
 
 \usepackage{needspace}
+
+% Add chapter subtitle support
+\makeatletter
+\newcommand{\chaptersubtitle}[1]{%
+  \vspace{-4em}%
+  {\LatoFont\large\itshape #1}%
+  \vspace{1em}%
+}
+\makeatother
 
 \begin{document}
 $if(has-frontmatter)$

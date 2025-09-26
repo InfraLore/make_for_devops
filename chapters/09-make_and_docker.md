@@ -1,5 +1,6 @@
 # Chapter 9 - Make and Docker - Containerization Made Discoverable
-_Creating transparent, repeatable container workflows that eliminate the "works on my machine" problem._
+
+\chaptersubtitle{Creating transparent, repeatable container workflows that eliminate the "works on my machine" problem.}
 
 Docker transformed software deployment by packaging applications with their dependencies into portable containers. But Docker's power comes with complexity: multi-stage builds, registry management, image tagging strategies, development environment setup, and security scanning workflows. Teams often end up with scattered scripts, inconsistent commands, and the dreaded "I forgot how to build this" syndrome.
 

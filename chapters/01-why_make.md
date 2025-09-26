@@ -1,5 +1,6 @@
 # Chapter 1: Why Make for DevOps?
-Examining the hidden crisis of undocumented institutional knowledge and introducing Make as the solution for discoverable, self-documenting DevOps processes.
+
+\chaptersubtitle{Examining the hidden crisis of undocumented institutional knowledge and introducing Make as the solution for discoverable, self-documenting DevOps processes.}
 
 - The institutional knowledge crisis in modern DevOps teams
 - The challenge of preserving team expertise

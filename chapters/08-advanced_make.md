@@ -1,5 +1,6 @@
 # Chapter 8 - Advanced Make Features for Workflow Automation
-_Exploring Make's powerful advanced features that enable sophisticated workflow automation while maintaining simplicity and discoverability._
+
+\chaptersubtitle{Exploring Make's powerful advanced features that enable sophisticated workflow automation while maintaining simplicity and discoverability.}
 
 Up to this point, we've explored Make's fundamental features: variables, targets, dependencies, and organization patterns. These basics handle most DevOps workflow needs effectively. But Make has a deeper toolkit of advanced features that can transform complex, repetitive operational tasks into elegant, maintainable automation.
 

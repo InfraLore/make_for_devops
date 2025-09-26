@@ -1,6 +1,7 @@
 # Chapter 2 - The Executable README
-_Transforming the traditional README from static documentation into an
-interactive, always-current guide to your project's capabilities._
+
+\chaptersubtitle{Transforming the traditional README from static documentation into an
+interactive, always-current guide to your project's capabilities.}
 
 Every developer has experienced the frustration: you clone a promising
 repository, eager to try it out, only to find a README that's either woefully

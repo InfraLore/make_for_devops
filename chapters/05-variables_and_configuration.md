@@ -1,5 +1,6 @@
 # Chapter 5 - Variables and Configuration Management
-_Using Make's variable system to create flexible, environment-aware workflows that reduce configuration drift and improve consistency._
+
+\chaptersubtitle{Using Make's variable system to create flexible, environment-aware workflows that reduce configuration drift and improve consistency.}
 
 One of the most powerful aspects of Make is its sophisticated variable system. While many people think of Make variables as simple string substitution, they're actually a flexible configuration management system that can eliminate much of the complexity and inconsistency that plagues modern deployment workflows.
 

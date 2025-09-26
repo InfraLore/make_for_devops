@@ -1,5 +1,6 @@
 # Chapter 4 - Testing and Validating Makefiles
-_Ensuring reliability and correctness of Make-based workflows through systematic testing and validation._
+
+\chaptersubtitle{Ensuring reliability and correctness of Make-based workflows through systematic testing and validation.}
 
 In the previous chapters, we've explored how Make can transform your DevOps workflows into discoverable, self-documenting systems. But there's a critical question we haven't yet addressed: **How do you ensure your Makefiles actually work correctly?**
 

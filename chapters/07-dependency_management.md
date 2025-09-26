@@ -1,5 +1,6 @@
 # Chapter 7 - Dependency Management for DevOps Workflows
-_Leveraging Make's dependency system to ensure correct execution order and prevent common deployment pitfalls._
+
+\chaptersubtitle{Leveraging Make's dependency system to ensure correct execution order and prevent common deployment pitfalls.}
 
 Make's dependency system is where the magic happens in DevOps workflows. While other automation tools require you to explicitly script every step in sequence, Make lets you declare what depends on what, then automatically figures out the optimal execution order. This declarative approach transforms error-prone linear scripts into robust, self-organizing workflows that adapt intelligently to changing conditions.
 

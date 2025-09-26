@@ -1,5 +1,6 @@
 # Chapter 3 - Make Fundamentals for the DevOps Engineer
-_A practical primer on Make syntax, focusing on the features most relevant to DevOps workflows rather than traditional compilation._
+
+\chaptersubtitle{A practical primer on Make syntax, focusing on the features most relevant to DevOps workflows rather than traditional compilation.}
 
 If you've encountered Make before, it was probably in the context of compiling C or C++ code. You might have run `make install` on a Linux system or struggled through a university computer science course where Makefiles seemed like an arcane ritual of tabs and cryptic syntax. This chapter will help you forget everything you think you know about Make and see it through fresh eyes—as a powerful orchestration tool perfectly suited for modern DevOps workflows.
 
