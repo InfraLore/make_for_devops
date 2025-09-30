@@ -1093,6 +1093,6 @@ Phony targets are the foundation of discoverable, well-organized DevOps workflow
 8. **State Management**: Organize targets around the natural lifecycle and states of your applications
     
 
-Well-organized phony targets transform your Makefile from a collection of scripts into an intuitive interface that guides team members through complex operational workflows. They make the implicit explicit, turning undocumented/institutional knowledge into discoverable, executable documentation.
+Well-organized phony targets transform your Makefile from a collection of scripts into an intuitive interface that guides team members through complex operational workflows. They make the implicit explicit, turning undocumented team lore into discoverable, executable documentation.
 
 In the next chapter, we'll explore how to use Make's dependency management features to create sophisticated workflow orchestration that ensures operations happen in the correct order and with proper validation, building on the solid foundation of well-organized phony targets we've established here.

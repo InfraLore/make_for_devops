@@ -61,8 +61,7 @@ This looks comprehensive and helpful. The problem emerges over time:
 
 Six months later, this helpful README has become a liability. New developers
 waste hours trying to follow outdated instructions, and experienced team members
-bypass the README entirely, relying on institutional knowledge that's never written
-down.
+bypass the README entirely, relying on team lore that's never written down.
 
 ## The Philosophy of the Executable README
 

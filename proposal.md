@@ -91,11 +91,7 @@ Claude's unique perspective comes from having no attachment to any particular to
 
 _Comprehensive reference for Make syntax, common patterns, and troubleshooting commands._
 
-### Appendix B: Tool Integration Examples
-
-_Ready-to-use code examples for integrating Make with popular DevOps tools._
-
-### Appendix C: Migration Strategies
+### Appendix B: Migration Strategies
 
 _Step-by-step guides for migrating existing workflows to Make-based approaches._
 

@@ -34,7 +34,7 @@ The institutional knowledge crisis manifests in measurable ways:
 
 **Cognitive Load**: Senior engineers become bottlenecks. They're interrupted constantly with questions like "How do I deploy to staging?" or "What's the command to rotate the database credentials?" This "ask an expert" pattern scales poorly and creates single points of failure in your team's operational capability.
 
-**Fear of Change**: When operational procedures are opaque and undocumented, engineers become conservative about making changes. Infrastructure improvements stall because nobody wants to be the one who breaks the undocumented deployment process.
+**Fear of Change**: When operational procedures are opaque and undocumented, "team lore" if you will, engineers become conservative about making changes. Infrastructure improvements stall because nobody wants to be the one who breaks the undocumented deployment process.
 
 ### The Knowledge Transfer Problem
 
@@ -46,7 +46,7 @@ Let's examine a typical knowledge transfer scenario. Your senior platform engine
 
 **Week 8**: A new tool was introduced. Someone adds a footnote but forgets to update the main procedure. Now there are two conflicting sets of instructions.
 
-**Week 12**: Marcus returns. The document has 15 comments saying "this didn't work" or "is this still current?" Nobody is sure which parts are accurate anymore. The team has developed new, undocumented workarounds.
+**Week 12**: Marcus returns. The document has 15 comments saying "this didn't work" or "is this still current?" Nobody is sure which parts are accurate anymore. The team has developed new, undocumented workarounds. The team lore has grown.
 
 The document failed not because it was poorly written, but because **static documentation cannot survive contact with a changing system**. The faster your infrastructure evolves—which is the goal of DevOps—the faster your documentation decays.
 

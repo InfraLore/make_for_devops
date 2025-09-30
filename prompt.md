@@ -1,4 +1,4 @@
-We're working on "Make for DevOps: Discovering and Documenting Your Workflow with Make", a 350-400 page book for Packt Publishing targeting Q2 2026. You've already completed chapters 1-12.
+We're working on "Make for DevOps: Discovering and Documenting Your Workflow with Make", a 350-400 page book for Packt Publishing targeting Q2 2026. You've already completed chapters 1-14.
 
 # Core Concept
 The book positions Make as a universal workflow orchestration and documentation layer for DevOps teams. The key innovation is treating Makefiles as "executable READMEs" that solve the institutional knowledge problem—where critical workflows exist only in senior engineers' minds or scattered documentation.
@@ -30,7 +30,7 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
 
 # RULES
 - We will always capitalize Make when we are referring to the software, like we do with all proper nouns.
-- We will NOT use the word Tribal.
+- We will NOT use the word "tribal" -- Use "team lore" instead.
 - We will keep Makefile line width to 75 characters max.
 - We will use "# implementation" for targets in Makefiles that are about the structure of a Makefile, and not specific to an actual task relevant to the current discussion.
 - WE will use `\chaptersubtitle{Bridging local and remote workflows with consistent, discoverable automation.}` as the markup for chapter subtitles
@@ -187,6 +187,8 @@ _Comprehensive reference for make syntax, common patterns, and troubleshooting c
 _Step-by-step guides for migrating existing workflows to make-based approaches._
 
 # Sample Chapter (Chapter 2 - for tone/style reference)
+
+### BEGIN CHAPTER 2 ###
 
 # Chapter 2 - The Executable README
 
@@ -885,3 +887,51 @@ intuitive, well-named, safe to execute, and thoroughly tested.
 In the next chapter, we'll dive deeper into Make's fundamental features and how
 they can be leveraged specifically for DevOps workflows, building on this
 foundation of discoverability and executable documentation.
+
+### END CHAPTER 2 ###
+
+# Makefile Examples Philosophy
+
+## Keep examples focused and conceptual, not exhaustive:
+
+- Makefile examples should be 10-30 lines that illustrate a specific pattern or
+  concept
+- Show the interface and discovery pattern, not complete implementations
+- Use hand-wavy placeholders like ./scripts/deploy.sh or @echo "Running
+  validation..." for complex operations
+- Examples should teach how to think about structuring Makefiles, not be
+  production-ready copy-paste code
+- Focus on what users discover when they run make help or follow error messages
+
+## Progressive disclosure principle:
+
+- Show simple, high-level targets first (e.g., deploy-dev, deploy-staging,
+  deploy-prod)
+- Indicate internal implementation with underscore prefix or references to
+  scripts
+- Demonstrate how complexity reveals itself as users interact with the Makefile
+- Emphasize the learning journey over comprehensive solutions
+
+## Examples should demonstrate:
+
+- Clear, discoverable target naming
+- Helpful error messages that guide next steps
+- Context-aware help systems
+- Safe defaults with progressive complexity
+- How Make teaches the workflow through use
+
+## Avoid:
+
+- 100+ line "complete" Makefiles trying to cover every edge case
+- Showing every flag and option for tools like terraform, docker, kubectl
+- Implementation details that obscure the pattern being taught
+- Examples that could work as-is in production (that's not the book's goal)
+
+## Remember:
+- The book is about discovering and documenting workflows.
+- Examples should show how Make makes workflows discoverable, not how to build
+production-grade infrastructure automation from scratch.
+- We're teaching patterns, not providing templates.
+- We will always capitalize Make when we are referring to the software.
+- We will NOT use the word "tribal" -- Use "team lore" instead.
+- We will keep Makefile line width to 75 characters max.
