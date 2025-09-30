@@ -294,6 +294,10 @@ $if(links-as-notes)$
 $endif$
 $if(strikeout)$
 \usepackage[normalem]{ulem}
+% Suppress warnings about underline commands
+\let\underbar\relax
+\let\underline\relax
+\usepackage[normalem]{ulem}
 % Avoid problems with \sout in headers with hyperref
 \pdfstringdefDisableCommands{\renewcommand{\sout}{}}
 $endif$

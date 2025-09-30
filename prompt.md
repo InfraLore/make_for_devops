@@ -128,7 +128,7 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
 - **Caching & artifacts**: dependency caching, Docker cache layers, artifact packaging, deployment from artifacts
 - **GitOps integration**: preparing manifests, committing to GitOps repos, triggering ArgoCD/Flux
 - **Key takeaways**: consistency + performance + platform-agnosticism
-## Part IV Applied DevOps Workflows with Make
+## Part IV: Applied DevOps Workflows with Make
 ### Chapter 13: Make for Infrastructure Provisioning
 - Terraform workflow orchestration
 - Cloud resource lifecycle management
@@ -151,9 +151,6 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
 - Secret rotation and management
 - Audit trail generation and maintenance
 - Incident response and forensics workflows
-
----
-
 ## Part V: Advanced Patterns and Team Adoption
 ### Chapter 18: Scaling Make Across Teams and Projects
 - Creating organization-wide make standards

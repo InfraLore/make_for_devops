@@ -2,9 +2,9 @@
 
 \chaptersubtitle{Understanding the institutional knowledge crisis and why Make is the unexpected solution for modern DevOps teams.}
 
-It's 3 AM, and your production system is down. The on-call engineer—Sarah, who joined three months ago—is frantically searching through Slack history, wiki pages, and a sprawling documentation site trying to figure out how to roll back the deployment. She finds five different runbooks, each with slightly different commands. Two reference scripts that no longer exist. One points to a Confluence page that requires permissions she doesn't have. The senior engineer who wrote most of these procedures left four months ago, and with them went years of operational knowledge.
+It's 3 AM, and your production system is down. The on-call engineer—Sage, who joined three months ago—is frantically searching through Slack history, wiki pages, and a sprawling documentation site trying to figure out how to roll back the deployment. She finds five different runbooks, each with slightly different commands. Two reference scripts that no longer exist. One points to a Confluence page that requires permissions she doesn't have. The senior engineer who wrote most of these procedures left four months ago, and with them went years of operational knowledge.
 
-By the time Sarah pieces together the correct sequence of commands—validating each step through trial and error in the staging environment—an hour has passed. The rollback succeeds, but the incident post-mortem reveals a troubling pattern: this wasn't an isolated case. It was just the most visible symptom of a much deeper problem.
+By the time Sage pieces together the correct sequence of commands—validating each step through trial and error in the staging environment—an hour has passed. The rollback succeeds, but the incident post-mortem reveals a troubling pattern: this wasn't an isolated case. It was just the most visible symptom of a much deeper problem.
 
 This scenario plays out differently across thousands of companies, but the underlying crisis is the same: **critical operational knowledge exists only in the minds of a few experienced engineers, and traditional documentation simply cannot keep pace with the reality of modern systems.**
 

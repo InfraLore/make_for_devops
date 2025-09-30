@@ -1,2 +1,2 @@
-\part{Part IV Applied DevOps Workflows with Make}
+\part{Part IV: Applied DevOps Workflows with Make}
 \newpage
