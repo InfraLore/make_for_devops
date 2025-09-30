@@ -19,6 +19,8 @@ geometry: twoside
 header-includes:
   - \widowpenalty=10000
   - \clubpenalty=10000
+  - \usepackage{setspace}
+  - \setstretch{1.50}  # Increase line spacing by 50%
   - \usepackage[most]{tcolorbox}
   - |
     \newtcblisting{codeblock}{

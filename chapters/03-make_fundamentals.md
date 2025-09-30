@@ -1,4 +1,4 @@
-# Chapter 3 - Make Fundamentals for the DevOps Engineer
+# Chapter 3 - Make Fundamentals for the Modern DevOps Engineer
 
 \chaptersubtitle{A practical primer on Make syntax, focusing on the features
 most relevant to DevOps workflows rather than traditional compilation.}
@@ -18,7 +18,7 @@ concepts you already understand: commands, dependencies, and variables.
 
 ## Essential Make Syntax for DevOps Use Cases
 
-### The Fundamental Structure: Targets, Prerequisites, and Commands
+### The Fundamental Structure: Targets, Prerequisites, and Recipes
 
 Every Makefile is built around a simple concept: **targets**. In the compilation
 world, targets are usually files you want to create. In DevOps, targets
@@ -35,35 +35,34 @@ This defines a target called `deploy` that runs a single command. When you run
 already more happening here than meets the eye.
 
 First, notice the **tab character** before the `kubectl` command. This isn't
-optional—Make requires commands to be indented with a literal tab character,
-not spaces. This is one of Make's most notorious quirks, but modern editors can
-handle this automatically.
+optional—Make requires commands to be indented with a literal tab character, not
+spaces. This is one of Make's most notorious quirks, but modern editors can
+handle this automatically. If you get an error like `*** missing separator`,
+you've used spaces instead of tabs.
 
 Second, Make is doing something subtle but powerful: it's providing a
 **standardized interface** to your infrastructure. Instead of team members
 needing to remember `kubectl apply -f k8s/`, they just run `make deploy`. This
 might seem trivial, but it's the foundation of discoverability.
 
-### Building Complex Workflows with Prerequisites
+### Building Workflows with Prerequisites
 
 The real power of Make emerges when you start defining **prerequisites**—targets
-that must run before other targets. Consider this expanded deployment workflow:
+that must run before other targets:
 
 ```makefile
 deploy: test build push
-	kubectl apply -f k8s/
-	kubectl rollout status deployment/my-app
+	@echo "Deploying application..."
+	@./scripts/deploy-to-k8s.sh
 
 test:
-	docker run --rm -v $(PWD):/app my-app:test pytest
+	@./scripts/run-test-suite.sh
 
 build:
-	docker build -t my-app:latest .
-	docker tag my-app:latest my-app:$(VERSION)
+	@docker build -t myapp:$(VERSION) .
 
-push:
-	docker push my-app:latest
-	docker push my-app:$(VERSION)
+push: build
+	@docker push myapp:$(VERSION)
 ```
 
 Now when someone runs `make deploy`, Make automatically ensures that `test`,
@@ -71,54 +70,60 @@ Now when someone runs `make deploy`, Make automatically ensures that `test`,
 entire process stops. This creates a **reliable, repeatable deployment
 pipeline** that's self-documenting.
 
-### Multiple Prerequisites and Parallel Execution
+Notice the pattern here: the targets show what happens and in what order, while
+the actual complexity lives in scripts. This keeps the Makefile readable while
+allowing detailed implementation elsewhere.
 
-Prerequisites can have their own prerequisites, creating complex dependency graphs:
+### Dependency Graphs and Execution Order
+
+Prerequisites can have their own prerequisites, creating dependency graphs:
 
 ```makefile
 deploy: test push
-	kubectl apply -f k8s/
+	@./scripts/deploy.sh
 
 push: build
-	docker push my-app:$(VERSION)
+	@./scripts/push-images.sh
 
 test: build
-	docker run --rm my-app:$(VERSION) pytest
+	@./scripts/run-tests.sh
 
 build: lint
-	docker build -t my-app:$(VERSION) .
+	@./scripts/build-containers.sh
 
 lint:
-	flake8 src/
-	black --check src/
+	@./scripts/run-linters.sh
 ```
 
-Make is smart about dependencies. It will run `lint` first, then `build`, then
-both `test` and `push` can run in parallel (since they don't depend on each
-other), and finally `deploy` runs after both complete.
+Make is smart about dependencies. It will run `lint` first, then `build`. After
+`build` completes, both `test` and `push` can run (they don't depend on each
+other). Finally, `deploy` runs after both complete.
+
+This declarative approach means you describe what depends on what, and Make
+figures out the optimal execution order. You're not writing imperative scripts
+with explicit sequencing—you're declaring relationships.
 
 ## Variables, Functions, and Conditional Logic
 
-### Variables: Configuration Made Discoverable
+### Variables: Configuration Made Visible
 
-Variables in Make serve a crucial role in DevOps workflows: they make
-configuration **visible and modifiable** without editing the workflow logic.
-Here are the most common patterns:
+Variables in Make serve a crucial role: they make configuration **visible and
+modifiable** without editing the workflow logic:
 
 ```makefile
-# Environment-specific configuration
+# Configuration with sensible defaults
 ENVIRONMENT ?= development
 VERSION ?= $(shell git rev-parse --short HEAD)
-REGISTRY ?= my-registry.com
-IMAGE_NAME ?= my-app
+REGISTRY ?= registry.company.com
+APP_NAME ?= myapp
 
 # Derived variables
-IMAGE_TAG = $(REGISTRY)/$(IMAGE_NAME):$(VERSION)
-NAMESPACE = my-app-$(ENVIRONMENT)
+IMAGE_TAG = $(REGISTRY)/$(APP_NAME):$(VERSION)
+NAMESPACE = $(APP_NAME)-$(ENVIRONMENT)
 
 deploy:
-	kubectl apply -f k8s/ -n $(NAMESPACE)
-	kubectl set image deployment/my-app app=$(IMAGE_TAG) -n $(NAMESPACE)
+	@echo "Deploying $(IMAGE_TAG) to $(NAMESPACE)"
+	@./scripts/deploy.sh $(NAMESPACE) $(IMAGE_TAG)
 ```
 
 The `?=` operator means "set this variable only if it's not already set,"
@@ -128,308 +133,389 @@ allowing users to override defaults:
 make deploy ENVIRONMENT=production VERSION=v1.2.3
 ```
 
-### Built-in Functions for Dynamic Configuration
+This is discoverable configuration—engineers can see what's configurable by
+reading the Makefile's variable definitions at the top.
 
-Make includes several built-in functions that are particularly useful for
-DevOps:
+### Shell Integration for Dynamic Values
+
+The `$(shell ...)` function lets you run commands and capture their output:
 
 ```makefile
-# Get git information
-VERSION = $(shell git describe --tags --always)
-BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
+VERSION := $(shell git describe --tags --always --dirty)
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+COMMIT := $(shell git rev-parse --short HEAD)
+BUILD_DATE := $(shell date -u +%Y-%m-%dT%H:%M:%SZ)
 
-# File operations
-SECRETS_EXIST = $(wildcard secrets/*.yaml)
-MIGRATION_FILES = $(wildcard migrations/*.sql)
+# Use these in your targets
+build:
+	@echo "Building version $(VERSION) from branch $(BRANCH)"
+	@docker build \
+	  --build-arg VERSION=$(VERSION) \
+	  --build-arg BUILD_DATE=$(BUILD_DATE) \
+	  -t myapp:$(VERSION) .
+```
 
-# String manipulation
-CLEAN_BRANCH = $(subst /,-,$(BRANCH))
-NAMESPACE = my-app-$(CLEAN_BRANCH)
+The `:=` operator evaluates the shell command once when the Makefile is parsed,
+while `=` evaluates it every time the variable is used. For expensive operations
+like git commands, use `:=`.
 
-# Conditional deployment
+### Conditional Logic for Environment-Aware Workflows
+
+Make supports conditional logic for adapting behavior:
+
+```makefile
+ENVIRONMENT ?= development
+
 deploy:
-ifneq ($(SECRETS_EXIST),)
-	kubectl apply -f secrets/
+ifeq ($(ENVIRONMENT),production)
+	@echo "Production deployment requires approval"
+	@read -p "Deploy to production? [yes/NO]: " ans && \
+	  [ "$$ans" = "yes" ]
 endif
-	kubectl apply -f k8s/
-```
+	@./scripts/deploy.sh $(ENVIRONMENT)
 
-### Environment Variable Integration
-
-Make seamlessly integrates with environment variables, making it perfect for
-CI/CD systems:
-
-```makefile
-# Use environment variables with fallbacks
-AWS_REGION ?= us-west-2
-CLUSTER_NAME ?= $(USER)-dev
-KUBECONFIG ?= ~/.kube/config
-
-# Validate required environment variables
-check-env:
-ifndef AWS_ACCESS_KEY_ID
-	$(error AWS_ACCESS_KEY_ID is not set)
-endif
-ifndef AWS_SECRET_ACCESS_KEY
-	$(error AWS_SECRET_ACCESS_KEY is not set)
+# Or use conditional variable assignment
+ifeq ($(ENVIRONMENT),production)
+  REPLICA_COUNT = 5
+else
+  REPLICA_COUNT = 2
 endif
 
-deploy: check-env
-	aws eks update-kubeconfig --region $(AWS_REGION) --name $(CLUSTER_NAME)
-	kubectl apply -f k8s/
+scale:
+	@kubectl scale deployment/myapp --replicas=$(REPLICA_COUNT)
 ```
 
-## Understanding Dependencies in the Context of Deployment Workflows
+### Built-in Functions
 
-### File-Based Dependencies for Infrastructure
-
-While DevOps workflows are often about executing commands rather than building
-files, file-based dependencies are still incredibly useful for tracking
-infrastructure state:
+Make includes useful built-in functions:
 
 ```makefile
-# Track Terraform state
-terraform.tfstate: main.tf variables.tf
-	terraform init
-	terraform apply -auto-approve
+# Wildcard: find files
+YAML_FILES := $(wildcard k8s/*.yaml)
+MIGRATION_FILES := $(wildcard migrations/*.sql)
 
-# Kubernetes secrets depend on source files
-k8s/secrets.yaml: secrets/database.env secrets/api-keys.env
-	kubectl create secret generic app-secrets \
-		--from-env-file=secrets/database.env \
-		--from-env-file=secrets/api-keys.env \
-		--dry-run=client -o yaml > k8s/secrets.yaml
+# Substitution: transform strings
+BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
+CLEAN_BRANCH := $(subst /,-,$(BRANCH))
+NAMESPACE := myapp-$(CLEAN_BRANCH)
 
-# Deploy only if configurations have changed
-deploy: k8s/secrets.yaml terraform.tfstate
-	kubectl apply -f k8s/
+# Pattern substitution
+SRC_FILES := $(wildcard src/*.py)
+TEST_FILES := $(patsubst src/%.py,tests/test_%.py,$(SRC_FILES))
 ```
 
-### Time-Based Dependencies
+## Understanding Dependencies in Deployment Workflows
 
-Sometimes you need to force re-execution based on time rather than file changes:
-
-```makefile
-# Daily cleanup task
-.PHONY: daily-cleanup
-daily-cleanup: /tmp/last-cleanup
-	kubectl delete pods --field-selector=status.phase=Succeeded
-	touch /tmp/last-cleanup
-
-/tmp/last-cleanup:
-	touch /tmp/last-cleanup
-
-# Force re-deployment every time
-.PHONY: force-deploy
-force-deploy:
-	kubectl rollout restart deployment/my-app
-```
-
-## File-Based vs. Phony Targets for Operational Tasks
-
-### When to Use Phony Targets
+### Phony Targets: The DevOps Default
 
 Most DevOps tasks should use **phony targets**—targets that don't correspond to
-actual files. This tells Make to always run these targets:
+actual files:
 
 ```makefile
-.PHONY: deploy test clean logs status
+.PHONY: deploy test clean logs status rollback
 
 deploy:
-	kubectl apply -f k8s/
+	@./scripts/deploy.sh
 
 test:
-	pytest tests/
+	@./scripts/run-tests.sh
 
 clean:
-	docker system prune -f
+	@docker system prune -f
 
 logs:
-	kubectl logs -f deployment/my-app
+	@kubectl logs -f deployment/myapp
 
 status:
-	kubectl get pods,services,ingress
+	@kubectl get pods,svc,ingress
+
+rollback:
+	@kubectl rollout undo deployment/myapp
 ```
 
-### When File Targets Make Sense
+Declaring targets as `.PHONY` tells Make to always run them, even if a file with
+that name exists. This is critical for DevOps workflows where targets represent
+actions, not build artifacts.
+
+### File-Based Dependencies: When They Make Sense
 
 File targets are useful when you want to avoid unnecessary work:
 
 ```makefile
-# Only rebuild Docker image if source changes
-Dockerfile.built: Dockerfile requirements.txt $(wildcard src/*.py)
-	docker build -t my-app:latest .
-	touch Dockerfile.built
+# Only rebuild if source files changed
+.built: Dockerfile requirements.txt $(wildcard src/*.py)
+	docker build -t myapp:latest .
+	touch .built
 
-# Only regenerate Kubernetes manifests if templates change
-k8s/deployment.yaml: templates/deployment.yaml.j2 config/values.yaml
-	j2 templates/deployment.yaml.j2 config/values.yaml > k8s/deployment.yaml
+# Only regenerate if template changed
+k8s/deployment.yaml: templates/deployment.j2 values.yaml
+	j2 templates/deployment.j2 values.yaml > k8s/deployment.yaml
+
+# Combine with phony targets
+.PHONY: build deploy
+
+build: .built
+
+deploy: k8s/deployment.yaml
+	kubectl apply -f k8s/deployment.yaml
 ```
+
+The pattern: use file targets as markers for expensive operations, then
+reference them from phony targets. This gives you both repeatability (phony) and
+efficiency (file-based caching).
+
+### Order-Only Prerequisites
+
+Sometimes you need something to run first, but don't want to re-run if it changes:
+
+```makefile
+deploy: | check-cluster
+	@./scripts/deploy.sh
+
+check-cluster:
+	@kubectl cluster-info > /dev/null || \
+	  (echo "Cannot connect to cluster" && exit 1)
+```
+
+The `|` creates an order-only prerequisite. `check-cluster` runs before
+`deploy`, but changes to the check script won't trigger re-deployment.
 
 ## Debugging and Troubleshooting Makefile Execution
 
-### Verbose Output and Dry Runs
+### Dry Runs and Debugging Output
 
-Make provides several debugging options that are invaluable when developing
-complex workflows:
+Make provides several debugging modes:
 
 ```bash
-# See what Make would do without doing it
+# See what would run without running it
 make -n deploy
 
-# Print extra debugging information
+# Print debug info about rules and dependencies
 make -d deploy
 
-# Print the database of rules and variables
+# Print all rules and variables (great for debugging)
 make -p
+
+# Print variables as Make sees them
+make -p | grep "^VERSION"
 ```
 
-### Echoing Commands and Variables
+The `-n` flag (dry run) is particularly useful for validating complex workflows
+before executing them.
 
-By default, Make doesn't print the commands it runs (it just prints the target
-name). For DevOps workflows, you usually want to see what's happening:
+### Visibility: Showing What's Happening
+
+By default, Make prints commands as it runs them. For cleaner output, use `@` to
+suppress command echoing:
 
 ```makefile
-# Default: commands are hidden
+# Without @: shows the command
 deploy:
+	echo "Deploying..."
 	kubectl apply -f k8s/
 
-# Show commands as they run
+# With @: shows only the output
 deploy:
-	@echo "Deploying to $(ENVIRONMENT)"
-	kubectl apply -f k8s/
-	@echo "Deployment complete"
+	@echo "Deploying..."
+	@kubectl apply -f k8s/
+	@echo "✓ Deployment complete"
 ```
 
-The `@` prefix suppresses echoing for that specific command, useful for cosmetic
-messages.
+For debugging, temporarily remove the `@` to see exactly what commands are
+running.
 
-### Error Handling and Cleanup
+### Error Handling Patterns
 
-Make stops execution when any command fails, but you can control this behavior:
+Make stops on first error by default, but you can control this:
 
 ```makefile
-# Continue even if some commands fail
-deploy:
-	-kubectl delete pod old-migration-job  # Ignore if it doesn't exist
-	kubectl apply -f k8s/
+# Ignore errors from specific command (useful for cleanup)
+clean:
+	-docker rm myapp-test  # Don't fail if container doesn't exist
+	-kubectl delete pod old-job
 
-# Always run cleanup, even if deployment fails
-deploy:
-	kubectl apply -f k8s/ || (kubectl describe pods && exit 1)
-	kubectl rollout status deployment/my-app
+# Continue on error for the entire target
+.IGNORE: clean
 
-# Multi-line commands with error handling
-backup-and-deploy:
-	set -e; \
-	kubectl exec deployment/database -- pg_dump mydb > backup.sql; \
-	kubectl apply -f k8s/; \
-	kubectl rollout status deployment/my-app
+# Always run cleanup, even on failure
+deploy:
+	@./scripts/deploy.sh || \
+	  (./scripts/rollback.sh && exit 1)
+
+# Multi-line with error handling
+backup-deploy:
+	@set -e; \
+	./scripts/backup-database.sh; \
+	./scripts/deploy.sh; \
+	./scripts/verify-health.sh
 ```
 
-### Conditional Execution Based on System State
+The `-` prefix ignores errors for that command. The `.IGNORE` directive ignores
+errors for the entire target. The `set -e` in shell blocks makes them fail on
+first error.
 
-Advanced debugging often requires checking system state before executing commands:
+### Validation Checks
+
+Build validation directly into your workflows:
 
 ```makefile
-# Check if cluster is reachable
+deploy: check-env check-cluster
+	@./scripts/deploy.sh
+
+check-env:
+	@test -n "$(VERSION)" || \
+	  (echo "VERSION not set" && exit 1)
+	@test "$(VERSION)" != "dirty" || \
+	  (echo "Cannot deploy uncommitted changes" && exit 1)
+
 check-cluster:
-	@kubectl cluster-info > /dev/null || (echo "Cannot connect to cluster" && exit 1)
-	@echo "Cluster connection: OK"
-
-# Deploy only if namespace exists
-deploy: check-cluster
+	@kubectl cluster-info > /dev/null || \
+	  (echo "Cannot reach cluster" && exit 1)
 	@kubectl get namespace $(NAMESPACE) > /dev/null 2>&1 || \
-		(echo "Namespace $(NAMESPACE) does not exist" && exit 1)
-	kubectl apply -f k8s/ -n $(NAMESPACE)
-
-# Conditional rollback
-deploy-safe:
-	@CURRENT_VERSION=$$(kubectl get deployment my-app -o jsonpath='{.spec.template.spec.containers[0].image}'); \
-	kubectl set image deployment/my-app app=$(IMAGE_TAG); \
-	kubectl rollout status deployment/my-app --timeout=300s || \
-		(echo "Deployment failed, rolling back to $$CURRENT_VERSION" && \
-		 kubectl set image deployment/my-app app=$$CURRENT_VERSION && \
-		 exit 1)
+	  (echo "Namespace $(NAMESPACE) does not exist" && exit 1)
 ```
 
-## Putting It All Together: A (Mostly) Real-World Example
+These validation targets catch problems early with clear error messages.
 
-Let's look at a complete Makefile that demonstrates these concepts in a
-realistic-ish DevOps scenario (forgive the hand-wavy *implementation* parts,
-we're still pretty meta here):
+## Pattern: The Self-Documenting Help System
+
+A well-designed Makefile teaches itself. The help system pattern is essential:
+
+```makefile
+.DEFAULT_GOAL := help
+
+help: ## Show available commands
+	@echo "Available targets:"
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
+	  printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
+	}' $(MAKEFILE_LIST)
+
+deploy: ## Deploy to Kubernetes
+	@./scripts/deploy.sh
+
+test: ## Run test suite
+	@./scripts/run-tests.sh
+
+logs: ## Show application logs
+	@kubectl logs -f deployment/myapp
+```
+
+Running `make` (or `make help`) shows:
+```
+Available targets:
+  deploy          Deploy to Kubernetes
+  test            Run test suite
+  logs            Show application logs
+```
+
+This pattern makes every Makefile self-documenting. New engineers run `make` and
+immediately see what's available.
+
+### Enhanced Help with Categories
+
+For larger Makefiles, organize help into categories:
+
+```makefile
+help: ## Show this help
+	@echo "MyApp DevOps Workflows"
+	@echo "====================="
+	@awk 'BEGIN {FS = ":.*##"} \
+	  /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } \
+	  /^[a-zA-Z_-]+:.*?##/ { \
+	    printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
+	  }' $(MAKEFILE_LIST)
+
+##@ Development
+
+test: ## Run tests
+	@./scripts/test.sh
+
+lint: ## Run linters
+	@./scripts/lint.sh
+
+##@ Deployment
+
+deploy: ## Deploy to cluster
+	@./scripts/deploy.sh
+
+rollback: ## Rollback deployment
+	@./scripts/rollback.sh
+
+##@ Operations
+
+logs: ## Show logs
+	@kubectl logs -f deployment/myapp
+
+status: ## Show status
+	@kubectl get all
+```
+
+## Putting It Together: A DevOps Makefile Pattern
+
+Here's a pattern that demonstrates core concepts:
 
 ```makefile
 # Configuration
 .DEFAULT_GOAL := help
 ENVIRONMENT ?= development
-VERSION ?= $(shell git rev-parse --short HEAD)
-REGISTRY ?= my-company.azurecr.io
-APP_NAME = my-microservice
-IMAGE_TAG = $(REGISTRY)/$(APP_NAME):$(VERSION)
-NAMESPACE = $(APP_NAME)-$(ENVIRONMENT)
+VERSION := $(shell git describe --tags --always --dirty)
+APP_NAME := myapp
+IMAGE := registry.company.com/$(APP_NAME):$(VERSION)
 
-# Ensure these targets always run
-.PHONY: help build test push deploy clean logs status
+.PHONY: help build test deploy clean
 
-help: ## Show this help message
-	@echo "Available targets:"
-	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} \
-	/^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } \
-	/^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' \
-	$(MAKEFILE_LIST)
+help: ## Show available commands
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
+	  printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
+	}' $(MAKEFILE_LIST)
 
 ##@ Development
-test: ## Run all tests
-	# ... implementation
 
-lint: ## Run code linting
-	# ... implementation
+test: ## Run test suite
+	@echo "Running tests..."
+	@./scripts/run-tests.sh
+
+lint: ## Run code linters
+	@./scripts/run-linters.sh
 
 build: lint ## Build Docker image
-	# ... implementation
+	@echo "Building $(IMAGE)..."
+	@docker build -t $(IMAGE) .
 
 ##@ Deployment
-push: build ## Push image to registry
-	@echo "Pushing $(IMAGE_TAG)"
-	docker push $(IMAGE_TAG)
 
-deploy: push check-namespace ## Deploy to Kubernetes
-	# ... implementation
+push: build ## Push image to registry
+	@echo "Pushing $(IMAGE)..."
+	@docker push $(IMAGE)
+
+deploy: test push check-cluster ## Deploy to $(ENVIRONMENT)
+	@echo "Deploying to $(ENVIRONMENT)..."
+	@./scripts/deploy.sh $(ENVIRONMENT) $(IMAGE)
 
 ##@ Operations
+
 logs: ## Show application logs
-	kubectl logs -f deployment/$(APP_NAME) -n $(NAMESPACE)
+	@kubectl logs -f deployment/$(APP_NAME) -n $(ENVIRONMENT)
 
 status: ## Show deployment status
-	# ... implementation
-
-clean: ## Clean up local Docker images
-	# ... implementation
+	@kubectl get pods,svc -n $(ENVIRONMENT)
 
 ##@ Utilities
-check-namespace: ## Ensure namespace exists
-	# ... implementation
 
-shell: ## Get shell in running pod
-	kubectl exec -it deployment/$(APP_NAME) -n $(NAMESPACE) -- /bin/bash
+check-cluster: ## Verify cluster connectivity
+	@kubectl cluster-info > /dev/null || \
+	  (echo "Cannot connect to cluster" && exit 1)
 
-# Export variables for use in shell commands
-export ENVIRONMENT VERSION IMAGE_TAG NAMESPACE
+clean: ## Clean up local resources
+	@docker system prune -f
 ```
 
-This Makefile demonstrates several key principles:
-
-1. **Self-documenting**: The help target automatically generates documentation
-   from comments
-2. **Environment-aware**: Different environments can be targeted with the same
-   commands
-3. **Error-resistant**: Commands check prerequisites and handle failures
-   gracefully
-4. **Discoverable**: Complex operations are exposed through simple, memorable
-   target names
-5. **Debuggable**: Variables are clearly defined and can be overridden for
-   testing
+This demonstrates:
+- **Discoverability**: Self-documenting help system
+- **Configuration**: Clear variables at the top
+- **Validation**: Pre-deployment checks
+- **Dependencies**: Automatic prerequisite handling
+- **Clarity**: Organized with categories
 
 ## Key Takeaways
 
@@ -439,12 +525,19 @@ apparent complexity masks a powerful simplicity: Make provides a way to
 document, organize, and execute your DevOps workflows that is both
 human-readable and machine-executable.
 
-The fundamental concepts you've learned in this chapter—targets, prerequisites,
-variables, and debugging—are the building blocks for everything we'll explore in
-the rest of this book. Whether you're orchestrating Docker builds, managing
-Kubernetes deployments, or coordinating infrastructure provisioning, these
-patterns will serve you well.
+The fundamental concepts you've learned in this chapter form the foundation of
+everything that follows:
 
-In the next chapter, we'll dive deeper into using Make's variable system to
-manage configuration across different environments, turning your Makefiles into
-flexible, reusable tools that can adapt to any deployment scenario.
+- **Targets and prerequisites** create self-documenting workflow graphs
+- **Variables** make configuration visible and overridable
+- **Phony targets** represent actions rather than files
+- **Help systems** make capabilities discoverable
+- **Validation checks** catch problems early with clear messages
+
+Remember: the goal isn't to put all your logic in the Makefile. The goal is to
+create a **discoverable interface** that shows what's possible and delegates to
+scripts for complex implementation. The Makefile teaches the workflow; the
+scripts do the work.
+
+In the next chapter, we'll explore testing and validating Makefiles to ensure
+they remain reliable as your infrastructure evolves.
