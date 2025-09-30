@@ -32,7 +32,7 @@ header-includes:
       right=4pt,
       top=4pt,
       bottom=4pt,
-        fontupper=\ttfamily\fontsize{8}{10}\selectfont
+        fontupper=\ttfamily\fontsize{8}{9}\selectfont
     }
   - \usepackage{needspace}
   # Ragged right headings with no hyphenation

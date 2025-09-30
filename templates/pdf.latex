@@ -454,14 +454,15 @@ $endif$
 \newtcblisting{mycodeblock}{
   colback=white,
   colframe=gray!70!black,
-  boxrule=0.7pt,
+  boxrule=0.5pt,
   arc=2pt,
-  left=6pt, right=6pt, top=6pt, bottom=6pt,
-  fontupper=\ttfamily\footnotesize,
+  left=4pt, right=4pt, top=4pt, bottom=4pt,
+  fontupper=\ttfamily\fontsize{8}{9}\selectfont,
   shadow={1mm}{-1mm}{0mm}{gray!60!white},
   listing only,
   breakable=false,
   enhanced,
+  listing options={breaklines=true, breakatwhitespace=true}
 }
 
 \usepackage{needspace}
