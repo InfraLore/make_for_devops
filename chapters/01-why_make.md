@@ -199,7 +199,7 @@ most valuable knowledge is often the knowledge you don't know you need.
 
 Even in organizations with excellent documentation practices, a shadow 
 knowledge base emerges: team lore. This is the collection of unwritten rules, 
-workarounds, and tribal knowledge that experienced engineers accumulate:
+workarounds, and accumulated wisdom that experienced engineers carry:
 
 - "Always run that command twice—the first time fails but initializes something"
 - "Don't deploy on Fridays between 2-4 PM when the batch job runs"
