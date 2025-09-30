@@ -1,6 +1,7 @@
 # Chapter 14: Make for Infrastructure Reliability
 
-\chaptersubtitle{Building discoverable workflows for testing, recovery, and maintaining healthy infrastructure.}
+\chaptersubtitle{Building discoverable workflows for testing, recovery, and
+maintaining healthy infrastructure.}
 
 In the previous chapter, we explored how Make brings discoverability to
 infrastructure provisioning—the act of creating and modifying infrastructure.
@@ -308,7 +309,8 @@ Each step can also run independently.
 
 ## Discovering Monitoring and Alerts
 
-Infrastructure reliability depends on monitoring. Make monitoring operations discoverable:
+Infrastructure reliability depends on monitoring. Make monitoring operations
+discoverable:
 
 ```makefile
 monitor: ## Monitoring operations
@@ -464,10 +466,13 @@ rather than requiring them to remember complex procedures under pressure.
 
 Infrastructure reliability becomes discoverable through Make by:
 
-1. **Health as a command**: `make health` immediately shows infrastructure status
-2. **Contextual menus**: Running `make recover` or `make backup` shows relevant options
+1. **Health as a command**: `make health` immediately shows infrastructure
+   status
+2. **Contextual menus**: Running `make recover` or `make backup` shows relevant
+   options
 3. **Guided workflows**: Each step suggests the next step
-4. **Self-contained operations**: Each reliability task is independently runnable
+4. **Self-contained operations**: Each reliability task is independently
+   runnable
 5. **Built-in verification**: Recovery procedures include validation steps
 
 The pattern transforms reliability from "remember the procedure" to "ask Make

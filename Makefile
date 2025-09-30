@@ -8,7 +8,19 @@ BUILD = build
 MAKEFILE = Makefile
 OUTPUT_FILENAME = book
 METADATA = metadata.yml
-CHAPTERS = chapters/*.md
+
+
+# Chapters content organized by parts
+PART_1 = parts/part-1.md chapters/01-why_make.md chapters/02-executable_readme.md chapters/03-make_fundamentals.md
+PART_2 = parts/part-2.md chapters/04-testing_and_validating.md chapters/05-variables_and_configuration.md chapters/06-phony_targets_and_task_organization.md chapters/07-dependency_management.md chapters/08-advanced_make.md
+PART_3 = parts/part-3.md chapters/09-make_and_docker.md chapters/10-make_and_kubernetes.md chapters/11-make_and_ci_cd.md chapters/12-make_in_the_ci_cd_ecosystem.md
+PART_4 = parts/part-4.md chapters/13-make_for_infrastructure_provisioning.md chapters/14-make_for_infrastructure_reliability.md chapters/15-make_for_monitoring_and_metrics.md chapters/16-make_for_logging_and_incident_response.md chapters/17-security_and_compliance_workflows.md
+PART_5 = parts/part-5.md chapters/18-scaling_make_across_teams_and_projects.md chapters/19-troubleshooting_and_debugging_make_workflows.md chapters/20-the_future_of_make_in_devops.md
+
+APPENDICES = chapters/Appendix_A-quick_referrence_guide.md chapters/Appendix_B-migration_strategies.md
+
+CHAPTERS = $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) $(APPENDICES)
+
 TOC = --toc --toc-depth 2
 METADATA_ARGS = --metadata-file $(METADATA)
 IMAGES = $(shell find images -type f)
@@ -43,7 +55,7 @@ PANDOC_COMMAND = pandoc
 DOCX_ARGS = --standalone --reference-doc templates/docx.docx
 EPUB_ARGS = --template templates/epub.html --epub-cover-image $(COVER_IMAGE)
 HTML_ARGS = --template templates/html.html --standalone --to html5
-PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex --no-highlight
+PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex --no-highlight --quiet
 
 # Per-format file dependencies
 
@@ -128,7 +140,9 @@ $(BUILD)/html/$(OUTPUT_FILENAME).html:	$(HTML_DEPENDENCIES)
 $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf:	$(PDF_DEPENDENCIES)
 	$(ECHO_BUILDING)
 	$(MKDIR_CMD) $(BUILD)/pdf
-	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(PDF_ARGS) -o $@
+	@printf "Generating PDF (about 30 secconds): "
+	@($(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(PDF_ARGS) -o $@) & \
+	while ps $$! > /dev/null 2>&1; do printf "▓"; sleep 3; done; echo " ✓"
 	$(ECHO_BUILT)
 
 $(BUILD)/docx/$(OUTPUT_FILENAME).docx:	$(DOCX_DEPENDENCIES)

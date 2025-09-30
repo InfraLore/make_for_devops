@@ -41,19 +41,26 @@ terraform apply staging.tfplan
 # Oh, and don't forget to tag the resources afterward...
 ```
 
-This is a simplified example. The real version includes error handling, validation checks, state file backups, cost estimation, and approval gates. Each step has potential failure modes. Documenting this in a README means maintaining a complex, multi-step prose description that will inevitably drift from reality.
+This is a simplified example. The real version includes error handling,
+validation checks, state file backups, cost estimation, and approval gates. Each
+step has potential failure modes. Documenting this in a README means maintaining
+a complex, multi-step prose description that will inevitably drift from reality.
 
 The challenge is compounded by:
 
 - **State management**: Terraform maintains state that's precious and fragile
-- **Multi-environment complexity**: Each environment needs different configurations and safety levels
-- **Dependency ordering**: Some infrastructure must exist before other infrastructure
+- **Multi-environment complexity**: Each environment needs different
+  configurations and safety levels
+- **Dependency ordering**: Some infrastructure must exist before other
+  infrastructure
 - **Cost implications**: A mistake can spin up expensive resources indefinitely
-- **Safety requirements**: Production needs different approval workflows than development
+- **Safety requirements**: Production needs different approval workflows than
+  development
 
 ## The Discovery Pattern for Infrastructure
 
-Rather than trying to document every step and flag, Make lets you create a discoverable interface that reveals workflows as you need them.
+Rather than trying to document every step and flag, Make lets you create a
+discoverable interface that reveals workflows as you need them.
 
 Here's how that same workflow becomes discoverable:
 
@@ -113,11 +120,14 @@ They see they need to set `ENVIRONMENT`, so they try:
 make init ENVIRONMENT=staging
 ```
 
-The workflow reveals itself progressively. Each target provides clear feedback about what's happening and what to do next. The complexity is hidden in scripts, but the interface is simple and discoverable.
+The workflow reveals itself progressively. Each target provides clear feedback
+about what's happening and what to do next. The complexity is hidden in scripts,
+but the interface is simple and discoverable.
 
 ## Progressive Disclosure of Complexity
 
-The key principle is **progressive disclosure**: show simple interfaces first, reveal complexity as needed.
+The key principle is **progressive disclosure**: show simple interfaces first,
+reveal complexity as needed.
 
 ```makefile
 # Simple top-level interface
@@ -192,11 +202,13 @@ help-production:
 	@echo "All production changes require change tickets"
 ```
 
-Now when someone runs `make help ENVIRONMENT=production`, they see only production-relevant commands with appropriate warnings.
+Now when someone runs `make help ENVIRONMENT=production`, they see only
+production-relevant commands with appropriate warnings.
 
 ## Discovering Infrastructure Components
 
-Many infrastructure deployments have multiple components with dependencies. Make these relationships discoverable:
+Many infrastructure deployments have multiple components with dependencies. Make
+these relationships discoverable:
 
 ```makefile
 help: ## Show infrastructure components
@@ -231,7 +243,8 @@ _deploy-component:
 	@./scripts/deploy-component.sh $(COMPONENT) $(ENVIRONMENT)
 ```
 
-The help output makes the architecture and dependencies obvious. New engineers can understand the system structure just by running `make help`.
+The help output makes the architecture and dependencies obvious. New engineers
+can understand the system structure just by running `make help`.
 
 ## Discovering Safety Checks
 
@@ -262,7 +275,8 @@ _check-production-requirements:
 	@echo "Production requirements met"
 ```
 
-When someone tries to deploy to production without following the process, they get clear, actionable feedback:
+When someone tries to deploy to production without following the process, they
+get clear, actionable feedback:
 
 ```bash
 $ make apply ENVIRONMENT=production
@@ -305,11 +319,13 @@ _show-cost-estimate:
 		--format=table --show-skipped
 ```
 
-Now `make plan` automatically shows what will change and what it will cost, making the impact discoverable before any changes are made.
+Now `make plan` automatically shows what will change and what it will cost,
+making the impact discoverable before any changes are made.
 
 ## Discovering Drift and State
 
-Infrastructure drift—when actual infrastructure diverges from Terraform state—is a common problem. Make it discoverable:
+Infrastructure drift—when actual infrastructure diverges from Terraform state—is
+a common problem. Make it discoverable:
 
 ```makefile
 status: ## Check infrastructure status
@@ -338,7 +354,8 @@ drift-report: ## Detailed drift analysis
 	@./scripts/drift-analysis.sh $(ENVIRONMENT)
 ```
 
-Running `make status` gives a quick overview and points to more detailed commands when needed.
+Running `make status` gives a quick overview and points to more detailed
+commands when needed.
 
 ## Discovering Multi-Region Patterns
 
@@ -376,7 +393,8 @@ status-all-regions: ## Check status across regions
 	done
 ```
 
-The pattern is clear: Make handles the orchestration, showing what's happening in each region while keeping the interface simple.
+The pattern is clear: Make handles the orchestration, showing what's happening
+in each region while keeping the interface simple.
 
 ## Discovering Emergency Procedures
 
@@ -412,7 +430,8 @@ emergency-rollback: ## Rollback to last known good state
 	@./scripts/emergency-rollback.sh $(ENVIRONMENT)
 ```
 
-In a crisis, `make emergency` immediately shows available options without requiring anyone to hunt through documentation.
+In a crisis, `make emergency` immediately shows available options without
+requiring anyone to hunt through documentation.
 
 ## Discovering Through Examples
 
@@ -449,7 +468,8 @@ Let's look at how discovery patterns work in practice.
 
 ### The Old Way: 50-Page Wiki
 
-The team maintained a comprehensive wiki titled "Infrastructure Provisioning Guide":
+The team maintained a comprehensive wiki titled "Infrastructure Provisioning
+Guide":
 
 ```markdown
 # Deploying to Staging
@@ -524,7 +544,9 @@ Results after migration:
 - Consistent procedures across all engineers
 - Junior engineers deploying infrastructure safely within first week
 
-The key insight: **discovery replaces documentation**. Instead of maintaining prose that describes what to do, create targets that reveal the workflow as engineers interact with it.
+The key insight: **discovery replaces documentation**. Instead of maintaining
+prose that describes what to do, create targets that reveal the workflow as
+engineers interact with it.
 
 ## Key Takeaways
 
@@ -536,8 +558,15 @@ Infrastructure provisioning workflows become discoverable through Make by:
 4. **Safe defaults**: Protection built into the workflow itself
 5. **Examples built in**: The Makefile teaches the workflow through use
 
-The pattern is consistent: start with `make help`, follow the breadcrumbs, get clear feedback at each step. The workflow reveals itself through interaction rather than requiring upfront documentation study.
+The pattern is consistent: start with `make help`, follow the breadcrumbs, get
+clear feedback at each step. The workflow reveals itself through interaction
+rather than requiring upfront documentation study.
 
-This discovery-based approach works because it aligns with how engineers actually work: trying things, reading error messages, following suggestions. Instead of fighting this pattern with static documentation, Make embraces it by making the documentation executable and responsive.
+This discovery-based approach works because it aligns with how engineers
+actually work: trying things, reading error messages, following suggestions.
+Instead of fighting this pattern with static documentation, Make embraces it by
+making the documentation executable and responsive.
 
-In the next chapter, we'll extend these patterns to infrastructure reliability—how Make can orchestrate testing, disaster recovery, and operational maintenance workflows that keep your infrastructure healthy.
+In the next chapter, we'll extend these patterns to infrastructure
+reliability—how Make can orchestrate testing, disaster recovery, and operational
+maintenance workflows that keep your infrastructure healthy.

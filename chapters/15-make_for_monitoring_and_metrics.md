@@ -1,6 +1,7 @@
 # Chapter 15 - Make for Monitoring and Metrics
 
-\chaptersubtitle{Bridging local and remote workflows with consistent, discoverable automation.}
+\chaptersubtitle{Bridging local and remote workflows with consistent,
+discoverable automation.}
 
 At 3 AM, your phone buzzes with an alert. The API response time has spiked to 2
 seconds. Half-awake, you need to check metrics, compare them to baseline, maybe

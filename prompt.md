@@ -1,4 +1,4 @@
-We're working on "Make for DevOps: Discovering and Documenting Your Workflow with Make", a 350-400 page book for Packt Publishing targeting Q2 2026. You've already completed chapters 1-14.
+We're working on "Make for DevOps: Discovering and Documenting Your Workflow with Make", a 350-400 page book for Packt Publishing targeting Q2 2026. You've already completed chapters 1-15.
 
 # Core Concept
 The book positions Make as a universal workflow orchestration and documentation layer for DevOps teams. The key innovation is treating Makefiles as "executable READMEs" that solve the institutional knowledge problem—where critical workflows exist only in senior engineers' minds or scattered documentation.
@@ -154,7 +154,7 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
 
 ---
 
-## Part IV: Advanced Patterns and Team Adoption
+## Part V: Advanced Patterns and Team Adoption
 ### Chapter 18: Scaling Make Across Teams and Projects
 - Creating organization-wide make standards
 - Shared libraries and common patterns

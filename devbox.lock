@@ -208,6 +208,54 @@
         }
       }
     },
+    "pv@latest": {
+      "last_modified": "2025-09-18T16:33:27Z",
+      "resolved": "github:NixOS/nixpkgs/f4b140d5b253f5e2a1ff4e5506edbf8267724bde#pv",
+      "source": "devbox-search",
+      "version": "1.9.34",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/0w4jgj82159jl738slsx0i463y28nhbx-pv-1.9.34",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/0w4jgj82159jl738slsx0i463y28nhbx-pv-1.9.34"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/hdlh6bc83f4rbd92yycx3n53jnrlk705-pv-1.9.34",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/hdlh6bc83f4rbd92yycx3n53jnrlk705-pv-1.9.34"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/nlxgci3n481fscy0mdl1myfiab62dfbk-pv-1.9.34",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/nlxgci3n481fscy0mdl1myfiab62dfbk-pv-1.9.34"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/x8nc4f2lws4m77xq0qmwbdhzc7axg24n-pv-1.9.34",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/x8nc4f2lws4m77xq0qmwbdhzc7axg24n-pv-1.9.34"
+        }
+      }
+    },
     "python310Full@latest": {
       "last_modified": "2024-08-14T11:41:26Z",
       "plugin_version": "0.0.4",

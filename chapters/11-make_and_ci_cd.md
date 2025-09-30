@@ -652,7 +652,7 @@ logs: ## Show application logs
 shell: ## Get shell in running container
 	@kubectl exec -it deployment/$(APP_NAME) -- /bin/bash
 
-info: ## ℹShow build information
+info: ## Show build information
 	@echo "Application: $(APP_NAME)"
 	@echo "Version: $(VERSION)"  
 	@echo "Environment: $(BUILD_ENV)"
