@@ -8,17 +8,19 @@ A poorly organized Makefile is like a toolbox where all the tools are thrown in 
 
 This chapter will teach you how to design and organize phony targets that create natural, discoverable workflows. Instead of team members needing to remember complex command sequences or hunt through documentation, they'll find exactly what they need through intuitive target names and logical organization.
 
-> ** Start Simple: Essential Phony Target Patterns**
-> 
-> Before diving into advanced organization strategies, establish these fundamental phony target patterns:
-> 
-> 1. **Declare everything**: `.PHONY: build test deploy clean help` prevents confusion if files with these names exist
-> 2. **Use verb-noun naming**: `build-image`, `test-unit`, `deploy-staging` clearly indicate what each target does
-> 3. **Create logical groupings**: Group related targets together with consistent prefixes
-> 4. **Provide a help system**: `make help` should always work and show available targets
-> 5. **Start with the basics**: Every project needs `build`, `test`, `deploy`, and `clean` at minimum
-> 
-> These patterns create immediately usable workflows. Advanced organization techniques become valuable as your operational complexity grows.
+\begin{calloutbox}[Start Simple: Essential Phony Target Patterns]
+Before diving into advanced organization strategies, establish these fundamental phony target patterns:
+
+\begin{enumerate}
+\item \textbf{Declare everything}: \texttt{.PHONY: build test deploy clean help} prevents confusion if files with these names exist
+\item \textbf{Use verb-noun naming}: \texttt{build-image}, \texttt{test-unit}, \texttt{deploy-staging} clearly indicate what each target does
+\item \textbf{Create logical groupings}: Group related targets together with consistent prefixes
+\item \textbf{Provide a help system}: \texttt{make help} should always work and show available targets
+\item \textbf{Start with the basics}: Every project needs \texttt{build}, \texttt{test}, \texttt{deploy}, and \texttt{clean} at minimum
+\end{enumerate}
+
+These patterns create immediately usable workflows. Advanced organization techniques become valuable as your operational complexity grows.
+\end{calloutbox}
 
 ## Understanding Phony Targets in DevOps Context
 

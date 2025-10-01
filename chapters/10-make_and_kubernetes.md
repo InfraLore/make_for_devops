@@ -1,12 +1,24 @@
 # Chapter 10: Make and Kubernetes - Discoverable Deployments
 
-\chaptersubtitle{Simplifying Kubernetes complexity through discoverable deployment workflows that any team member can understand and execute.}
+\chaptersubtitle{Simplifying Kubernetes complexity through discoverable
+deployment workflows that any team member can understand and execute.}
 
-Kubernetes has become the foundation of modern cloud-native infrastructure, but its power comes with overwhelming complexity. YAML manifests, kubectl commands, namespace management, resource dependencies, health checks, rollback procedures—the cognitive load can be crushing. Teams often resort to complex shell scripts, struggle with inconsistent deployments, or rely on heavyweight platforms that obscure the underlying operations.
+Kubernetes has become the foundation of modern cloud-native infrastructure, but
+its power comes with overwhelming complexity. YAML manifests, kubectl commands,
+namespace management, resource dependencies, health checks, rollback
+procedures—the cognitive load can be crushing. Teams often resort to complex
+shell scripts, struggle with inconsistent deployments, or rely on heavyweight
+platforms that obscure the underlying operations.
 
-Make provides an elegant solution by creating a discoverable orchestration layer over Kubernetes operations. Instead of memorizing intricate kubectl incantations or navigating maze-like deployment scripts, team members can simply run `make deploy`, `make status`, or `make rollback`. The Makefile becomes both the documentation and the implementation of your Kubernetes deployment strategy.
+Make provides an elegant solution by creating a discoverable orchestration layer
+over Kubernetes operations. Instead of memorizing intricate kubectl incantations
+or navigating maze-like deployment scripts, team members can simply run `make
+deploy`, `make status`, or `make rollback`. The Makefile becomes both the
+documentation and the implementation of your Kubernetes deployment strategy.
 
-This chapter demonstrates how to create maintainable, reliable Kubernetes workflows using Make. We'll explore patterns for manifest generation, environment-specific deployments, health checks, and Helm chart management.
+This chapter demonstrates how to create maintainable, reliable Kubernetes
+workflows using Make. We'll explore patterns for manifest generation,
+environment-specific deployments, health checks, and Helm chart management.
 
 \newpage
 ## Discovering Kubernetes Operations
@@ -27,7 +39,9 @@ kubectl port-forward service/myapp 8080:80 --namespace myapp-prod &
 curl http://localhost:8080/health
 ```
 
-Each command requires remembering namespace names, image tags, timeout values, and verification steps. Different engineers follow different procedures. Documentation drifts.
+Each command requires remembering namespace names, image tags, timeout values,
+and verification steps. Different engineers follow different procedures.
+Documentation drifts.
 
 \newpage
 Here's the discovery-based approach:
@@ -63,7 +77,8 @@ rollback: ## Rollback to previous version
 	@./scripts/k8s-rollback.sh $(ENVIRONMENT)
 ```
 
-Running `make help` shows available operations. The workflow reveals itself, and complexity lives in scripts rather than documentation.
+Running `make help` shows available operations. The workflow reveals itself, and
+complexity lives in scripts rather than documentation.
 
 \newpage
 ## Discovering Environment-Specific Deployments
@@ -96,7 +111,8 @@ deploy-prod: ## Deploy to production
 	@./scripts/deploy-production.sh $(VERSION)
 ```
 
-Each environment has appropriate safety checks built in. The workflow is discoverable but implementations can differ.
+Each environment has appropriate safety checks built in. The workflow is
+discoverable but implementations can differ.
 
 \newpage
 ## Discovering Manifest Generation
@@ -227,7 +243,8 @@ debug-events: ## Show recent events
 	@./scripts/debug-events.sh $(ENVIRONMENT)
 ```
 
-Debugging operations are organized and discoverable. Engineers can find the right tool quickly.
+Debugging operations are organized and discoverable. Engineers can find the
+right tool quickly.
 
 \newpage
 ## Discovering Resource Management
@@ -342,16 +359,19 @@ rollback: ## Rollback deployment
 	@./scripts/k8s-rollback.sh $(ENVIRONMENT)
 ```
 
-One interface, works everywhere. CI and local use identical commands. New team members discover the workflow through `make help`.
+One interface, works everywhere. CI and local use identical commands. New team
+members discover the workflow through `make help`.
 
 \newpage
 ## Key Patterns
 
 Make Kubernetes workflows discoverable through:
 
-1. **Progressive menus** - `make deploy` shows deployment options, `make debug` shows debugging tools
+1. **Progressive menus** - `make deploy` shows deployment options, `make debug`
+   shows debugging tools
 2. **Environment awareness** - Same interface adapts to dev/staging/prod
-3. **Built-in safety** - Production requires confirmation, dangerous operations are explicit
+3. **Built-in safety** - Production requires confirmation, dangerous operations
+   are explicit
 4. **Script extraction** - Complex kubectl commands live in scripts
 5. **Clear guidance** - Each operation suggests next steps
 
@@ -365,8 +385,16 @@ Make transforms Kubernetes operations from scattered commands into discoverable 
 4. **Composability**: Complex workflows from simple targets
 5. **Teachability**: New team members learn by discovering
 
-The goal isn't to hide Kubernetes complexity—it's to make it discoverable. Engineers can see available operations, understand environment-specific behaviors, and follow guided workflows.
+The goal isn't to hide Kubernetes complexity—it's to make it discoverable.
+Engineers can see available operations, understand environment-specific
+behaviors, and follow guided workflows.
 
-Most importantly, Kubernetes operations become team knowledge rather than individual expertise. That complex deployment procedure? It's `make deploy`. The multi-step rollback process? It's `make rollback`. The workflow is captured, discoverable, and improvable by anyone on the team.
+Most importantly, Kubernetes operations become team knowledge rather than
+individual expertise. That complex deployment procedure? It's `make deploy`. The
+multi-step rollback process? It's `make rollback`. The workflow is captured,
+discoverable, and improvable by anyone on the team.
 
-The pattern is consistent across all infrastructure: create discovery menus, extract complexity to scripts, provide clear interfaces, suggest next steps. Whether it's Docker, Kubernetes, Terraform, or any other tool, the discovery approach makes workflows accessible to everyone.
+The pattern is consistent across all infrastructure: create discovery menus,
+extract complexity to scripts, provide clear interfaces, suggest next steps.
+Whether it's Docker, Kubernetes, Terraform, or any other tool, the discovery
+approach makes workflows accessible to everyone.

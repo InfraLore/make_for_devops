@@ -26,23 +26,20 @@ Make. We'll explore the core design principles and create pipeline-friendly
 targets that work identically everywhere. Advanced optimizations, platform
 integrations, and scaling strategies are covered in Chapter 12.
 
-> **Make Your CI/CD Commands Identical to Local Development**
-> 
-> Use the exact same Make commands locally and in CI/CD pipelines:
-> 
-> 1. **Same targets everywhere**: `make test`, `make build`, `make deploy` must
->    work identically on laptops and in CI
-> 2. **Environment detection**: Make targets should automatically adapt to CI
->    environments without changing behavior
-> 3. **Build once, deploy everywhere**: Generate artifacts locally that deploy
->    identically in production
-> 4. **Fast feedback loops**: Structure targets for quick developer validation
->    before pushing to CI
-> 5. **Security by default**: Integrate scanning into standard workflows, not as
->    afterthoughts
-> 
-> When CI/CD uses identical commands to local development, debugging pipeline
-> issues becomes trivial and new developers can contribute immediately.
+\newpage
+\begin{calloutbox}[Make Your CI/CD Commands Identical to Local Development]
+Use the exact same Make commands locally and in CI/CD pipelines:
+
+\begin{enumerate}
+\item \textbf{Same targets everywhere}: \texttt{make test}, \texttt{make build}, \texttt{make deploy} must work identically on laptops and in CI
+\item \textbf{Environment detection}: Make targets should automatically adapt to CI environments without changing behavior  
+\item \textbf{Build once, deploy everywhere}: Generate artifacts locally that deploy identically in production
+\item \textbf{Fast feedback loops}: Structure targets for quick developer validation before pushing to CI
+\item \textbf{Security by default}: Integrate scanning into standard workflows, not as afterthoughts
+\end{enumerate}
+
+When CI/CD uses identical commands to local development, debugging pipeline issues becomes trivial and new developers can contribute immediately.
+\end{calloutbox}
 
 ## The Problem: "Works on My Machine" → "Fails in Pipeline"
 

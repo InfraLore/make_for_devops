@@ -8,53 +8,65 @@ Think of the difference between a basic toolbox and a professional workshop. The
 
 This chapter explores Make's sophisticated features: pattern rules that eliminate repetitive target definitions, recursive Make for coordinating multiple projects, external tool integration patterns, conditional execution based on system state, and techniques for creating extensible workflow frameworks that grow with your organization's needs.
 
-> **  The Glide Path: Evolving to Advanced Features**
-> 
-> Don't jump straight to advanced features—evolve into them naturally as your needs grow:
-> 
-> **Stage 1: Start with Repetition**
-> 
-> - Write `deploy-dev`, `deploy-staging`, `deploy-prod` as separate targets
-> - Copy-paste is fine when you're learning what each environment needs
-> - Focus on making each target work reliably first
-> 
-> **Stage 2: Notice the Patterns**
-> 
-> - After 3-4 similar targets, you'll see the repetition
-> - This is when pattern rules (`deploy-%`) start making sense
-> - Convert one set of repetitive targets at a time
-> 
-> **Stage 3: Handle Exceptions**
-> 
-> - Some environments will need special handling (production validation, staging smoke tests)
-> - Use pattern rules for the common case, specific targets for exceptions
-> - Don't force everything into patterns if it doesn't fit naturally
-> 
-> **Stage 4: Add Intelligence**
-> 
-> - Once your patterns are stable, add conditional execution
-> - Start with simple Git branch detection or environment checks
-> - Build up to system state detection as you gain confidence
-> 
-> **Stage 5: Scale Across Projects**
-> 
-> - Only use recursive Make when you actually have multiple related projects
-> - Start with simple coordination before building complex frameworks
-> - Remember: multiple simple Makefiles often beat one complex one
-> 
-> The key is solving today's problems with today's complexity level, not building for imaginary future requirements.
+\begin{calloutbox}[The Glide Path: Evolving to Advanced Features]
+Don't jump straight to advanced features—evolve into them naturally as your needs grow:
 
-> ** Start Simple: When to Reach for Advanced Features**
-> 
-> Advanced Make features solve specific problems. Use them when:
-> 
-> 1. **Pattern rules**: You're defining many similar targets (deploy-dev, deploy-staging, deploy-prod)
-> 2. **Recursive Make**: You're managing multiple related projects that need coordination
-> 3. **Tool integration**: You need to orchestrate external tools with complex interaction patterns
-> 4. **Conditional execution**: Your workflows need to adapt to system state or configuration
-> 5. **Framework building**: You're creating reusable workflows for multiple teams
-> 
-> Don't use advanced features just because they exist. Simple, clear Makefiles are better than clever, complex ones unless the complexity solves a real problem.
+\textbf{Stage 1: Start with Repetition}
+
+\begin{itemize}
+\item Write \texttt{deploy-dev}, \texttt{deploy-staging}, \texttt{deploy-prod} as separate targets
+\item Copy-paste is fine when you're learning what each environment needs
+\item Focus on making each target work reliably first
+\end{itemize}
+
+\textbf{Stage 2: Notice the Patterns}
+
+\begin{itemize}
+\item After 3-4 similar targets, you'll see the repetition
+\item This is when pattern rules (\texttt{deploy-\%}) start making sense
+\item Convert one set of repetitive targets at a time
+\end{itemize}
+
+\textbf{Stage 3: Handle Exceptions}
+
+\begin{itemize}
+\item Some environments will need special handling (production validation, staging smoke tests)
+\item Use pattern rules for the common case, specific targets for exceptions
+\item Don't force everything into patterns if it doesn't fit naturally
+\end{itemize}
+
+\textbf{Stage 4: Add Intelligence}
+
+\begin{itemize}
+\item Once your patterns are stable, add conditional execution
+\item Start with simple Git branch detection or environment checks
+\item Build up to system state detection as you gain confidence
+\end{itemize}
+
+\textbf{Stage 5: Scale Across Projects}
+
+\begin{itemize}
+\item Only use recursive Make when you actually have multiple related projects
+\item Start with simple coordination before building complex frameworks
+\item Remember: multiple simple Makefiles often beat one complex one
+\end{itemize}
+
+The key is solving today's problems with today's complexity level, not building for imaginary future requirements.
+\end{calloutbox}
+
+\begin{calloutbox}[Start Simple: When to Reach for Advanced Features]
+Advanced Make features solve specific problems. Use them when:
+
+\begin{enumerate}
+\item \textbf{Pattern rules}: You're defining many similar targets (deploy-dev, deploy-staging, deploy-prod)
+\item \textbf{Recursive Make}: You're managing multiple related projects that need coordination
+\item \textbf{Tool integration}: You need to orchestrate external tools with complex interaction patterns
+\item \textbf{Conditional execution}: Your workflows need to adapt to system state or configuration
+\item \textbf{Framework building}: You're creating reusable workflows for multiple teams
+\end{enumerate}
+
+Don't use advanced features just because they exist. Simple, clear Makefiles are better than clever, complex ones unless the complexity solves a real problem.
+\end{calloutbox}
 
 ## Pattern Rules for Handling Multiple Environments
 

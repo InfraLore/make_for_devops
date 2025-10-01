@@ -19,17 +19,19 @@ This script has several problems: it runs every step regardless of whether it's 
 
 In this chapter, we'll explore how to model complex DevOps workflows using Make's dependency system, creating orchestration that's both more reliable and more efficient than traditional scripting approaches.
 
-> ** Start Simple: Basic Dependency Patterns**
-> 
-> Master these fundamental dependency patterns before exploring advanced orchestration:
-> 
-> 1. **Linear dependencies**: `deploy: test` ensures tests run before deployment
-> 2. **Parallel opportunities**: `test: build` and `push: build` can run simultaneously after build
-> 3. **Validation gates**: `deploy: validate-environment build test push` enforces prerequisites
-> 4. **Conditional execution**: Make only rebuilds what's actually changed
-> 5. **Failure isolation**: If tests fail, deployment never attempts to run
-> 
-> These patterns handle most workflow orchestration needs. Advanced techniques become valuable for complex multi-service, multi-environment deployments.
+\begin{calloutbox}[Start Simple: Basic Dependency Patterns]
+Master these fundamental dependency patterns before exploring advanced orchestration:
+
+\begin{enumerate}
+\item \textbf{Linear dependencies}: \texttt{deploy: test} ensures tests run before deployment
+\item \textbf{Parallel opportunities}: \texttt{test: build} and \texttt{push: build} can run simultaneously after build
+\item \textbf{Validation gates}: \texttt{deploy: validate-environment build test push} enforces prerequisites
+\item \textbf{Conditional execution}: Make only rebuilds what's actually changed
+\item \textbf{Failure isolation}: If tests fail, deployment never attempts to run
+\end{enumerate}
+
+These patterns handle most workflow orchestration needs. Advanced techniques become valuable for complex multi-service, multi-environment deployments.
+\end{calloutbox}
 
 ## Modeling Deployment Dependencies and Prerequisites
 
