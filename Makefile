@@ -93,7 +93,12 @@ all:	book
 book:	epub html pdf docx
 
 clean:
-	$(RMDIR_CMD) $(BUILD)
+	@if [ -d "$(BUILD)" ]; then \
+		echo "Removing $(BUILD) directory..."; \
+		$(RMDIR_CMD) $(BUILD); \
+	else \
+		echo "$(BUILD) directory already clean."; \
+	fi
 
 ####################################################################################################
 # Utilities
