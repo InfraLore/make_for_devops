@@ -8,6 +8,7 @@ Make provides the perfect orchestration layer for Docker workflows. Instead of r
 
 This chapter demonstrates how to create discoverable, maintainable Docker workflows using Make. We'll explore patterns for development environments, multi-stage builds, registry management, and local development with docker-compose.
 
+\newpage
 ## Discovering Docker Workflows
 
 The traditional approach to Docker involves remembering complex commands:
@@ -33,6 +34,7 @@ docker run --rm myapp:test pytest tests/
 
 Each command has multiple flags, arguments that need calculation, and dependencies on previous steps. Documentation drifts, engineers forget flags, and "works on my machine" persists.
 
+\newpage
 Here's the discovery-based approach:
 
 ```makefile
@@ -67,6 +69,7 @@ push: ## Push to registry
 
 Running `make help` shows what's available. Each command is discoverable, and the complexity lives in scripts rather than being scattered across documentation.
 
+\newpage
 ## Discovering Development Environments
 
 Development with Docker involves multiple services and configuration. Make this discoverable:
@@ -103,6 +106,7 @@ dev-test: ## Run tests in dev environment
 
 The workflow reveals itself progressively. `make dev` starts everything and tells you what commands are available. Each operation is independently discoverable.
 
+\newpage
 ## Discovering Multi-Stage Builds
 
 Multi-stage Dockerfiles create different images for different purposes. Make the stages discoverable:
@@ -132,6 +136,7 @@ build-prod: ## Build production image
 
 Running `make build` shows available build targets. Each stage is independently buildable and the workflow is clear.
 
+\newpage
 ## Discovering Registry Operations
 
 Registry management involves tagging, pushing, and version control:
@@ -167,6 +172,7 @@ list-tags: ## List tags in registry
 
 The registry workflow is discoverable through `make registry`. Authentication, versioning, and cleanup are all explicit operations.
 
+\newpage
 ## Discovering Security Scanning
 
 Security scanning should be built into the workflow:
@@ -196,6 +202,7 @@ security-compliance: ## Check compliance
 
 Security becomes discoverable and repeatable. Developers can run the same scans locally that run in CI.
 
+\newpage
 ## Discovering Compose Orchestration
 
 Docker Compose involves multiple services and dependencies:
@@ -225,6 +232,7 @@ compose-ps: ## Show running services
 
 Compose operations are discoverable. Complex orchestration becomes simple commands.
 
+\newpage
 ## Discovering CI/CD Integration
 
 CI/CD pipelines need consistent, reliable Docker operations:
@@ -257,6 +265,7 @@ ci-security: ## CI security phase
 
 The CI pipeline is discoverable and can be run locally. No surprises in CI that didn't happen locally.
 
+\newpage
 ## Real-World Example
 
 ### Before: Scattered Scripts and Documentation
@@ -276,7 +285,7 @@ dev-setup.sh:
 
 Result: Confusion, inconsistency, broken builds
 ```
-
+\newpage
 ### After: Discoverable Workflow
 
 ```makefile
@@ -307,6 +316,7 @@ security-scan: ## Scan for vulnerabilities
 
 One interface, works everywhere. CI and local development use identical commands. New team members run `make help` and understand the workflow immediately.
 
+\newpage
 ## Key Patterns
 
 Make Docker workflows discoverable through:
