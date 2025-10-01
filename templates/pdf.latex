@@ -408,12 +408,34 @@ $if(logo)$
 $endif$
 $endif$
 
-% Use Lato for headings
+% Use Lato for headings and configure all title formatting
 \usepackage{sectsty}
-\allsectionsfont{\LatoFont}
+\usepackage{titlesec}
 
-% and for chapters, too:
-\chapterfont{\LatoFont}
+% Configure all heading formats with tight leading
+\titleformat{\part}[display]
+  {\LatoFont\Huge\bfseries\setstretch{0.5}\centering}
+  {\partname\ \thepart}
+  {20pt}
+  {\LatoFont\Huge\bfseries\setstretch{0.5}}
+
+\titleformat{\chapter}[display]
+  {\LatoFont\huge\bfseries\setstretch{0.9}}
+  {\chaptertitlename\ \thechapter}
+  {20pt}
+  {\LatoFont\huge\raggedright\setstretch{0.9}}
+
+\titleformat{\section}
+  {\LatoFont\Large\bfseries\setstretch{0.9}}
+  {\thesection}{1em}{\raggedright}
+
+\titleformat{\subsection}
+  {\LatoFont\large\bfseries\setstretch{0.9}}
+  {\thesubsection}{1em}{\raggedright}
+
+\titleformat{\subsubsection}
+  {\LatoFont\normalsize\bfseries\setstretch{0.9}}
+  {\thesubsubsection}{1em}{\raggedright}
 
 % and for the title:
 \makeatletter
@@ -449,6 +471,14 @@ $endif$
 \fancyhead[RO]{\LatoFont\thepage} % Page number on right, odd pages
 \fancyhead[LE]{\LatoFont\thepage} % Page number on left, even pages
 \fancyfoot{}           % Clear all footer fields
+
+% Fix footer page numbers for special pages (part pages, chapter starts)
+\fancypagestyle{plain}{%
+  \fancyhf{}% Clear all headers and footers
+  \fancyfoot[C]{\LatoFont\thepage}% Center page number in footer with Lato font
+  \renewcommand{\headrulewidth}{0pt}% No header rule
+  \renewcommand{\footrulewidth}{0pt}% No footer rule
+}
 
 \usepackage[most]{tcolorbox}
 \newtcblisting{mycodeblock}{

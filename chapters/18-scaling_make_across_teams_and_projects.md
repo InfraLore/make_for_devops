@@ -1,23 +1,21 @@
-# Chapter 18 - Scaling Make Across Teams and Projects
+# Chapter 18: Scaling Make Across Teams and Projects
 
 \chaptersubtitle{Building organization-wide standards that preserve team autonomy while enabling consistency and shared learning.}
 
-Your company now has fifteen development teams, each with their own services, repositories, and workflows. The good news: each team has adopted Make-based workflows and loves the discoverability. The bad news: you now have fifteen different ways to run tests, deploy services, check logs, and handle incidents. New engineers rotating between teams face a steep learning curve. Cross-team collaboration requires learning each team's unique conventions. Platform changes require updating fifteen different Makefiles.
+Your company now has fifteen development teams, each with their own services, repositories, and workflows. The good news: each team has adopted Make-based workflows and loves the discoverability. The bad news: you now have fifteen different ways to run tests, deploy services, check logs, and handle incidents. New engineers rotating between teams face a steep learning curve. Cross-team collaboration requires learning each team's unique conventions.
 
-The backend team uses `make deploy-prod` while the frontend team uses `make production-deploy`. One team's `make test` runs only unit tests; another's runs the full suite including slow integration tests. The mobile team has comprehensive security scanning; the API team forgot it entirely. Each Makefile represents one team's accumulated wisdom, but that wisdom doesn't spread.
+The backend team uses `make deploy-prod` while the frontend team uses `make production-deploy`. One team's `make test` runs only unit tests; another's runs the full suite including slow integration tests. Each Makefile represents one team's accumulated wisdom, but that wisdom doesn't spread.
 
-You face a classic scaling problem: how do you maintain consistency across teams without destroying the autonomy and flexibility that made Make adoption successful in the first place? How do you share patterns and best practices without mandating one-size-fits-all solutions? How do you evolve standards without breaking existing workflows?
+You face a classic scaling problem: how do you maintain consistency across teams without destroying the autonomy that made Make adoption successful? How do you share patterns without mandating one-size-fits-all solutions?
 
-This chapter explores how to scale Make-based workflows across organizations—creating shared libraries, establishing conventions, building template projects, and fostering a culture where teams learn from each other while maintaining ownership of their workflows.
+This chapter explores how to scale Make-based workflows across organizations—creating shared libraries, establishing conventions, building templates, and fostering a culture where teams learn from each other while maintaining ownership.
 
 ## The Antipattern: Centralized Enforcement
 
-Before we discuss what works, let's look at what doesn't: the centralized enforcement approach. This typically emerges when a platform team decides to "standardize everything":
+Before we discuss what works, let's look at what doesn't: the centralized enforcement approach:
 
 ```makefile
 # DON'T DO THIS: Mandated corporate Makefile
-# All teams must use this exact Makefile with no modifications
-
 include /corporate/makefiles/standard.mk
 
 # All targets defined centrally
@@ -25,333 +23,141 @@ include /corporate/makefiles/standard.mk
 # All workflows controlled by platform team
 ```
 
-This approach fails for several reasons:
+This fails because:
 
-**It assumes one size fits all**: A Python microservice and a React frontend have fundamentally different build and test workflows. Forcing them into identical patterns creates friction.
-
-**It prevents experimentation**: When teams can't modify their Makefiles, they can't try new tools, optimize workflows, or adapt to project-specific needs.
-
-**It creates bottlenecks**: Every workflow change requires platform team approval and a centralized update, slowing down all teams.
-
-**It breeds resentment**: Teams resent being told exactly how to work, especially when the mandated approach doesn't fit their needs.
-
-**It encourages workarounds**: Teams route around the restrictions, creating ad-hoc scripts that bypass the "standard" Makefile entirely.
+- **One size fits all assumption**: A Python microservice and a React frontend need different workflows
+- **Prevents experimentation**: Teams can't try new tools or optimize for their needs
+- **Creates bottlenecks**: Every change requires platform team approval
+- **Breeds resentment**: Teams resent being told exactly how to work
+- **Encourages workarounds**: Teams route around restrictions with ad-hoc scripts
 
 The right approach balances consistency with autonomy through shared libraries, conventions, and templates—not mandates.
 
 ## The Pattern: Shared Libraries with Local Flexibility
 
-The successful pattern provides shared, reusable components while letting teams compose and customize them for their needs:
+Provide shared, reusable components while letting teams compose and customize:
 
 ```makefile
 # Team's project Makefile - they own this
-# Located at: myservice/Makefile
+SERVICE_NAME := myservice
+IMAGE_NAME := company/myservice
 
 # Import shared libraries (optional)
 include .make/docker.mk
 include .make/kubernetes.mk
 include .make/security.mk
 
-# Team-specific configuration
-SERVICE_NAME := myservice
-IMAGE_NAME := company/myservice
-NAMESPACE := backend
+# Use shared targets as-is or override
+docker-build: ## Build with custom optimization
+	@echo "Building $(SERVICE_NAME)..."
+	@$(MAKE) _docker-build-shared BUILD_ARGS="--custom-flag"
 
-# Team can use shared targets as-is
-# Shared targets like 'docker-build', 'k8s-deploy', 'security-scan' 
-# are now available
-
-# Or override them for project-specific needs
-docker-build: ## Build service with custom optimization
-	@echo "Building $(SERVICE_NAME) with custom flags..."
-	@$(MAKE) _docker-build-shared BUILD_ARGS="--build-arg GO_OPTS=-race"
-
-# Or add completely custom targets
+# Add team-specific targets
 load-test: ## Run load tests (team-specific)
-	@echo "Running load tests for $(SERVICE_NAME)..."
-	./scripts/load-test.sh
-
-# Team maintains full control while benefiting from shared components
+	@./scripts/load-test.sh
 ```
 
-The shared library files live in a `.make/` directory that's distributed via a common mechanism (Git submodule, package, or generated by tooling):
+Teams get useful defaults but retain complete control. They can use shared targets, override them, ignore them, or mix shared and custom targets freely.
+
+## Building Discoverable Shared Libraries
+
+Shared libraries should be discoverable, not just documented:
 
 ```makefile
 # .make/docker.mk - Shared Docker workflows
-# Teams import this but can override specific targets
+# Version: 2.1.0
 
-_docker-build-shared: ## Internal: Standard Docker build
-	@docker build -t $(IMAGE_NAME):$(VERSION) \
-		$(BUILD_ARGS) \
-		--label "version=$(VERSION)" \
-		--label "commit=$(GIT_COMMIT)" \
-		.
+DOCKER_REGISTRY ?= company.registry.io
 
-docker-build: _docker-build-shared ## Build Docker image
+docker: ## Show Docker commands
+	@echo "Docker Commands"
+	@echo "==============="
+	@echo "  make docker-build    - Build image"
+	@echo "  make docker-push     - Push to registry"
+	@echo "  make docker-scan     - Security scan"
+	@echo "  make docker-run      - Run locally"
+
+docker-build: ## Build Docker image
+	@echo "Building $(IMAGE_NAME):$(VERSION)..."
+	@./scripts/docker-build.sh
 
 docker-push: ## Push image to registry
 	@echo "Pushing $(IMAGE_NAME):$(VERSION)..."
-	@docker push $(IMAGE_NAME):$(VERSION)
-	@docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@docker push $(IMAGE_NAME):latest
+	@./scripts/docker-push.sh
 
-docker-scan: ## Scan image for vulnerabilities
-	@trivy image --severity HIGH,CRITICAL $(IMAGE_NAME):$(VERSION)
+docker-scan: ## Scan for vulnerabilities
+	@echo "Scanning $(IMAGE_NAME):$(VERSION)..."
+	@./scripts/docker-scan.sh
 ```
 
-Teams get useful defaults but retain complete control. They can:
-- Use shared targets as-is
-- Override targets with custom implementations
-- Ignore shared libraries entirely for specific projects
-- Extend shared targets with additional behavior
-- Mix shared and custom targets freely
-
-## Building a Shared Library System
-
-Let's build a practical shared library system for a mid-size organization:
-
-### Directory Structure
-
-```
-company-make-libraries/
-├── docker.mk           # Docker workflows
-├── kubernetes.mk       # Kubernetes deployments
-├── security.mk         # Security scanning
-├── testing.mk          # Test execution
-├── ci.mk              # CI/CD helpers
-├── observability.mk    # Logging and monitoring
-└── helpers.mk          # Common utilities
-```
-
-### Example: Shared Docker Library
-
-```makefile
-# docker.mk - Reusable Docker workflows
-# Version: 2.1.0
-
-# Configuration (teams can override)
-DOCKER_REGISTRY ?= company.registry.io
-BUILD_ARGS ?=
-DOCKER_BUILD_CONTEXT ?= .
-
-# Internal helpers (prefixed with _)
-_check-docker:
-	@command -v docker >/dev/null || \
-		(echo "❌ Docker required" && exit 1)
-
-_docker-version-tag:
-	@echo "$(DOCKER_REGISTRY)/$(SERVICE_NAME):$(VERSION)"
-
-# Public targets (teams can use or override)
-docker-build: _check-docker ## Build Docker image
-	@echo "🐳 Building $$($(MAKE) -s _docker-version-tag)..."
-	@docker build \
-		-t $$($(MAKE) -s _docker-version-tag) \
-		-t $(DOCKER_REGISTRY)/$(SERVICE_NAME):latest \
-		$(BUILD_ARGS) \
-		--label "version=$(VERSION)" \
-		--label "commit=$$(git rev-parse HEAD)" \
-		--label "built-by=$(USER)" \
-		--label "built-at=$$(date -Iseconds)" \
-		$(DOCKER_BUILD_CONTEXT)
-	@echo "✅ Built: $$($(MAKE) -s _docker-version-tag)"
-
-docker-push: _check-docker ## Push image to registry
-	@echo "📤 Pushing $$($(MAKE) -s _docker-version-tag)..."
-	@docker push $$($(MAKE) -s _docker-version-tag)
-	@docker push $(DOCKER_REGISTRY)/$(SERVICE_NAME):latest
-	@echo "✅ Pushed to $(DOCKER_REGISTRY)"
-
-docker-run-local: _check-docker ## Run image locally
-	@echo "🚀 Running locally on port 8080..."
-	@docker run -p 8080:8080 \
-		--rm \
-		-e ENVIRONMENT=local \
-		$$($(MAKE) -s _docker-version-tag)
-
-docker-shell: _check-docker ## Get shell in container
-	@docker run -it --rm \
-		--entrypoint /bin/sh \
-		$$($(MAKE) -s _docker-version-tag)
-
-docker-clean: ## Remove local images
-	@echo "🧹 Cleaning Docker images..."
-	@docker rmi $$($(MAKE) -s _docker-version-tag) 2>/dev/null || true
-	@docker rmi $(DOCKER_REGISTRY)/$(SERVICE_NAME):latest 2>/dev/null || true
-	@echo "✅ Cleaned"
-```
-
-### Example: Shared Kubernetes Library
-
-```makefile
-# kubernetes.mk - Reusable Kubernetes workflows
-# Version: 2.1.0
-
-# Configuration
-K8S_NAMESPACE ?= default
-K8S_CONTEXT ?= $(ENVIRONMENT)
-K8S_MANIFESTS_DIR ?= k8s
-
-# Internal helpers
-_check-kubectl:
-	@command -v kubectl >/dev/null || \
-		(echo "❌ kubectl required" && exit 1)
-
-_check-namespace: _check-kubectl
-	@kubectl get namespace $(K8S_NAMESPACE) >/dev/null 2>&1 || \
-		(echo "❌ Namespace $(K8S_NAMESPACE) doesn't exist" && exit 1)
-
-_k8s-deployment-name:
-	@echo "$(SERVICE_NAME)"
-
-# Public targets
-k8s-apply: _check-kubectl _check-namespace ## Apply Kubernetes manifests
-	@echo "☸️  Applying manifests to $(K8S_NAMESPACE)..."
-	@kubectl apply -f $(K8S_MANIFESTS_DIR)/ \
-		--namespace=$(K8S_NAMESPACE) \
-		--context=$(K8S_CONTEXT)
-	@echo "✅ Applied"
-
-k8s-deploy: docker-push k8s-apply ## Build, push, and deploy
-	@echo "🚀 Deploying $(SERVICE_NAME) to $(ENVIRONMENT)..."
-	@kubectl set image deployment/$$($(MAKE) -s _k8s-deployment-name) \
-		app=$$($(MAKE) -s _docker-version-tag) \
-		--namespace=$(K8S_NAMESPACE) \
-		--context=$(K8S_CONTEXT)
-	@kubectl rollout status deployment/$$($(MAKE) -s _k8s-deployment-name) \
-		--namespace=$(K8S_NAMESPACE) \
-		--context=$(K8S_CONTEXT)
-	@echo "✅ Deployed $(VERSION)"
-
-k8s-rollback: _check-kubectl ## Rollback to previous version
-	@echo "⏮️  Rolling back $(SERVICE_NAME)..."
-	@kubectl rollout undo deployment/$$($(MAKE) -s _k8s-deployment-name) \
-		--namespace=$(K8S_NAMESPACE) \
-		--context=$(K8S_CONTEXT)
-	@echo "✅ Rolled back"
-
-k8s-logs: _check-kubectl ## Stream logs
-	@kubectl logs -f deployment/$$($(MAKE) -s _k8s-deployment-name) \
-		--namespace=$(K8S_NAMESPACE) \
-		--context=$(K8S_CONTEXT) \
-		--tail=50
-
-k8s-shell: _check-kubectl ## Get shell in pod
-	@pod=$$(kubectl get pod -n $(K8S_NAMESPACE) \
-		-l app=$(SERVICE_NAME) \
-		-o jsonpath='{.items[0].metadata.name}'); \
-	kubectl exec -it $$pod -n $(K8S_NAMESPACE) -- /bin/sh
-
-k8s-status: _check-kubectl ## Show deployment status
-	@echo "📊 Status for $(SERVICE_NAME):"
-	@kubectl get deployment,pods,services \
-		-n $(K8S_NAMESPACE) \
-		-l app=$(SERVICE_NAME)
-```
+Running `make docker` shows what's available from the shared library. Each shared target is independently useful.
 
 ## Establishing Organization-Wide Conventions
 
-Beyond shared libraries, establish conventions that create consistency without restricting flexibility:
+Create consistency through conventions, not mandates:
 
 ### Naming Conventions
 
 ```makefile
 # Convention: Standard target names across all projects
-# Teams must provide these targets, but implementation is up to them
+# Teams must provide these, but implementation is up to them
 
-# Development workflow
+# Development
 setup:      ## Set up development environment
 dev:        ## Start development environment  
 test:       ## Run tests
 build:      ## Build artifacts
 
-# Deployment workflow
+# Deployment
 deploy-dev:     ## Deploy to development
 deploy-staging: ## Deploy to staging
 deploy-prod:    ## Deploy to production
 
-# Maintenance
+# Utilities
 clean:      ## Clean up resources
 logs:       ## Show logs
-shell:      ## Get interactive shell
-
-# Help must always work
 help:       ## Show available commands
 ```
 
-This convention means engineers can move between any project and know that `make test` runs tests, `make deploy-staging` deploys to staging, etc. How each project implements these targets is up to the team.
+Engineers can move between projects knowing `make test` runs tests and `make deploy-staging` deploys to staging. Implementation varies, interface stays consistent.
 
 ### Configuration Conventions
 
 ```makefile
-# Convention: Standard variables across projects
-# Teams can add more, but these should be consistent
-
+# Convention: Standard variables
 SERVICE_NAME    # Name of the service
 VERSION         # Version being built/deployed
-ENVIRONMENT     # Target environment (dev/staging/prod)
+ENVIRONMENT     # Target environment
 IMAGE_NAME      # Full Docker image name
-NAMESPACE       # Kubernetes namespace
 ```
 
 ### Help System Conventions
 
 ```makefile
-# Convention: All projects must have helpful, categorized help
-
+# Convention: All projects must have discoverable help
 .DEFAULT_GOAL := help
 
 help: ## Show available commands
 	@echo "$(SERVICE_NAME) Commands"
 	@echo "======================="
-	@echo ""
-	@echo "Development:"
-	@awk '/^[a-z].*## .*Dev/ { ... }' $(MAKEFILE_LIST)
-	@echo ""
-	@echo "Testing:"
-	@awk '/^[a-z].*## .*Test/ { ... }' $(MAKEFILE_LIST)
-	@echo ""
-	@echo "Deployment:"
-	@awk '/^[a-z].*## .*Deploy/ { ... }' $(MAKEFILE_LIST)
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; \
+		{printf "  %-20s %s\n", $$1, $$2}'
 ```
 
 ## Creating Template Projects
 
-Templates help teams start new projects with good patterns already in place:
-
-```
-company-service-template/
-├── Makefile              # Pre-configured with shared libraries
-├── .make/                # Shared library imports
-│   ├── docker.mk
-│   ├── kubernetes.mk
-│   └── security.mk
-├── k8s/                  # Kubernetes manifests
-├── scripts/              # Helper scripts
-└── README.md             # Instructions
-```
-
-### Template Makefile
+Templates help teams start with good patterns:
 
 ```makefile
 # Service Template Makefile
-# Replace SERVICE_NAME with your service name
-
-# Service configuration
 SERVICE_NAME := myservice
 VERSION := $(shell git describe --tags --always --dirty)
-ENVIRONMENT ?= dev
 
 # Import shared libraries
 include .make/docker.mk
 include .make/kubernetes.mk
 include .make/security.mk
-include .make/testing.mk
-
-# Configuration
-DOCKER_REGISTRY := company.registry.io
-IMAGE_NAME := $(DOCKER_REGISTRY)/$(SERVICE_NAME)
-K8S_NAMESPACE := $(ENVIRONMENT)
 
 .DEFAULT_GOAL := help
 
@@ -359,304 +165,204 @@ K8S_NAMESPACE := $(ENVIRONMENT)
 
 setup: ## Set up development environment
 	@echo "Setting up $(SERVICE_NAME)..."
-	# Add your setup steps here
-	@echo "✅ Setup complete"
+	@./scripts/setup.sh
 
 dev: ## Start development environment
-	@echo "Starting $(SERVICE_NAME) in development mode..."
-	# Add your dev server command here
+	@echo "Starting development mode..."
+	@./scripts/dev-server.sh
 
 test: ## Run all tests
-	@echo "Running tests for $(SERVICE_NAME)..."
-	# Add your test command here
+	@echo "Running tests..."
+	@./scripts/run-tests.sh
 
 ##@ Deployment
 
-deploy-dev: ## Deploy to development
+deploy-dev: security-check ## Deploy to development
 	@$(MAKE) k8s-deploy ENVIRONMENT=dev
 
-deploy-staging: ## Deploy to staging
+deploy-staging: security-check ## Deploy to staging
 	@$(MAKE) k8s-deploy ENVIRONMENT=staging
 
-deploy-prod: ## Deploy to production
+deploy-prod: security-check ## Deploy to production
 	@echo "⚠️  Deploying to PRODUCTION"
 	@$(MAKE) _confirm-production
 	@$(MAKE) k8s-deploy ENVIRONMENT=prod
 
-##@ Utilities
-
-logs: ## Show service logs
-	@$(MAKE) k8s-logs ENVIRONMENT=$(ENVIRONMENT)
-
-shell: ## Get shell in container
-	@$(MAKE) k8s-shell ENVIRONMENT=$(ENVIRONMENT)
-
-clean: ## Clean up local resources
-	@$(MAKE) docker-clean
-
-# Internal targets
 _confirm-production:
-	@echo "About to deploy $(SERVICE_NAME) to production"
-	@echo -n "Type the service name to confirm: "
-	@read confirm && [ "$$confirm" = "$(SERVICE_NAME)" ] || \
-		(echo "Confirmation failed" && exit 1)
+	@echo -n "Type service name to confirm: "
+	@read confirm && [ "$$confirm" = "$(SERVICE_NAME)" ]
 ```
 
-Teams can scaffold new projects with:
+Teams scaffold new projects with good defaults but full flexibility to adapt.
+
+## Distribution Strategies
+
+How do you distribute shared libraries? Several approaches:
+
+### Git Submodules
 
 ```bash
-# Scaffolding tool
-make-new-service myservice
-# Creates new directory with template, shared libraries, and docs
-```
-
-## Distribution Strategies for Shared Libraries
-
-How do you distribute shared libraries to teams? Several approaches work:
-
-### Option 1: Git Submodules
-
-```bash
-# In each project
 git submodule add https://github.com/company/make-libs .make
-git submodule update --init
 ```
 
-**Pros**: Simple, version-controlled, explicit updates
-**Cons**: Teams need to remember to update submodules
+Simple, version-controlled, explicit updates.
 
-### Option 2: Download Script
+### Download Script
 
 ```makefile
-# In project Makefile
 .make/docker.mk:
-	@echo "Downloading shared libraries..."
 	@mkdir -p .make
 	@curl -sL https://company.com/make-libs/docker.mk -o .make/docker.mk
-	@curl -sL https://company.com/make-libs/kubernetes.mk -o .make/kubernetes.mk
 
-# Automatically download if missing
 -include .make/docker.mk
--include .make/kubernetes.mk
 ```
 
-**Pros**: Zero setup, always available
-**Cons**: Network dependency, harder to version
+Zero setup, always available.
 
-### Option 3: Package Manager
+### Package Manager
 
 ```bash
-# Use npm, pip, or custom package manager
 npm install --save-dev @company/make-libs
-
-# Makefile includes from node_modules
 include node_modules/@company/make-libs/docker.mk
 ```
 
-**Pros**: Familiar workflow, version management
-**Cons**: Requires package manager in all projects
+Familiar workflow, version management.
 
-### Option 4: Generated Makefiles
-
-```bash
-# CLI tool generates Makefile with libraries embedded
-company-make init
-# Creates Makefile with shared code inlined
-```
-
-**Pros**: No external dependencies
-**Cons**: Updates require regeneration
-
-Choose based on your organization's workflow and tooling preferences.
+Choose based on your organization's existing workflow.
 
 ## Versioning and Evolution
 
-Shared libraries need version management to allow graceful evolution:
+Shared libraries need version management:
 
 ```makefile
 # .make/docker.mk
 # Version: 2.1.0
 # Changelog: https://wiki.company.com/make-libs/changelog
 
-# Version compatibility check
-REQUIRED_MAKE_VERSION := 2.0.0
-CURRENT_MAKE_VERSION := $(shell grep "Version:" .make/docker.mk | \
-	awk '{print $$3}')
-
-ifneq ($(CURRENT_MAKE_VERSION),)
-  # Warn if version is outdated
-  ifeq ($(shell printf '%s\n' "$(REQUIRED_MAKE_VERSION)" \
-    "$(CURRENT_MAKE_VERSION)" | sort -V | head -n1),$(CURRENT_MAKE_VERSION))
-    $(warning Your make libraries are outdated. Run: make update-libs)
-  endif
-endif
-```
-
-### Semantic Versioning for Libraries
-
-- **Major version** (2.0.0 → 3.0.0): Breaking changes, target names change
-- **Minor version** (2.0.0 → 2.1.0): New features, backward compatible
-- **Patch version** (2.0.0 → 2.0.1): Bug fixes, no API changes
-
-### Update Workflow
-
-```makefile
-# In project Makefile
-update-libs: ## Update shared libraries to latest version
+update-libs: ## Update shared libraries
 	@echo "Updating make libraries..."
 	@cd .make && git pull origin main
-	@echo "✅ Libraries updated"
-	@echo "Changelog: https://wiki.company.com/make-libs/changelog"
+	@echo "✓ Libraries updated"
 
 check-libs: ## Check library versions
 	@echo "Current versions:"
-	@grep "Version:" .make/*.mk | awk '{print $$1, $$3}'
-	@echo ""
-	@echo "Latest version: $(LATEST_LIB_VERSION)"
-	@echo "Update with: make update-libs"
+	@grep "Version:" .make/*.mk
 ```
 
-## Measuring Adoption and Success
+Use semantic versioning:
+- **Major** (2.0 → 3.0): Breaking changes
+- **Minor** (2.0 → 2.1): New features, backward compatible
+- **Patch** (2.0.0 → 2.0.1): Bug fixes only
 
-Track how Make-based workflows spread and provide value:
-
-### Metrics to Track
-
-```makefile
-# Generate adoption report
-adoption-report: ## Report on Make usage across org
-	@echo "📊 Make Adoption Report"
-	@echo "======================"
-	@echo ""
-	@repos=$$(gh repo list company --limit 1000 --json name -q '.[].name')
-	@total=$$(echo "$$repos" | wc -l)
-	@with_make=$$(echo "$$repos" | xargs -I {} gh api \
-		repos/company/{}/contents/Makefile 2>/dev/null | wc -l)
-	@echo "Repositories: $$total"
-	@echo "With Makefile: $$with_make ($$((with_make * 100 / total))%)"
-	@echo ""
-	@echo "Common targets:"
-	@# Find most common target names across repos
-	@echo "  test: $$(grep-all-repos '^test:' | wc -l) repos"
-	@echo "  build: $$(grep-all-repos '^build:' | wc -l) repos"
-	@echo "  deploy: $$(grep-all-repos '^deploy:' | wc -l) repos"
-```
-
-### Success Indicators
-
-- **Onboarding time**: How quickly new engineers become productive
-- **Cross-team mobility**: Time to productivity when switching teams
-- **Incident response time**: MTTR when using runbooks
-- **Tool adoption**: How quickly new tools spread via shared libraries
-- **Documentation freshness**: Executable docs stay current
-
-## Training and Adoption Strategies
-
-Successful rollout requires more than just providing libraries:
-
-### 1. Start with Champions
-
-```makefile
-# Identify early adopters who can demonstrate value
-# Provide extra support and documentation
-# Showcase their success to other teams
-```
-
-### 2. Provide Examples, Not Just Documentation
-
-```bash
-# Repository of real-world examples
-https://github.com/company/make-examples
-├── simple-api/           # Basic REST API
-├── react-frontend/       # Frontend application
-├── data-pipeline/        # Batch processing
-└── monorepo/            # Multi-service project
-```
-
-### 3. Office Hours and Support
-
-```makefile
-# Regular "Make Office Hours" for teams to ask questions
-# Slack channel: #make-help
-# Wiki with patterns and troubleshooting
-```
-
-### 4. Gradual Adoption Path
-
-```markdown
-Phase 1: Start with `make help` and basic targets (test, build)
-Phase 2: Add deployment targets (deploy-dev, deploy-staging)
-Phase 3: Import shared libraries
-Phase 4: Add security and compliance workflows
-Phase 5: Create incident response runbooks
-```
-
-## Governance Without Bureaucracy
-
-Balance standardization with team autonomy:
-
-### What to Mandate
-
-- Standard target names for common operations
-- Required help system
-- Security scanning for production deployments
-- Compliance evidence collection
-
-### What to Recommend
-
-- Shared library usage
-- Naming conventions
-- Project structure
-- Helper scripts
-
-### What to Leave Flexible
-
-- Implementation details
-- Project-specific workflows
-- Tool choices (as long as they integrate)
-- Team-specific targets
-
-## Real-World Example: Before and After
+## Real-World Example: From Silos to Standards
 
 ### Before: Team Silos
 
 ```
-Team A:
-  make deploy-production → deploys to prod
-  make test-all → runs tests
-  
-Team B:
-  make prod-deploy → deploys to prod
-  make run-tests → runs tests
-  
-Team C:
-  make push-prod → deploys to prod
-  make check → runs tests
+Team A: make deploy-production
+Team B: make prod-deploy
+Team C: make push-prod
 
-New engineer switches teams → confused, slow to contribute
+New engineer switches teams → confused, unproductive
 ```
 
-### After: Shared Conventions with Flexibility
+### After: Shared Conventions
 
 ```makefile
 # All teams implement standard interface
-# But can customize implementation
+# Implementation differs, interface consistent
 
 # Team A - Simple deployment
 deploy-prod: security-check
-	kubectl apply -f k8s/prod/
+	@./scripts/deploy.sh prod
 
-# Team B - Complex deployment with feature flags
+# Team B - Complex deployment
 deploy-prod: security-check validate-features
-	./scripts/deploy-prod.sh --feature-flags=$(FEATURES)
+	@./scripts/complex-deploy.sh --env prod
 
 # Team C - Blue/green deployment
 deploy-prod: security-check
-	$(MAKE) k8s-deploy-blue-green ENVIRONMENT=prod
+	@$(MAKE) k8s-deploy-blue-green ENVIRONMENT=prod
 
 # Different implementations, same interface
-# New engineer knows 'make deploy-prod' works everywhere
 ```
+
+New engineers know `make deploy-prod` works everywhere, even if implementation differs.
+
+## Measuring Adoption
+
+Track how Make workflows spread:
+
+```makefile
+adoption-report: ## Report on Make usage
+	@echo "Make Adoption Report"
+	@echo "===================="
+	@total_repos=$(COUNT_REPOS)
+	@with_makefile=$(COUNT_MAKEFILES)
+	@echo "Repositories: $$total_repos"
+	@echo "With Makefile: $$with_makefile"
+	@echo "Adoption: $$((with_makefile * 100 / total_repos))%"
+```
+
+Success indicators:
+- Onboarding time reduced
+- Cross-team mobility improved
+- Incident response faster
+- Tool adoption accelerated
+
+## Training and Adoption Strategies
+
+Successful rollout requires more than libraries:
+
+### Start with Champions
+
+Identify early adopters, provide extra support, showcase their success.
+
+### Provide Examples
+
+```
+make-examples/
+├── simple-api/
+├── react-frontend/
+├── data-pipeline/
+└── monorepo/
+```
+
+Real examples beat documentation.
+
+### Gradual Adoption Path
+
+```
+Phase 1: Basic targets (test, build, help)
+Phase 2: Deployment targets
+Phase 3: Shared libraries
+Phase 4: Security workflows
+Phase 5: Incident runbooks
+```
+
+### Office Hours
+
+Regular "Make Office Hours" for teams to ask questions. Slack channel for async help.
+
+## Governance Without Bureaucracy
+
+Balance standardization with autonomy:
+
+**Mandate:**
+- Standard target names for common operations
+- Required help system
+- Security scanning for production
+
+**Recommend:**
+- Shared library usage
+- Naming conventions
+- Project structure
+
+**Leave Flexible:**
+- Implementation details
+- Project-specific workflows
+- Tool choices
+- Team-specific targets
 
 ## Key Takeaways
 
@@ -665,11 +371,13 @@ Scaling Make across an organization requires balancing consistency with autonomy
 1. **Shared libraries** provide reusable components without mandating usage
 2. **Conventions** create consistency without restricting implementation
 3. **Templates** help teams start with good patterns
-4. **Versioning** allows gradual evolution without breaking existing workflows
-5. **Flexibility** matters more than uniformity—teams own their Makefiles
+4. **Versioning** allows gradual evolution
+5. **Flexibility** matters more than uniformity
 
-The goal isn't perfect standardization—it's creating a culture where teams learn from each other, share successful patterns, and continuously improve workflows while maintaining ownership and flexibility.
+The goal isn't perfect standardization—it's creating a culture where teams learn from each other, share successful patterns, and continuously improve while maintaining ownership.
 
-Most importantly, scaling Make-based workflows preserves what made them successful in the first place: discoverability, executable documentation, and the ability to capture team lore in a form that benefits everyone. When done right, organization-wide Make adoption doesn't feel like a mandate—it feels like discovering a better way to work.
+Most importantly, scaling Make preserves what made it successful: discoverability, executable documentation, and the ability to capture team knowledge in a form that benefits everyone. When done right, organization-wide Make adoption doesn't feel like a mandate—it feels like discovering a better way to work.
+
+The pattern is consistent: provide shared building blocks, establish discoverable conventions, let teams compose their own workflows. Standards emerge from shared practice, not central decree. Teams learn from each other's Makefiles, adopt patterns that work, and ignore patterns that don't. Knowledge spreads through discovery and proven value, not through policy documents.
 
 In the final chapter, we'll explore troubleshooting and debugging Make workflows, equipping you with the skills to diagnose issues, optimize performance, and help others succeed with Make-based workflows.

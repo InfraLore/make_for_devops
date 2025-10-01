@@ -37,15 +37,6 @@ header-includes:
   - \usepackage{needspace}
   # Ragged right headings with no hyphenation
   - \usepackage{ragged2e}
-  - \usepackage{titlesec}
-  - \titleformat{\chapter}[display]{\LatoFont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\LatoFont\huge\raggedright}
-  - \titleformat{\section}{\LatoFont\Large\bfseries}{\thesection}{1em}{\raggedright}
-  - \titleformat{\subsection}{\LatoFont\large\bfseries}{\thesubsection}{1em}{\raggedright}
-  - \titleformat{\subsubsection}{\LatoFont\normalsize\bfseries}{\thesubsubsection}{1em}{\raggedright}
-  # Disable the template's sectsty formatting that might be interfering
-  - \makeatletter
-  - \let\@hangfrom\@gobble
-  - \makeatother
   # Disable hyphenation everywhere
   - \hyphenpenalty=10000
   - \exhyphenpenalty=10000
