@@ -53,11 +53,11 @@ As Kubernetes becomes more sophisticated, teams are building custom operators an
 .PHONY: operator-dev operator-deploy operator-test
 
 operator-dev: ## Start operator development environment
-	@echo "🔧 Starting operator development..."
+	@echo "Starting operator development..."
 	@kind create cluster --name operator-dev || true
 	@$(MAKE) operator-install-crds
 	@$(MAKE) operator-run-local
-	@echo "💡 Operator running locally against cluster"
+	@echo "Operator running locally against cluster"
 
 operator-install-crds: ## Install Custom Resource Definitions
 	@kubectl apply -f config/crd/
@@ -77,8 +77,8 @@ operator-verify-state: ## Verify operator created expected resources
 	@echo "Checking created resources..."
 	@kubectl get deployment,service,configmap \
 		-l managed-by=myoperator | grep -q "myresource" || \
-		(echo "❌ Expected resources not found" && exit 1)
-	@echo "✅ Operator working correctly"
+		(echo "Expected resources not found" && exit 1)
+	@echo "Operator working correctly"
 ```
 
 ### Service Mesh Integration
@@ -89,14 +89,14 @@ As service meshes like Istio and Linkerd become standard, Make workflows adapt:
 # Service mesh deployment with progressive rollout
 mesh-deploy: ## Deploy with traffic shifting
 	@$(MAKE) deploy-canary TRAFFIC=10
-	@echo "⏳ Monitoring canary for 5 minutes..."
+	@echo "Monitoring canary for 5 minutes..."
 	@sleep 300
 	@if $(MAKE) -s mesh-check-canary-health; then \
 		$(MAKE) mesh-shift-traffic TRAFFIC=50; \
 		sleep 300; \
 		$(MAKE) mesh-shift-traffic TRAFFIC=100; \
 	else \
-		echo "❌ Canary unhealthy, rolling back..."; \
+		echo "Canary unhealthy, rolling back..."; \
 		$(MAKE) mesh-rollback; \
 	fi
 
@@ -112,7 +112,7 @@ mesh-check-canary-health: ## Verify canary deployment health
 		'rate(http_errors{version="v$(VERSION)"}[5m])' | \
 		jq -r '.data.result[0].value[1]'); \
 	if [ "$$(echo "$$error_rate > 0.01" | bc)" -eq 1 ]; then \
-		echo "❌ Error rate too high: $$error_rate"; \
+		echo "Error rate too high: $$error_rate"; \
 		exit 1; \
 	fi
 ```
@@ -124,7 +124,7 @@ Organizations are building Internal Developer Platforms (IDPs). Make serves as t
 ```makefile
 # Platform engineering: Make as the IDP interface
 platform-create-service: ## Create new service from template
-	@echo "🏗️  Creating new service..."
+	@echo "Creating new service..."
 	@read -p "Service name: " name; \
 	read -p "Team: " team; \
 	read -p "Language (go/python/node): " lang; \
@@ -138,7 +138,7 @@ _platform-scaffold:
 		-H "Authorization: Bearer $(PLATFORM_TOKEN)"
 	@git clone https://git.company.com/$(TEAM)/$(NAME)
 	@cd $(NAME) && make setup
-	@echo "✅ Service created: $(NAME)"
+	@echo "Service created: $(NAME)"
 	@echo "Next steps:"
 	@echo "  cd $(NAME)"
 	@echo "  make dev"
@@ -170,7 +170,7 @@ ai-add-target: ## Generate Make target from description
 	@read -p "> " desc; \
 	echo "Generating target..."; \
 	ai-makefile-generator "$$desc" >> Makefile.ai-generated
-	@echo "✅ Generated target in Makefile.ai-generated"
+	@echo "Generated target in Makefile.ai-generated"
 	@echo "Review and merge into Makefile if acceptable"
 
 # Example AI-generated targets would be reviewed by humans
@@ -183,7 +183,7 @@ AI could analyze repository state and suggest relevant Make targets:
 
 ```makefile
 suggest: ## AI-powered workflow suggestions
-	@echo "🤖 Analyzing repository state..."
+	@echo "Analyzing repository state..."
 	@changes=$$(git status --short)
 	@branch=$$(git rev-parse --abbrev-ref HEAD)
 	@echo "Based on your changes, you might want to:"
@@ -205,7 +205,7 @@ AI could suggest Makefile optimizations:
 
 ```makefile
 optimize-makefile: ## Analyze Makefile for improvements
-	@echo "🔍 Analyzing Makefile..."
+	@echo "Analyzing Makefile..."
 	@# AI service analyzes Makefile structure
 	@ai-makefile-analyzer Makefile | \
 		jq -r '.suggestions[] | "- \(.type): \(.description)"'
@@ -243,11 +243,11 @@ _commit-to-gitops-repo:
 		git add . && \
 		git commit -m "Deploy $(SERVICE_NAME) $(VERSION) to $(ENVIRONMENT)" && \
 		git push origin deploy-$(SERVICE_NAME)-$(VERSION)
-	@echo "📝 Created PR in GitOps repository"
+	@echo "Created PR in GitOps repository"
 
 _trigger-argocd-sync:
 	@argocd app sync $(SERVICE_NAME)-$(ENVIRONMENT) --async
-	@echo "🔄 ArgoCD sync triggered"
+	@echo "ArgoCD sync triggered"
 	@echo "Monitor: argocd app wait $(SERVICE_NAME)-$(ENVIRONMENT)"
 ```
 
@@ -261,7 +261,7 @@ deploy-progressive: ## Progressive deployment with automated rollback
 	@$(MAKE) deploy-canary REPLICAS=3
 	@$(MAKE) progressive-verify STAGE=2 || $(MAKE) progressive-rollback
 	@$(MAKE) deploy-full
-	@echo "✅ Progressive deployment complete"
+	@echo "Progressive deployment complete"
 
 progressive-verify:
 	@echo "Verifying stage $(STAGE)..."
@@ -269,14 +269,14 @@ progressive-verify:
 	@error_rate=$$($(MAKE) -s _get-error-rate)
 	@latency=$$($(MAKE) -s _get-latency-p99)
 	@if [ "$$(echo "$$error_rate > 0.01" | bc)" -eq 1 ]; then \
-		echo "❌ High error rate: $$error_rate"; \
+		echo "High error rate: $$error_rate"; \
 		exit 1; \
 	fi
 	@if [ "$$(echo "$$latency > 1000" | bc)" -eq 1 ]; then \
-		echo "❌ High latency: $${latency}ms"; \
+		echo "High latency: $${latency}ms"; \
 		exit 1; \
 	fi
-	@echo "✅ Stage $(STAGE) verified"
+	@echo "Stage $(STAGE) verified"
 ```
 
 ## Observability and OpenTelemetry
@@ -322,7 +322,7 @@ As cloud costs become more important, Make helps with cost awareness:
 ```makefile
 # Cost-aware deployment workflows
 cost-estimate: ## Estimate deployment costs
-	@echo "💰 Estimating costs for $(ENVIRONMENT)..."
+	@echo "Estimating costs for $(ENVIRONMENT)..."
 	@infracost breakdown \
 		--path terraform/ \
 		--terraform-var-file $(ENVIRONMENT).tfvars \
@@ -330,13 +330,13 @@ cost-estimate: ## Estimate deployment costs
 	@monthly=$$(jq -r '.totalMonthlyCost' cost-estimate.json)
 	@echo "Estimated monthly cost: \$$$$monthly"
 	@if [ "$$(echo "$$monthly > 10000" | bc)" -eq 1 ]; then \
-		echo "⚠️  High cost deployment!"; \
+		echo "High cost deployment!"; \
 		echo "Approve? [y/N]"; \
 		read ans && [ "$$ans" = "y" ] || exit 1; \
 	fi
 
 cost-optimize: ## Suggest cost optimizations
-	@echo "🔍 Analyzing for cost optimization opportunities..."
+	@echo "Analyzing for cost optimization opportunities..."
 	@# Check for unused resources
 	@$(MAKE) _check-unused-volumes
 	@$(MAKE) _check-oversized-instances
@@ -349,7 +349,7 @@ _check-unused-volumes:
 		--query 'Volumes[].VolumeId' \
 		--output text | wc -w)
 	@if [ $$unused -gt 0 ]; then \
-		echo "⚠️  $$unused unused EBS volumes found"; \
+		echo "$$unused unused EBS volumes found"; \
 		echo "   Estimated waste: \$$$$((unused * 10))/month"; \
 	fi
 ```
@@ -365,7 +365,7 @@ wasm-build: ## Build WebAssembly module
 	@cargo build --target wasm32-wasi --release
 	@wasm-opt -Oz target/wasm32-wasi/release/$(SERVICE_NAME).wasm \
 		-o $(SERVICE_NAME).wasm
-	@echo "✅ WASM module: $(shell du -h $(SERVICE_NAME).wasm | cut -f1)"
+	@echo "WASM module: $(shell du -h $(SERVICE_NAME).wasm | cut -f1)"
 
 edge-deploy: wasm-build ## Deploy to edge locations
 	@echo "Deploying to edge locations..."
@@ -373,7 +373,7 @@ edge-deploy: wasm-build ## Deploy to edge locations
 		echo "Deploying to $$region..."; \
 		$(MAKE) _edge-deploy-region REGION=$$region; \
 	done
-	@echo "✅ Deployed to all edge locations"
+	@echo "Deployed to all edge locations"
 
 _edge-deploy-region:
 	@fastly compute publish \
@@ -394,7 +394,7 @@ Security practices continue to mature. Make workflows evolve too:
 sbom-generate: ## Generate Software Bill of Materials
 	@echo "Generating SBOM..."
 	@syft packages dir:. -o spdx-json > sbom.json
-	@echo "✅ SBOM generated: sbom.json"
+	@echo "SBOM generated: sbom.json"
 
 sbom-verify: ## Verify software supply chain
 	@echo "Verifying supply chain security..."
@@ -406,7 +406,7 @@ sign-artifacts: ## Sign release artifacts with Sigstore
 	@echo "Signing artifacts..."
 	@cosign sign $(IMAGE_NAME):$(VERSION)
 	@cosign sign-blob sbom.json --output-signature sbom.json.sig
-	@echo "✅ Artifacts signed"
+	@echo "Artifacts signed"
 
 verify-signatures: ## Verify artifact signatures
 	@echo "Verifying signatures..."
@@ -420,7 +420,7 @@ verify-signatures: ## Verify artifact signatures
 ```makefile
 # Zero trust deployment workflows
 ztrust-deploy: ## Deploy with zero trust verification
-	@echo "🔒 Zero trust deployment"
+	@echo "Zero trust deployment"
 	@$(MAKE) _ztrust-verify-identity
 	@$(MAKE) _ztrust-verify-image
 	@$(MAKE) _ztrust-verify-policy
@@ -441,7 +441,7 @@ _ztrust-verify-policy:
 		-i deployment-request.json \
 		'data.deployment.allow' | \
 		grep -q true || \
-		(echo "❌ Policy violation" && exit 1)
+		(echo "Policy violation" && exit 1)
 ```
 
 ## Sustainability and Green Computing
@@ -451,7 +451,7 @@ Environmental impact becomes a factor in infrastructure decisions:
 ```makefile
 # Carbon-aware computing workflows
 carbon-estimate: ## Estimate carbon footprint of deployment
-	@echo "🌱 Estimating carbon footprint..."
+	@echo "Estimating carbon footprint..."
 	@cloud-carbon-footprint estimate \
 		--start-date $(START_DATE) \
 		--end-date $(END_DATE) \
@@ -462,7 +462,7 @@ deploy-green: ## Deploy during low-carbon hours
 	@intensity=$$(carbon-intensity get --region $(REGION))
 	@echo "Current: $$intensity gCO2/kWh"
 	@if [ "$$(echo "$$intensity > 400" | bc)" -eq 1 ]; then \
-		echo "⚠️  High carbon intensity"; \
+		echo "High carbon intensity"; \
 		echo "Consider deploying during off-peak hours"; \
 		echo "Proceed anyway? [y/N]"; \
 		read ans && [ "$$ans" = "y" ] || exit 1; \

@@ -61,17 +61,17 @@ setup: ## Set up development environment (run once)
 	@$(MAKE) _install-dependencies
 	@$(MAKE) _setup-configuration
 	@$(MAKE) _setup-database
-	@echo "✅ Setup complete! Run 'make dev' to start."
+	@echo "Setup complete! Run 'make dev' to start."
 
 _check-prerequisites:
 	@echo "Checking prerequisites..."
 	@command -v node >/dev/null || \
-		(echo "❌ Node.js required. Install from nodejs.org" && exit 1)
+		(echo "Node.js required. Install from nodejs.org" && exit 1)
 	@command -v python3 >/dev/null || \
-		(echo "❌ Python 3 required" && exit 1)
+		(echo "Python 3 required" && exit 1)
 	@command -v docker >/dev/null || \
-		(echo "❌ Docker required" && exit 1)
-	@echo "✅ All prerequisites found"
+		(echo "Docker required" && exit 1)
+	@echo "All prerequisites found"
 
 _install-dependencies:
 	@echo "Installing dependencies..."
@@ -81,10 +81,10 @@ _install-dependencies:
 _setup-configuration:
 	@if [ ! -f .env ]; then \
 		cp .env.example .env; \
-		echo "✅ Created .env file"; \
-		echo "⚠️  Please edit .env with your configuration"; \
+		echo "Created .env file"; \
+		echo "Please edit .env with your configuration"; \
 	else \
-		echo "✅ .env already exists"; \
+		echo ".env already exists"; \
 	fi
 
 _setup-database:
@@ -193,10 +193,10 @@ Enhance scripts with pre-flight checks:
 
 ```makefile
 deploy: _check-environment _check-tests ## Deploy to environment
-	@echo "⚠️  Deploying to $(ENVIRONMENT)"
+	@echo "Deploying to $(ENVIRONMENT)"
 	@$(MAKE) _confirm-deploy
 	@./scripts/deploy.sh $(ENVIRONMENT)
-	@echo "✅ Deployment complete"
+	@echo "Deployment complete"
 
 _check-environment:
 	@test -n "$(ENVIRONMENT)" || \
@@ -207,7 +207,7 @@ _check-environment:
 _check-tests:
 	@echo "Checking if tests pass..."
 	@./scripts/run-tests.sh >/dev/null || \
-		(echo "❌ Tests must pass before deployment" && exit 1)
+		(echo "Tests must pass before deployment" && exit 1)
 
 _confirm-deploy:
 	@if [ "$(ENVIRONMENT)" = "prod" ]; then \
@@ -232,7 +232,7 @@ deploy-prod: ## Deploy to production
 
 # Composite workflows
 full-deploy: test build deploy-staging ## Full staging deployment
-	@echo "✅ Complete staging deployment finished"
+	@echo "Complete staging deployment finished"
 ```
 
 ### Step 5: Gradually Internalize Scripts
@@ -246,13 +246,13 @@ backup:
 
 # After: internalized
 backup: ## Backup database
-	@echo "📦 Backing up database..."
+	@echo "Backing up database..."
 	@timestamp=$$(date +%Y%m%d_%H%M%S); \
 	backup_file="backups/db_$$timestamp.sql"; \
 	mkdir -p backups; \
 	pg_dump $(DATABASE_URL) > $$backup_file; \
 	gzip $$backup_file; \
-	echo "✅ Backup saved: $$backup_file.gz"
+	echo "Backup saved: $$backup_file.gz"
 ```
 
 ## Migration 3: From CI/CD Platform Scripts to Make
@@ -314,10 +314,10 @@ deploy: ## Deploy to Kubernetes
 	@echo "Deploying $(IMAGE)..."
 	@kubectl set image deployment/myapp app=$(IMAGE)
 	@kubectl rollout status deployment/myapp
-	@echo "✅ Deployed $(VERSION)"
+	@echo "Deployed $(VERSION)"
 
 ci-deploy: build test push deploy ## Complete CI deployment
-	@echo "✅ CI deployment complete"
+	@echo "CI deployment complete"
 ```
 
 ### Step 3: Simplify CI Configuration
@@ -382,7 +382,7 @@ make deploy
 up: ## Start all services
 	@echo "Starting services..."
 	@docker-compose up -d
-	@echo "✅ Services started"
+	@echo "Services started"
 	@echo "Logs: make logs"
 	@echo "Stop: make down"
 
@@ -420,7 +420,7 @@ db-migrate: ## Run database migrations
 	@docker-compose exec api python manage.py migrate
 
 db-reset: ## Reset database (WARNING: destroys data)
-	@echo "⚠️  This will destroy all data!"
+	@echo "This will destroy all data!"
 	@echo -n "Continue? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@docker-compose down -v
 	@$(MAKE) up
@@ -502,14 +502,14 @@ db-restore: ## Restore database from backup
 ##@ Complete Workflows
 
 deploy-all: ## Complete deployment (infra + app)
-	@echo "🚀 Complete deployment to $(ENVIRONMENT)"
+	@echo "Complete deployment to $(ENVIRONMENT)"
 	@$(MAKE) infra-apply
 	@$(MAKE) app-upgrade
 	@$(MAKE) db-migrate
-	@echo "✅ Deployment complete"
+	@echo "Deployment complete"
 
 teardown-all: ## Teardown everything
-	@echo "⚠️  Destroying all resources in $(ENVIRONMENT)"
+	@echo "Destroying all resources in $(ENVIRONMENT)"
 	@$(MAKE) _confirm-teardown
 	@$(MAKE) app-uninstall
 	@$(MAKE) infra-destroy
@@ -527,7 +527,7 @@ validate-all: ## Validate all configurations
 	@$(MAKE) validate-terraform
 	@$(MAKE) validate-helm
 	@$(MAKE) validate-k8s
-	@echo "✅ All validations passed"
+	@echo "All validations passed"
 
 validate-terraform:
 	@cd terraform && terraform validate
@@ -559,7 +559,7 @@ incident-help: ## Show incident runbooks
 	@echo "  make incident-disk-full     # Disk space issues"
 
 incident-high-cpu: ## Diagnose high CPU usage
-	@echo "🔍 Investigating high CPU usage..."
+	@echo "Investigating high CPU usage..."
 	@echo ""
 	@echo "1. Top CPU-consuming pods:"
 	@kubectl top pods --sort-by=cpu | head -10
@@ -568,7 +568,7 @@ incident-high-cpu: ## Diagnose high CPU usage
 	@kubectl get pods -o json | \
 		jq '.items[] | {name: .metadata.name, cpu: .spec.containers[].resources.limits.cpu}'
 	@echo ""
-	@echo "💡 Next steps:"
+	@echo "Next steps:"
 	@echo "   - Check logs: make logs POD=<pod-name>"
 	@echo "   - Scale up: make scale REPLICAS=5"
 	@echo "   - Restart: make restart-pod POD=<pod-name>"
@@ -578,7 +578,7 @@ incident-high-cpu: ## Diagnose high CPU usage
 
 ```makefile
 incident-db-slow: ## Diagnose slow database queries
-	@echo "🔍 Checking database performance..."
+	@echo "Checking database performance..."
 	@echo ""
 	@echo "Active queries (>1s):"
 	@kubectl exec postgres-0 -- psql -c \
@@ -586,19 +586,19 @@ incident-db-slow: ## Diagnose slow database queries
 		FROM pg_stat_activity \
 		WHERE state = 'active' AND now() - query_start > interval '1 second'"
 	@echo ""
-	@echo "💡 Next steps:"
+	@echo "Next steps:"
 	@echo "   - Kill query: make db-kill-query PID=<pid>"
 	@echo "   - Check connections: make db-connections"
 
 incident-disk-full: ## Handle disk space issues
-	@echo "🔍 Checking disk usage..."
+	@echo "Checking disk usage..."
 	@echo ""
 	@kubectl exec deploy/myapp -- df -h
 	@echo ""
 	@echo "Largest directories:"
 	@kubectl exec deploy/myapp -- du -h /var/log | sort -rh | head -5
 	@echo ""
-	@echo "💡 Cleanup options:"
+	@echo "Cleanup options:"
 	@echo "   - Clear logs: make clean-logs"
 	@echo "   - Clear cache: make clear-cache"
 ```

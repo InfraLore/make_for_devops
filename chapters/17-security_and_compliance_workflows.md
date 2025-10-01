@@ -17,7 +17,7 @@ Make offers a better approach: **security and compliance as discoverable workflo
 Traditional security integration follows a pattern: the security team mandates a tool, someone adds it to the CI pipeline, and it becomes an invisible step that either passes or fails mysteriously. Developers encounter security failures like this:
 
 ```
-❌ Build failed: Security scan detected vulnerabilities
+Build failed: Security scan detected vulnerabilities
 See: https://ci.company.com/build/12847/security-scan
 ```
 
@@ -33,7 +33,7 @@ security-check: ## Run all security scans
 	@$(MAKE) -s security-scan-containers || exit 1
 	@$(MAKE) -s security-scan-code || exit 1
 	@$(MAKE) -s security-scan-secrets || exit 1
-	@echo "✓ All security checks passed"
+	@echo "All security checks passed"
 
 security-scan-containers: ## Scan container images
 	@echo "Scanning container images..."
@@ -144,7 +144,7 @@ security-rotate: ## Show secret rotation workflows
 rotate-database: ## Rotate database password
 	@echo "Rotating database password..."
 	@./scripts/rotate-db-password.sh
-	@echo "✓ Password rotated"
+	@echo "Password rotated"
 	@echo "Log it: make audit-log ACTION='rotated db password'"
 
 security-audit-secrets: ## Audit secret age and usage
@@ -167,7 +167,7 @@ compliance-check: ## Run all compliance checks
 	@$(MAKE) -s compliance-encryption || exit 1
 	@$(MAKE) -s compliance-access || exit 1
 	@$(MAKE) -s compliance-logging || exit 1
-	@echo "✓ All compliance checks passed"
+	@echo "All compliance checks passed"
 
 compliance-encryption: ## Verify encryption requirements
 	@echo "Checking encryption compliance..."
@@ -185,7 +185,7 @@ compliance-report: ## Generate compliance evidence
 	@echo "Generating compliance report..."
 	@mkdir -p compliance-reports
 	@./scripts/generate-compliance-report.sh
-	@echo "✓ Report saved to compliance-reports/"
+	@echo "Report saved to compliance-reports/"
 ```
 
 Each check is independently runnable and produces clear pass/fail results.
@@ -199,7 +199,7 @@ audit-log: ## Log compliance action
 	@test -n "$(ACTION)" || \
 		(echo "Usage: make audit-log ACTION='description'" && exit 1)
 	@echo "$(date -Iseconds) | $(USER) | $(ACTION)" >> audit-trail.log
-	@echo "✓ Logged: $(ACTION)"
+	@echo "Logged: $(ACTION)"
 
 audit-changes: ## Show infrastructure changes
 	@echo "Infrastructure Changes (Last 30 Days)"
@@ -212,7 +212,7 @@ audit-access: ## Show access logs
 audit-package: ## Package audit evidence
 	@echo "Packaging audit evidence..."
 	@./scripts/package-audit-evidence.sh
-	@echo "✓ Audit package created"
+	@echo "Audit package created"
 ```
 
 ## Integrating Security into Development
@@ -224,24 +224,24 @@ pre-commit: ## Security checks before commit
 	@echo "Pre-commit security checks..."
 	@$(MAKE) security-scan-secrets
 	@$(MAKE) security-scan-code
-	@echo "✓ Ready to commit"
+	@echo "Ready to commit"
 
 pre-push: ## Security checks before push
 	@echo "Pre-push security checks..."
 	@$(MAKE) security-check
-	@echo "✓ Ready to push"
+	@echo "Ready to push"
 
 pre-deploy: ## Security validation before deployment
 	@echo "Pre-deployment validation..."
 	@$(MAKE) security-check
 	@$(MAKE) compliance-check
 	@$(MAKE) audit-log ACTION="Pre-deployment validation passed"
-	@echo "✓ Ready to deploy"
+	@echo "Ready to deploy"
 
 security-quick: ## Quick security scan
 	@echo "Quick security scan..."
 	@$(MAKE) security-scan-secrets
-	@echo "✓ Quick scan complete"
+	@echo "Quick scan complete"
 ```
 
 Developers can run these locally before the CI pipeline catches issues.
@@ -271,12 +271,12 @@ compliance-daily: ## Daily compliance evidence collection
 	@$(MAKE) security-check > $$evidence_dir/security.log 2>&1
 	@$(MAKE) compliance-check > $$evidence_dir/compliance.log 2>&1
 	@./scripts/collect-evidence.sh $$evidence_dir
-	@echo "✓ Evidence collected"
+	@echo "Evidence collected"
 
 compliance-quarterly: ## Package quarterly evidence
 	@echo "Packaging quarterly compliance evidence..."
 	@./scripts/package-quarterly-evidence.sh
-	@echo "✓ Quarterly package ready"
+	@echo "Quarterly package ready"
 ```
 
 Now when auditors request evidence:

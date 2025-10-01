@@ -318,7 +318,7 @@ deploy:
 deploy:
 	@echo "Deploying..."
 	@kubectl apply -f k8s/
-	@echo "✓ Deployment complete"
+	@echo "Deployment complete"
 ```
 
 For debugging, temporarily remove the `@` to see exactly what commands are

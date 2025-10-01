@@ -184,7 +184,7 @@ deploy-staging: security-check ## Deploy to staging
 	@$(MAKE) k8s-deploy ENVIRONMENT=staging
 
 deploy-prod: security-check ## Deploy to production
-	@echo "⚠️  Deploying to PRODUCTION"
+	@echo "Deploying to PRODUCTION"
 	@$(MAKE) _confirm-production
 	@$(MAKE) k8s-deploy ENVIRONMENT=prod
 
@@ -242,7 +242,7 @@ Shared libraries need version management:
 update-libs: ## Update shared libraries
 	@echo "Updating make libraries..."
 	@cd .make && git pull origin main
-	@echo "✓ Libraries updated"
+	@echo "Libraries updated"
 
 check-libs: ## Check library versions
 	@echo "Current versions:"

@@ -79,7 +79,7 @@ dev: ## Start development environment
 	@echo "Starting development environment..."
 	@$(MAKE) dev-services
 	@$(MAKE) dev-app
-	@echo "✓ Development ready: http://localhost:8080"
+	@echo "Development ready: http://localhost:8080"
 	@echo "  Logs: make dev-logs"
 	@echo "  Shell: make dev-shell"
 
@@ -299,7 +299,7 @@ help: ## Show available commands
 
 dev: ## Start development environment
 	@./scripts/docker-dev.sh
-	@echo "✓ Dev ready: http://localhost:8080"
+	@echo "Dev ready: http://localhost:8080"
 
 build: ## Build production image
 	@./scripts/docker-build.sh $(VERSION)

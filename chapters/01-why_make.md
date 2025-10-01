@@ -300,7 +300,7 @@ deploy-staging: build test ## Deploy to staging environment
 	@echo "Deploying $(VERSION) to staging..."
 	@./scripts/deploy.sh staging $(VERSION)
 	@$(MAKE) verify-deployment ENVIRONMENT=staging
-	@echo "✓ Deployment complete"
+	@echo "Deployment complete"
 ```
 
 Engineers don't need to remember the complex sequence. They run `make
@@ -364,7 +364,7 @@ help: ## Show available commands
 setup: ## Set up development environment
 	@echo "Setting up $(SERVICE)..."
 	@./scripts/setup-environment.sh
-	@echo "✓ Setup complete! Run 'make dev' to start."
+	@echo "Setup complete! Run 'make dev' to start."
 
 dev: ## Start development environment
 	@docker-compose up --build
@@ -375,7 +375,7 @@ test: ## Run all tests
 deploy-staging: build test ## Deploy to staging
 	@echo "Deploying $(SERVICE) $(VERSION) to staging..."
 	@./scripts/deploy.sh staging $(VERSION)
-	@echo "✓ Deployed successfully"
+	@echo "Deployed successfully"
 
 deploy-prod: ## Deploy to production (requires approval)
 	@echo "Deploying to PRODUCTION - Version: $(VERSION)"
@@ -385,7 +385,7 @@ deploy-prod: ## Deploy to production (requires approval)
 rollback: ## Rollback deployment (set ENVIRONMENT=staging|production)
 	@echo "Rolling back $(SERVICE) in $(ENVIRONMENT)..."
 	@./scripts/rollback.sh $(ENVIRONMENT)
-	@echo "✓ Rollback complete"
+	@echo "Rollback complete"
 ```
 
 The pattern here is clear: **discoverable interface, hidden complexity**. The

@@ -276,13 +276,13 @@ deploy: _check-docker _check-kubectl _check-version
 ```makefile
 # Simple confirmation
 deploy-prod: ## Deploy to production
-	@echo "⚠️  About to deploy to PRODUCTION"
+	@echo "About to deploy to PRODUCTION"
 	@echo -n "Continue? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@$(MAKE) _deploy ENVIRONMENT=production
 
 # Typed confirmation
 deploy-prod: ## Deploy to production
-	@echo "⚠️  PRODUCTION DEPLOYMENT"
+	@echo "PRODUCTION DEPLOYMENT"
 	@echo -n "Type 'production' to confirm: " && read ans && \
 		[ "$$ans" = "production" ]
 	@$(MAKE) _deploy ENVIRONMENT=production
@@ -513,7 +513,7 @@ build/app: $(shell find src -type f)
 	@mkdir -p build
 	@echo "Building application..."
 	@go build -o build/app
-	@echo "✅ Built: build/app"
+	@echo "Built: build/app"
 
 # Conditional rebuild
 config.yaml: config.template.yaml
@@ -696,7 +696,7 @@ show-deps:
 
 # Validate Makefile syntax
 check:
-	@make -n help >/dev/null && echo "✅ Makefile valid"
+	@make -n help >/dev/null && echo "Makefile valid"
 ```
 
 ## Performance Optimization
@@ -744,21 +744,21 @@ test-unit test-integration test-e2e:
 
 ## Best Practices Checklist
 
-- ✅ Use `.DEFAULT_GOAL := help` to show help by default
-- ✅ Mark all non-file targets as `.PHONY`
-- ✅ Use `##` comments for self-documenting help
-- ✅ Prefix internal targets with `_` 
-- ✅ Validate prerequisites before executing
-- ✅ Provide confirmation for destructive operations
-- ✅ Use `:=` for immediate expansion, `?=` for defaults
-- ✅ Keep line length under 75 characters
-- ✅ Suppress command output with `@` unless debugging
-- ✅ Check for required tools and variables
-- ✅ Provide clear error messages
-- ✅ Document complex logic with comments
-- ✅ Test with `make -n` before running
-- ✅ Use `make -j` for parallelizable operations
-- ✅ Version control your Makefile
+- Use `.DEFAULT_GOAL := help` to show help by default
+- Mark all non-file targets as `.PHONY`
+- Use `##` comments for self-documenting help
+- Prefix internal targets with `_` 
+- Validate prerequisites before executing
+- Provide confirmation for destructive operations
+- Use `:=` for immediate expansion, `?=` for defaults
+- Keep line length under 75 characters
+- Suppress command output with `@` unless debugging
+- Check for required tools and variables
+- Provide clear error messages
+- Document complex logic with comments
+- Test with `make -n` before running
+- Use `make -j` for parallelizable operations
+- Version control your Makefile
 
 ## Quick Start Template
 
@@ -782,7 +782,7 @@ help: ## Show this help
 setup: ## Set up development environment
 	@echo "Setting up $(PROJECT_NAME)..."
 	# Add setup commands
-	@echo "✅ Setup complete"
+	@echo "Setup complete"
 
 dev: ## Start development environment
 	@echo "Starting development..."

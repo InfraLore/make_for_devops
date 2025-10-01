@@ -298,14 +298,14 @@ _maybe-build:
 ifneq ($(SKIP_BUILD),1)
 	@$(MAKE) build
 else
-	@echo "⏭️  Skipping build (SKIP_BUILD=1)"
+	@echo "Skipping build (SKIP_BUILD=1)"
 endif
 
 _maybe-test:
 ifneq ($(SKIP_TESTS),1)
 	@$(MAKE) test
 else
-	@echo "⏭️  Skipping tests (SKIP_TESTS=1)"
+	@echo "Skipping tests (SKIP_TESTS=1)"
 endif
 
 _deploy:
@@ -322,14 +322,14 @@ _deploy:
 checkpoint-build:
 	@echo "$(VERSION)" > .checkpoint-version
 	@echo "$(IMAGE_NAME):$(VERSION)" > .checkpoint-image
-	@echo "✅ Checkpoint saved"
+	@echo "Checkpoint saved"
 
 checkpoint-restore:
 	@test -f .checkpoint-version || \
 		(echo "No checkpoint found" && exit 1)
 	$(eval VERSION := $(shell cat .checkpoint-version))
 	$(eval IMAGE_TAG := $(shell cat .checkpoint-image))
-	@echo "📍 Restored: VERSION=$(VERSION), IMAGE=$(IMAGE_TAG)"
+	@echo "Restored: VERSION=$(VERSION), IMAGE=$(IMAGE_TAG)"
 
 # Use checkpoints to resume after failures
 deploy: build checkpoint-build push deploy-k8s
@@ -346,7 +346,7 @@ deploy:
 deploy:
 	@kubectl apply -f k8s/ || \
 		(echo ""; \
-		 echo "❌ Deployment failed"; \
+		 echo "Deployment failed"; \
 		 echo ""; \
 		 echo "Troubleshooting steps:"; \
 		 echo "  1. Check kubectl context: kubectl config current-context"; \
@@ -362,7 +362,7 @@ deploy:
 ```makefile
 # Comprehensive debugging target
 debug: ## Show debug information
-	@echo "🔍 Debug Information"
+	@echo "Debug Information"
 	@echo "==================="
 	@echo ""
 	@echo "Make Version:"
@@ -410,7 +410,7 @@ Slow Makefiles harm developer productivity:
 ```makefile
 # Time each major step
 timed-deploy: ## Deploy with timing information
-	@echo "⏱️  Timed Deployment"
+	@echo "Timed Deployment"
 	@echo "==================="
 	@start=$$(date +%s); \
 	$(MAKE) build; \
@@ -525,11 +525,11 @@ Yes, you can test Makefiles:
 ```makefile
 # Self-test target
 test-makefile: ## Test Makefile functionality
-	@echo "🧪 Testing Makefile..."
+	@echo "Testing Makefile..."
 	@$(MAKE) _test-variables
 	@$(MAKE) _test-required-commands
 	@$(MAKE) _test-target-dependencies
-	@echo "✅ All tests passed"
+	@echo "All tests passed"
 
 _test-variables:
 	@test -n "$(SERVICE_NAME)" || \
@@ -559,7 +559,7 @@ When helping teammates with Make issues:
 
 ```makefile
 support-bundle: ## Generate support bundle for debugging
-	@echo "📦 Generating support bundle..."
+	@echo "Generating support bundle..."
 	@mkdir -p support-bundle
 	@echo "Make version:" > support-bundle/info.txt
 	@make --version >> support-bundle/info.txt
@@ -569,30 +569,30 @@ support-bundle: ## Generate support bundle for debugging
 	@make -p > support-bundle/database.txt
 	@cp Makefile support-bundle/
 	@tar czf support-bundle.tar.gz support-bundle/
-	@echo "✅ Created support-bundle.tar.gz"
+	@echo "Created support-bundle.tar.gz"
 ```
 
 ### 2. Provide Diagnostic Targets
 
 ```makefile
 doctor: ## Run diagnostic checks
-	@echo "🏥 Running diagnostics..."
+	@echo "Running diagnostics..."
 	@echo ""
 	@$(MAKE) _check-make-version
 	@$(MAKE) _check-required-tools
 	@$(MAKE) _check-configuration
 	@$(MAKE) _check-connectivity
 	@echo ""
-	@echo "✅ All checks passed"
+	@echo "All checks passed"
 
 _check-make-version:
 	@version=$$(make --version | head -1 | grep -o '[0-9.]\+'); \
 	required="4.0"; \
 	if [ "$$(printf '%s\n' "$$required" "$$version" | sort -V | head -n1)" != "$$required" ]; then \
-		echo "❌ Make version too old ($$version < $$required)"; \
+		echo "Make version too old ($$version < $$required)"; \
 		exit 1; \
 	else \
-		echo "✅ Make version: $$version"; \
+		echo "Make version: $$version"; \
 	fi
 ```
 

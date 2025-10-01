@@ -78,7 +78,7 @@ incident-db-pool: ## Diagnose database connection pool issues
 	@echo "  make incident-db-kill       - Kill long queries"
 
 incident-db-restart: ## Restart API to reset connection pool
-	@echo "⚠️  About to restart API pods in production"
+	@echo "About to restart API pods in production"
 	@echo -n "Continue? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@./scripts/restart-api-pods.sh
 	@echo "Monitor with: make incident-watch-recovery"
@@ -96,9 +96,9 @@ A complete incident response system has layers that reveal themselves as needed:
 health-check: ## Quick system health check
 	@echo "System Health Check"
 	@echo "==================="
-	@$(MAKE) -s _check-api && echo "✓ API" || echo "✗ API"
-	@$(MAKE) -s _check-db && echo "✓ Database" || echo "✗ Database"
-	@$(MAKE) -s _check-cache && echo "✓ Cache" || echo "✗ Cache"
+	@$(MAKE) -s _check-api && echo "API" || echo "API"
+	@$(MAKE) -s _check-db && echo "Database" || echo "Database"
+	@$(MAKE) -s _check-cache && echo "Cache" || echo "Cache"
 	@echo ""
 	@echo "For diagnosis: make incident-help"
 
@@ -140,7 +140,7 @@ incident-cache-warm: ## Warm cache with common queries
 	@./scripts/warm-cache.sh
 
 incident-maintenance-mode: ## Enable maintenance mode
-	@echo "⚠️  ENABLING MAINTENANCE MODE"
+	@echo "ENABLING MAINTENANCE MODE"
 	@echo -n "Continue? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@./scripts/enable-maintenance.sh
 	@echo "To disable: make incident-normal-mode"
@@ -280,11 +280,9 @@ New team members can learn without fear.
   Cache health: FAILED
   Resolution: make incident-cache-restart
 [2:18 AM] OnCall: $ make incident-cache-restart
-  Restarting cache... ✓
-  Restarting dependent services... ✓
-  Monitor: make health-check
+  Restarting cache...   Restarting dependent services...   Monitor: make health-check
 [2:20 AM] OnCall: $ make health-check
-  ✓ API  ✓ Database  ✓ Cache
+  API  Database  Cache
 [2:20 AM] RESOLVED (MTTR: 5 minutes)
 ```
 
@@ -302,7 +300,7 @@ incident-cache-check: ## Check cache health
 		echo "Resolution: make incident-cache-restart"
 
 incident-cache-restart: ## Restart cache and dependencies
-	@echo "⚠️  Restart production cache?"
+	@echo "Restart production cache?"
 	@echo -n "Continue? [y/N] " && read ans && [ $${ans:-N} = y ]
 	@./scripts/restart-cache.sh
 	@./scripts/restart-dependent-services.sh
