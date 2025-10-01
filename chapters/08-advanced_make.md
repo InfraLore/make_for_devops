@@ -33,6 +33,7 @@ Don't jump straight to advanced features—evolve into them naturally as your ne
 The key is solving today's problems with today's complexity level, not building for imaginary future requirements.
 \end{calloutbox}
 
+\newpage
 ## Pattern Rules for Handling Multiple Environments
 
 Pattern rules eliminate repetitive target definitions:
@@ -58,6 +59,7 @@ deploy-%: validate-% ## Deploy to specified environment
 
 The `%` matches any string, and `$*` contains the matched portion. One rule creates multiple targets.
 
+\newpage
 ### Environment-Specific Validation
 
 Different environments need different safety levels:
@@ -83,6 +85,7 @@ deploy-%: validate-%
 
 Pattern rules work with prerequisites. Each environment gets appropriate validation automatically.
 
+\newpage
 ### Service-Specific Pattern Rules
 
 Handle multiple services consistently:
@@ -106,6 +109,7 @@ deploy-all-services: $(SERVICES:%=deploy-%-service)
 
 One pattern handles all services. Add new services without changing the Makefile.
 
+\newpage
 ## Recursive Make for Multi-Project Orchestration
 
 Coordinate multiple related projects:
@@ -138,6 +142,7 @@ deploy-all: ## Deploy all projects
 
 Simple orchestration across projects. Each project has its own Makefile.
 
+\newpage
 ### Parallel Execution
 
 Execute independent projects in parallel:
@@ -162,6 +167,7 @@ deploy-orchestrated: ## Deploy with sequencing
 
 Use `-j` flag for parallel execution where safe.
 
+\newpage
 ## Integration with External Tools
 
 Integrate with APIs and external services:
@@ -184,6 +190,7 @@ deploy-with-api: notify-start deploy notify-complete
 
 Integration adds observability without complicating core workflows.
 
+\newpage
 ### Cloud Provider Integration
 
 Fetch configuration from cloud services:
@@ -206,6 +213,7 @@ deploy-cloud: fetch-$(CLOUD)-secrets deploy
 
 Abstract cloud provider differences behind consistent interfaces.
 
+\newpage
 ## Conditional Execution Based on System State
 
 Execute different workflows based on current state:
@@ -234,6 +242,7 @@ deploy-update:
 
 Workflows adapt to system state automatically.
 
+\newpage
 ### Git-Based Conditional Execution
 
 Different actions for different branches:
@@ -256,6 +265,7 @@ check-git-clean: ## Ensure clean working directory
 
 Git state influences workflow decisions.
 
+\newpage
 ## Creating Extensible Frameworks
 
 Build frameworks teams can customize:
@@ -290,6 +300,7 @@ post-build-hooks:
 
 Framework provides structure, teams add customization through hooks.
 
+\newpage
 ### Configuration-Driven Workflows
 
 Adapt based on configuration files:
@@ -317,6 +328,7 @@ workflow-canary:
 
 Configuration determines workflow without changing the Makefile.
 
+\newpage
 ## Key Takeaways
 
 Make's advanced features enable sophisticated automation:
