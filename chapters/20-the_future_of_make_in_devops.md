@@ -34,7 +34,7 @@ Orchestration layers that provide a unified interface across disparate tools wil
 
 ### The Discoverability Crisis
 
-Projects will always be more complex than any one person can hold in their head. The "How do I...?" questions will persist. Documentation will drift. Tribal knowledge—sorry, **team lore**—will accumulate.
+Projects will always be more complex than any one person can hold in their head. The "How do I...?" questions will persist. Documentation will drift. Team lore will accumulate.
 
 Systems that make capabilities discoverable will always matter.
 
