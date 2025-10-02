@@ -1,19 +1,10 @@
 # Chapter 7: Dependency Management for DevOps Workflows
 
-\chaptersubtitle{Leveraging Make's dependency system to ensure correct execution
-order and prevent common deployment pitfalls.}
+\chaptersubtitle{Leveraging Make's dependency system to ensure correct execution order and prevent common deployment pitfalls.}
 
-Make's dependency system is where the magic happens in DevOps workflows. While
-other automation tools require you to explicitly script every step in sequence,
-Make lets you declare what depends on what, then automatically figures out the
-optimal execution order. This declarative approach transforms error-prone linear
-scripts into robust, self-organizing workflows.
+Make's dependency system is where the magic happens in DevOps workflows. While other automation tools require you to explicitly script every step in sequence, Make lets you declare what depends on what, then automatically figures out the optimal execution order. This declarative approach transforms error-prone linear scripts into robust, self-organizing workflows.
 
-Consider a typical deployment: build application, run tests, push image, update
-manifests, deploy to cluster. A traditional script runs every step regardless of
-whether it's necessary, fails catastrophically if any step breaks, and can't
-leverage parallelization. Make's dependency system solves these issues
-elegantly.
+Consider a typical deployment: build application, run tests, push image, update manifests, deploy to cluster. A traditional script runs every step regardless of whether it's necessary, fails catastrophically if any step breaks, and can't leverage parallelization. Make's dependency system solves these issues elegantly.
 
 \begin{calloutbox}[Start Simple: Basic Dependency Patterns]
 Master these fundamental dependency patterns:
@@ -86,9 +77,7 @@ verify: apply
 	@./scripts/verify.sh
 ```
 
-This ensures: validation first, building after checks, testing on actual
-artifacts, parallel preparation, deployment only after prerequisites,
-verification after deployment.
+This ensures: validation first, building after checks, testing on actual artifacts, parallel preparation, deployment only after prerequisites, verification after deployment.
 
 ### Multi-Service Dependencies
 
@@ -160,6 +149,24 @@ deploy: .image-pushed k8s-manifests
 ```
 
 ## Parallel Execution
+
+\begin{calloutbox}[Parallelism: An Optimization You Discover, Not Design]
+Don't start by trying to design parallel execution into your Makefiles. Instead:
+
+\begin{enumerate}
+\item Write targets with correct dependencies first
+\item Run your workflows and notice where they're slow
+\item Look for independent operations that could run simultaneously
+\item Add \texttt{make -j4} to see what parallelizes naturally
+\item If nothing speeds up, your dependencies are too sequential
+\end{enumerate}
+
+\textbf{Important:} Parallelism only happens when you invoke Make with \texttt{-j}. Running \texttt{make deploy} executes sequentially no matter how your dependencies are structured. Run \texttt{make -j4 deploy} to enable parallel execution with 4 jobs.
+
+\textbf{Make it part of your review process:} When reviewing Makefiles (yours or your team's), ask: "Can any of these targets run in parallel?" Look for targets with the same prerequisites but no dependencies on each other. These are natural parallelization opportunities.
+
+Most developers discover parallelism by running \texttt{make -j4} on an existing Makefile and noticing which operations suddenly run simultaneously. This reveals which dependencies are truly independent.
+\end{calloutbox}
 
 Make automatically identifies parallelization opportunities:
 
@@ -264,8 +271,7 @@ deploy-all-envs: deploy-to-dev deploy-to-staging
 
 ## Key Takeaways
 
-Make's dependency system transforms workflows from brittle scripts into robust
-orchestration:
+Make's dependency system transforms workflows from brittle scripts into robust orchestration:
 
 1. **Declare Relationships**: Focus on what depends on what, not execution order
 2. **Leverage Parallelism**: Make runs independent tasks in parallel automatically
@@ -273,9 +279,6 @@ orchestration:
 4. **Handle Failures**: Implement rollback and partial completion strategies
 5. **Pattern Rules**: Scale dependency patterns across services and environments
 
-The power lies in the declarative approach: describe relationships, Make figures
-out optimal execution. This creates workflows that are more reliable, efficient,
-and maintainable than traditional scripts.
+The power lies in the declarative approach: describe relationships, Make figures out optimal execution. This creates workflows that are more reliable, efficient, and maintainable than traditional scripts.
 
-In the next chapter, we'll explore Make's advanced features that enable even
-more sophisticated automation while maintaining simplicity and discoverability.
+In the next chapter, we'll explore Make's advanced features that enable even more sophisticated automation while maintaining simplicity and discoverability.
