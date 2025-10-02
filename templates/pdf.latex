@@ -455,6 +455,14 @@ $endif$
     $if(date)$
       {\LatoFont\large \@date \par} % date
     $endif$
+    $if(git_url)$
+      \vskip 0.5em
+      {\LatoFont\footnotesize \textcolor{gray}{Git URL: $git_url$}\par}
+    $endif$
+    $if(git_sha)$
+      \vskip 0.5em
+      {\LatoFont\footnotesize \textcolor{gray}{Git commit: $git_sha$}\par}
+    $endif$
     $if(logo)$
       \vskip 1em
       \includegraphics{$logo$} % logo

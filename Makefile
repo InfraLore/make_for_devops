@@ -8,6 +8,7 @@ BUILD = build
 MAKEFILE = Makefile
 OUTPUT_FILENAME = MakeForDevops
 METADATA = metadata.yml
+TMP_METADATA = $(BUILD)/tmp-metadata.yml
 
 
 # Chapters content organized by parts
@@ -22,7 +23,7 @@ APPENDICES = chapters/Appendix_A-quick_referrence_guide.md chapters/Appendix_B-m
 CHAPTERS = $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) $(APPENDICES)
 
 TOC = --toc --toc-depth 2
-METADATA_ARGS = --metadata-file $(METADATA)
+METADATA_ARGS = --metadata-file $(METADATA) --metadata-file $(TMP_METADATA)
 IMAGES = $(shell find images -type f)
 TEMPLATES = $(shell find templates/ -type f)
 COVER_IMAGE = images/cover.png
@@ -121,6 +122,12 @@ validate:
 # File builders
 ####################################################################################################
 
+$(TMP_METADATA): 
+	$(MKDIR_CMD) $(BUILD)
+	echo "git_sha: $(shell git rev-parse --short HEAD)" > $(TMP_METADATA)
+	echo "git_url: $(shell git config --get remote.origin.url | \
+		sed -E 's#git@([^:]+):#\1/#; s#\.git$$##')" >> $(TMP_METADATA)
+
 epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub
 
 html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html
@@ -129,20 +136,20 @@ pdf:	validate $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
 
 docx:	validate $(BUILD)/docx/$(OUTPUT_FILENAME).docx
 
-$(BUILD)/epub/$(OUTPUT_FILENAME).epub:	$(EPUB_DEPENDENCIES)
+$(BUILD)/epub/$(OUTPUT_FILENAME).epub:	$(EPUB_DEPENDENCIES) $(TMP_METADATA)
 	$(ECHO_BUILDING)
 	$(MKDIR_CMD) $(BUILD)/epub
 	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(EPUB_ARGS) -o $@
 	$(ECHO_BUILT)
 
-$(BUILD)/html/$(OUTPUT_FILENAME).html:	$(HTML_DEPENDENCIES)
+$(BUILD)/html/$(OUTPUT_FILENAME).html:	$(HTML_DEPENDENCIES) $(TMP_METADATA)
 	$(ECHO_BUILDING)
 	$(MKDIR_CMD) $(BUILD)/html
 	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(HTML_ARGS) -o $@
 	$(COPY_CMD) $(IMAGES) $(BUILD)/html/
 	$(ECHO_BUILT)
 
-$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf:	$(PDF_DEPENDENCIES)
+$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf:	$(PDF_DEPENDENCIES) $(TMP_METADATA)
 	$(ECHO_BUILDING)
 	$(MKDIR_CMD) $(BUILD)/pdf
 	@printf "Generating PDF (about 30 secconds): "
