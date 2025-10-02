@@ -6,7 +6,7 @@
 
 BUILD = build
 MAKEFILE = Makefile
-OUTPUT_FILENAME = book
+OUTPUT_FILENAME = MakeForDevops
 METADATA = metadata.yml
 
 
