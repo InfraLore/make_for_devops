@@ -42,16 +42,16 @@ build: lint
 
 **Parallel Dependencies** - operations simultaneously:
 ```makefile
-deploy: test push  # Both can run in parallel after build (see below)
-test: build
-push: build
+all-checks: lint security-scan  # Both can run in parallel on same source
+lint: src
+security-scan: src
 ```
 
-**Validation Dependencies** - prerequisites before proceeding:
+**Validation Dependencies/Quality Gates** - prerequisites before proceeding:
 ```makefile
 deploy: validate-environment validate-secrets build test
 ```
-
+\newpage
 ### Real-World Pipeline Dependencies
 
 Model a complete deployment pipeline:
@@ -90,6 +90,7 @@ This ensures: validation first, building after checks, testing on actual
 artifacts, parallel preparation, deployment only after prerequisites,
 verification after deployment.
 
+\newpage
 ### Multi-Service Dependencies
 
 Model inter-service dependencies:
@@ -115,6 +116,7 @@ deploy-frontend: deploy-api build-frontend
 	@./scripts/deploy-frontend.sh
 ```
 
+\newpage
 ## File-Based Dependencies
 
 Track infrastructure state with files:
@@ -133,7 +135,7 @@ deploy-app: infra/.applied k8s/deployment.yaml
 k8s/deployment.yaml: k8s/deployment.yaml.template config/$(ENV).env
 	@./scripts/generate-manifest.sh
 ```
-
+\newpage
 ### Docker Image Dependencies
 
 Track Docker builds efficiently:
@@ -159,6 +161,7 @@ deploy: .image-pushed k8s-manifests
 	@./scripts/deploy.sh
 ```
 
+\newpage
 ## Parallel Execution
 
 One of Make's most powerful features is automatic parallel execution—the ability
@@ -174,6 +177,7 @@ dependency structure allows parallelism. Only `make -j4 test` enables parallel
 execution with 4 simultaneous jobs.
 
 The candidates for parallel execution are targets that:
+
 - Share the same prerequisites (like both depending on `build`)
 - Have no dependencies on each other
 - Perform independent operations (one doesn't need the other's output)
@@ -209,6 +213,7 @@ Most developers discover parallelism by running \texttt{make -j4} on an existing
 Makefile and noticing which operations suddenly run simultaneously. This reveals
 which dependencies are truly independent. \end{calloutbox}
 
+\newpage
 Make automatically identifies parallelization opportunities:
 
 ```makefile
@@ -233,6 +238,7 @@ deploy-monitoring: deploy-backend deploy-frontend
 	@./scripts/deploy-monitoring.sh
 ```
 
+\newpage
 ### Controlling Parallelism
 
 Fine-tune parallel execution:
@@ -349,7 +355,7 @@ deploy: push
 push: test  
 test: build
 ```
-
+\newpage
 **Avoid parallelizing operations that compete for resources:**
 
 ```makefile
@@ -378,7 +384,7 @@ deploy-step: push
 push: build validate  # Skip some validations, parallel where safe
 validate: lint type-check  # Parallel validations only
 ```
-
+\newpage
 ### Team Communication
 
 Document parallelization decisions in your Makefile:
