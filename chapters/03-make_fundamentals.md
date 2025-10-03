@@ -1,7 +1,7 @@
 # Chapter 3: Make Fundamentals for the Modern DevOps Engineer
 
-\chaptersubtitle{A practical primer on Make syntax, focusing on the features
-most relevant to DevOps workflows rather than traditional compilation.}
+\chaptersubtitle{A primer on Make syntax, focusing on the features most relevant
+to DevOps workflows rather than traditional compilation.}
 
 If you've encountered Make before, it was probably in the context of compiling C
 or C++ code. You might have run `make install` on a Linux system or struggled
@@ -10,7 +10,7 @@ arcane ritual of tabs and cryptic syntax. This chapter will help you forget
 everything you think you know about Make and see it through fresh eyes—as a
 powerful orchestration tool perfectly suited for modern DevOps workflows.
 
-The beauty of Make for DevOps lies not in its ability to compile code, but in
+The beauty of Make **for DevOps** lies not in its ability to compile code, but in
 its capacity to define, document, and execute complex operational workflows with
 remarkable simplicity. While other tools require you to learn new
 domain-specific languages or complex configuration formats, Make leverages
