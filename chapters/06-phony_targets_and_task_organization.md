@@ -1,32 +1,38 @@
 # Chapter 6 - Phony Targets and Task Organization
 
-\chaptersubtitle{Mastering phony targets to create clear, discoverable interfaces for all operational tasks, from development to production deployment.}
+\chaptersubtitle{Creating discoverable workflows through clear naming and
+logical organization.}
 
-In traditional Make usage, targets represent files that need to be built. But in DevOps workflows, most of our "targets" don't create files—they perform actions like deploying services, running tests, or cleaning up resources. This is where **phony targets** become crucial. They're the foundation of creating discoverable, well-organized Make workflows that serve as intuitive interfaces to your operational processes.
+In traditional Make, targets represent files to be built. But in DevOps
+workflows, most targets don't create files—they perform actions like deploying
+services, running tests, or starting development environments. This is where
+**phony targets** become essential.
 
-A poorly organized Makefile is like a toolbox where all the tools are thrown in randomly. You know the screwdriver is in there somewhere, but finding it when you need it quickly becomes frustrating. A well-organized Makefile, on the other hand, is like a professional workshop where every tool has its place, related tools are grouped together, and common tasks are immediately accessible.
+A poorly organized Makefile is like a toolbox where tools are thrown in
+randomly. A well-organized Makefile is like a professional workshop where every
+tool has its place and common tasks are immediately accessible.
 
-This chapter will teach you how to design and organize phony targets that create natural, discoverable workflows. Instead of team members needing to remember complex command sequences or hunt through documentation, they'll find exactly what they need through intuitive target names and logical organization.
+The reality for most teams: **you need 5-10 clearly named targets organized in a
+way that matches how you think about your workflow.** That's the foundation.
+Everything else is refinement.
 
-\begin{calloutbox}[Start Simple: Essential Phony Target Patterns]
-Before diving into advanced organization strategies, establish these fundamental phony target patterns:
+\begin{calloutbox}[Start Simple: Five Targets Cover Most Workflows] Most
+projects need these core targets to start:
 
-\begin{enumerate}
-\item \textbf{Declare everything}: \texttt{.PHONY: build test deploy clean help} prevents confusion if files with these names exist
-\item \textbf{Use verb-noun naming}: \texttt{build-image}, \texttt{test-unit}, \texttt{deploy-staging} clearly indicate what each target does
-\item \textbf{Create logical groupings}: Group related targets together with consistent prefixes
-\item \textbf{Provide a help system}: \texttt{make help} should always work and show available targets
-\item \textbf{Start with the basics}: Every project needs \texttt{build}, \texttt{test}, \texttt{deploy}, and \texttt{clean} at minimum
-\end{enumerate}
+\begin{enumerate} \item \textbf{setup} - Get development environment ready \item
+\textbf{dev} - Start development environment \item \textbf{test} - Run tests
+\item \textbf{build} - Build the application \item \textbf{deploy} - Deploy
+(with ENVIRONMENT variable for staging/prod) \end{enumerate}
 
-These patterns create immediately usable workflows. Advanced organization techniques become valuable as your operational complexity grows.
+Add more targets when you have actual operations that don't fit these
+categories. Don't pre-emptively create targets for theoretical operations.
 \end{calloutbox}
 
-## Understanding Phony Targets in DevOps Context
+## Understanding Phony Targets
 
 ### What Makes a Target "Phony"
 
-In traditional Make, targets represent files to be created:
+Traditional Make creates files:
 
 ```makefile
 # File target - creates app.o from app.c
@@ -34,1067 +40,564 @@ app.o: app.c
 	gcc -c app.c -o app.o
 ```
 
-But DevOps tasks rarely create predictable files. Instead, they perform actions:
+DevOps tasks perform actions:
 
 ```makefile
-# These are phony targets - they perform actions, don't create files
+# Phony targets - perform actions, don't create files
 deploy:
 	kubectl apply -f k8s/
 
 test:
 	pytest tests/
-
-clean:
-	docker system prune -f
 ```
 
-The problem arises when someone accidentally creates a file named `deploy`, `test`, or `clean`. Make will think the target is already up-to-date and won't run the commands. The `.PHONY` declaration tells Make that these targets don't represent files:
+The problem: if someone creates a file named `deploy` or `test`, Make thinks the
+target is already built and won't run the commands. The `.PHONY` declaration
+fixes this:
 
 ```makefile
 .PHONY: deploy test clean
 
 deploy:
 	kubectl apply -f k8s/
-
-test:
-	pytest tests/
-
-clean:
-	docker system prune -f
 ```
 
-### Why Phony Targets Are Perfect for DevOps
+**Declare all your action targets as phony.** It's a one-line insurance policy
+against weird bugs.
 
-Phony targets align perfectly with DevOps workflows because:
+## Naming Targets: Clear Beats Clever
 
-**They represent actions, not artifacts**: Most DevOps tasks (deploy, monitor, backup) are about performing actions rather than creating files.
+### The Verb-Object Pattern (Use This)
 
-**They provide standardized interfaces**: `make deploy` works consistently across all projects, regardless of the underlying deployment mechanism.
-
-**They enable dependency management**: You can ensure tests run before deployment, or that builds complete before pushing to registries.
-
-**They support parameterization**: The same target can behave differently based on environment variables or other configuration.
-
-## Designing Intuitive Target Naming Schemes
-
-### The Verb-Object Pattern
-
-The most discoverable naming pattern uses clear verbs and objects:
+Clear names using verbs and objects:
 
 ```makefile
-# Good: Clear verb-object patterns
+# Good: Clear what each does
 build-image:     # Builds Docker image
 test-unit:       # Runs unit tests
 deploy-staging:  # Deploys to staging
 clean-docker:    # Cleans Docker resources
 
-# Avoid: Unclear or abbreviated names
+# Bad: Unclear or abbreviated
 bld:            # What does this build?
 test:           # Which tests?
-deploy:         # Deploy where?
+go:             # Go where?
 cleanup:        # Clean up what?
 ```
 
-### Hierarchical Naming for Complex Operations
+### Environment Naming: Pick One Pattern
 
-For complex operations, use hierarchical naming with consistent separators:
+Three patterns for handling environments. Pick one and stick with it:
 
 ```makefile
-# Database operations
-db-start:        # Start database
-db-stop:         # Stop database
-db-migrate:      # Run migrations
-db-backup:       # Create backup
-db-restore:      # Restore from backup
+# Pattern 1: Suffix (most common)
+deploy-dev
+deploy-staging
+deploy-prod
 
-# Docker operations
-docker-build:    # Build images
-docker-push:     # Push to registry
-docker-clean:    # Clean local images
-docker-login:    # Login to registry
+# Pattern 2: Parameterized (most flexible)
+deploy:  # Uses ENVIRONMENT variable
+	kubectl apply -f k8s/$(ENVIRONMENT)/
 
-# Kubernetes operations
-k8s-deploy:      # Deploy to Kubernetes
-k8s-status:      # Check deployment status
-k8s-logs:        # Show application logs
-k8s-shell:       # Get shell in pod
+# Pattern 3: Prefix (least common)
+dev-deploy
+staging-deploy
+prod-deploy
 ```
 
-### Environment-Specific Naming
-
-Handle multiple environments with clear, consistent patterns:
+**Recommendation:** Use Pattern 2 (parameterized) for flexibility, add Pattern 1
+(suffix) shortcuts for common environments:
 
 ```makefile
-# Pattern 1: Environment suffix
-deploy-dev:      # Deploy to development
-deploy-staging:  # Deploy to staging
-deploy-prod:     # Deploy to production
+# Flexible base target
+deploy:
+	@echo "Deploying to $(ENVIRONMENT)..."
+	kubectl apply -f k8s/$(ENVIRONMENT)/
 
-# Pattern 2: Parameterized targets (more flexible)
-deploy:          # Deploy to environment specified by ENVIRONMENT variable
-	@$(MAKE) deploy-$(ENVIRONMENT)
+# Convenient shortcuts
+deploy-staging: ## Deploy to staging
+	@$(MAKE) deploy ENVIRONMENT=staging
 
-# Pattern 3: Environment prefix
-dev-deploy:      # Development deployment
-staging-deploy:  # Staging deployment
-prod-deploy:     # Production deployment
+deploy-prod: ## Deploy to production (with confirmation)
+	@echo "Deploy to PRODUCTION? [y/N]" && read ans && [ $$ans = y ]
+	@$(MAKE) deploy ENVIRONMENT=production
 ```
 
-Choose one pattern and stick with it consistently across your organization.
+\begin{calloutbox}[Naming: Optimize for Autocomplete and Guessability] Good
+target names should be: \begin{itemize} \item \textbf{Guessable} - Someone
+should guess \texttt{deploy-staging} exists \item \textbf{Autocomplete-friendly}
+- Typing \texttt{make dep<TAB>} should work \item \textbf{Consistent} - All
+deployment targets start with \texttt{deploy-} \item \textbf{Self-explanatory} -
+No need to check documentation \end{itemize}
 
-## Organizing Targets into Logical Categories
+Test: Can a new team member guess the command to deploy to staging? If not,
+rename it. \end{calloutbox}
 
-### The Standard DevOps Lifecycle Categories
+## Organizing Targets: Match Your Workflow
 
-Organize targets around the standard DevOps lifecycle:
+### Level 1: Flat Organization (Start Here)
+
+For projects with 10 or fewer targets, keep it flat:
 
 ```makefile
-# =============================================================================
-# Development Lifecycle Targets
-# =============================================================================
+.PHONY: setup dev test build deploy clean help
 
-.PHONY: setup dev build test package deploy monitor clean help
+setup:    ## Set up development environment
+dev:      ## Start development environment  
+test:     ## Run all tests
+build:    ## Build application
+deploy:   ## Deploy to configured environment
+clean:    ## Clean up development environment
+help:     ## Show this help message
+```
 
-# Setup and Development
-setup:          ##   Set up development environment
-dev:            ##  Start development environment  
-dev-stop:       ##  Stop development environment
+This covers 80% of projects. Don't add complexity until you need it.
 
-# Build and Package
-build:          ##   Build application
-build-dev:      ##   Build for development (with debug symbols)
-package:        ##   Package application for distribution
+### Level 2: Grouped Organization (When You Hit ~15 Targets)
+
+Group related targets with prefixes:
+
+```makefile
+# Development
+dev:           ## Start development
+dev-stop:      ## Stop development
 
 # Testing
-test:           ##   Run all tests
-test-unit:      ##   Run unit tests
-test-integration: ##   Run integration tests
-test-e2e:       ##   Run end-to-end tests
+test:          ## Run all tests
+test-unit:     ## Run unit tests
+test-integration: ## Run integration tests
 
 # Deployment
-deploy:         ##   Deploy to default environment
-deploy-staging: ##   Deploy to staging
-deploy-prod:    ##   Deploy to production
+deploy:        ## Deploy to environment
+deploy-staging: ## Deploy to staging
+deploy-prod:   ## Deploy to production
 
-# Operations
-monitor:        ##   Show monitoring dashboard
-logs:           ##   Show application logs
-backup:         ##   Create data backup
+# Database
+db-start:      ## Start database
+db-migrate:    ## Run migrations
+db-backup:     ## Create backup
 
 # Maintenance
-clean:          ##   Clean up development environment
-reset:          ##   Reset to clean state
+clean:         ## Clean development environment
+reset:         ## Reset to clean state
 ```
 
-### Grouping by System Component
+The prefixes create natural groupings that work with tab completion.
 
-For complex systems, organize by component:
+### Level 3: Categorized Help (When You Hit ~25+ Targets)
+
+Add categories to your help system:
 
 ```makefile
-# =============================================================================
-# Frontend Operations
-# =============================================================================
-.PHONY: frontend-build frontend-test frontend-deploy frontend-dev
-
-frontend-build: ##   Build frontend assets
-frontend-test:  ##   Run frontend tests
-frontend-deploy: ##   Deploy frontend
-frontend-dev:   ##  Start frontend development server
-
-# =============================================================================
-# Backend API Operations  
-# =============================================================================
-.PHONY: api-build api-test api-deploy api-dev
-
-api-build:      ##   Build API server
-api-test:       ##   Run API tests
-api-deploy:     ##   Deploy API server
-api-dev:        ##  Start API development server
-
-# =============================================================================
-# Database Operations
-# =============================================================================
-.PHONY: db-start db-stop db-migrate db-backup db-restore
-
-db-start:       ##    Start database server
-db-stop:        ##  Stop database server
-db-migrate:     ##   Run database migrations
-db-backup:      ##   Create database backup
-db-restore:     ##   Restore database from backup
-
-# =============================================================================
-# Infrastructure Operations
-# =============================================================================
-.PHONY: infra-plan infra-apply infra-destroy
-
-infra-plan:     ##   Plan infrastructure changes
-infra-apply:    ##    Apply infrastructure changes
-infra-destroy:  ##  Destroy infrastructure
+help: ## Show available commands
+	@echo "Development:"
+	@grep -E '^(setup|dev).*##' $(MAKEFILE_LIST) | awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
+	@echo ""
+	@echo "Testing:"
+	@grep -E '^test.*##' $(MAKEFILE_LIST) | awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
+	@echo ""
+	@echo "Deployment:"
+	@grep -E '^deploy.*##' $(MAKEFILE_LIST) | awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
 ```
 
-### Frequency-Based Organization
+Only add this when `make help` becomes overwhelming (25+ targets).
 
-Organize by how often targets are used:
+\begin{calloutbox}[Organization: Match How Your Team Thinks] Organize around
+what your team does daily:
 
-```makefile
-# =============================================================================
-# Daily Development Tasks
-# =============================================================================
-.PHONY: dev test build
+\textbf{Feature team:} Group by workflow stage (dev → test → build → deploy)
 
-dev:            ##  Start development (most common)
-test:           ##   Run tests (very common)
-build:          ##   Build application (common)
+\textbf{Platform team:} Group by component (frontend, backend, database,
+infrastructure)
 
-# =============================================================================
-# Weekly/Release Tasks  
-# =============================================================================
-.PHONY: deploy package integration-test
+\textbf{SRE team:} Group by frequency (daily ops, weekly tasks, emergency
+procedures)
 
-deploy:         ##   Deploy application
-package:        ##   Create release package
-integration-test: ##   Run full integration suite
+Don't organize by what sounds good in theory. Organize by what your team types
+most often. \end{calloutbox}
 
-# =============================================================================
-# Occasional/Maintenance Tasks
-# =============================================================================
-.PHONY: backup restore clean reset
-
-backup:         ##   Create backup
-restore:        ##   Restore from backup
-clean:          ##   Clean development environment
-reset:          ##   Complete environment reset
-```
-
-## Creating Composite Targets for Complex Workflows
-
-### Sequential Composite Targets
-
-Build complex workflows from simpler components:
-
-```makefile
-# Simple components
-build-image:    ## Build Docker image
-	docker build -t $(IMAGE_TAG) .
-
-run-tests:      ## Run test suite
-	docker run --rm $(IMAGE_TAG) pytest
-
-push-image:     ## Push image to registry
-	docker push $(IMAGE_TAG)
-
-update-k8s:     ## Update Kubernetes deployment
-	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
-
-# Composite workflows
-deploy-full: build-image run-tests push-image update-k8s ##   Full deployment pipeline
-	@echo " Full deployment completed successfully"
-
-quick-deploy: build-image push-image update-k8s ##  Quick deployment (skip tests)
-	@echo " Quick deployment completed"
-
-ci-pipeline: build-image run-tests ##   CI pipeline (build and test only)
-	@echo " CI pipeline completed"
-```
-
-### Parallel Composite Targets
-
-Some workflows can run components in parallel:
-
-```makefile
-# Components that can run in parallel
-lint-python:    ## Lint Python code
-	flake8 src/
-
-lint-docker:    ## Lint Dockerfiles
-	hadolint Dockerfile
-
-lint-yaml:      ## Lint YAML files
-	yamllint k8s/
-
-security-scan:  ## Run security scan
-	bandit -r src/
-
-# Run all linting in parallel
-lint-all: ##   Run all linting (parallel)
-	@echo "Running all linting checks in parallel..."
-	@$(MAKE) -j4 lint-python lint-docker lint-yaml security-scan
-	@echo " All linting completed"
-
-# Sequential version for debugging
-lint-sequential: lint-python lint-docker lint-yaml security-scan ##   Run all linting (sequential)
-	@echo " All linting completed sequentially"
-```
-
-### Conditional Composite Targets
-
-Create workflows that adapt based on conditions:
-
-```makefile
-# Environment-aware deployment
-deploy: ##   Deploy to configured environment
-ifeq ($(ENVIRONMENT),production)
-	@echo " Production deployment requires additional validation"
-	@$(MAKE) validate-production-readiness
-	@$(MAKE) create-deployment-backup
-	@$(MAKE) deploy-with-rollback-plan
-else ifeq ($(ENVIRONMENT),staging)
-	@echo " Staging deployment"
-	@$(MAKE) deploy-standard
-	@$(MAKE) run-smoke-tests
-else
-	@echo " Development deployment"
-	@$(MAKE) deploy-fast
-endif
-
-# Feature-flag aware workflows
-test-full: ##   Run comprehensive test suite
-	@$(MAKE) test-unit
-	@$(MAKE) test-integration
-ifdef ENABLE_E2E_TESTS
-	@$(MAKE) test-e2e
-endif
-ifdef ENABLE_PERFORMANCE_TESTS
-	@$(MAKE) test-performance
-endif
-	@echo " All enabled tests completed"
-```
-
-## Target Dependencies for Enforcing Operational Prerequisites
+## Dependencies: Enforcing the Right Order
 
 ### Basic Dependency Chains
 
 Ensure operations happen in the correct order:
 
 ```makefile
-# Dependencies ensure correct execution order
-deploy: test build push ##   Deploy application
+deploy: test build push ## Deploy requires test, build, and push
 	kubectl apply -f k8s/
 
-push: build ##   Push image to registry
+push: build ## Push requires build
 	docker push $(IMAGE_TAG)
 
-build: lint ##   Build Docker image
+build: ## Build application
 	docker build -t $(IMAGE_TAG) .
 
-test: build ##   Run tests
-	docker run --rm $(IMAGE_TAG) pytest
+test: ## Run tests
+	pytest tests/
+```
 
-lint: ##   Lint code
+When you run `make deploy`, Make automatically runs: `build` → `test` and `push`
+→ `deploy`.
+
+### When to Use Dependencies vs Manual Steps
+
+**Use dependencies for:**
+- Things that must happen in order (build before push)
+- Safety checks (test before deploy)
+- Common workflows (deploy always needs build + test)
+
+**Don't use dependencies for:**
+- Things that take a long time unnecessarily (full test suite before quick dev
+  deploy)
+- Optional steps (not every build needs to push)
+- Things that should be explicit (production deploys should be deliberate)
+
+Example of the tradeoff:
+
+```makefile
+# Full deployment (automated dependencies)
+deploy-full: test build push ## Full deployment with all checks
+	kubectl apply -f k8s/
+
+# Quick deployment (manual steps)
+deploy-quick: build ## Quick deploy (skip tests)
+	@echo "⚠️  Skipping tests - use deploy-full for production"
+	docker push $(IMAGE_TAG)
+	kubectl apply -f k8s/
+```
+
+## Creating Composite Workflows
+
+### When to Create Composite Targets
+
+Create composite targets when you regularly run the same sequence:
+
+```makefile
+# You find yourself running these commands together
+make build
+make test
+make push
+make deploy
+
+# Create a composite target
+ship-it: build test push deploy ## Build, test, push, and deploy
+	@echo "✓ Shipped successfully"
+```
+
+**Don't create composite targets for:**
+- Sequences you rarely run
+- Steps that need human verification in between
+- Operations where you might want just part of the sequence
+
+### Parallel Execution for Independent Tasks
+
+If tasks don't depend on each other, run them in parallel:
+
+```makefile
+# These can run in parallel
+lint: ## Run all linting
+	@$(MAKE) -j4 lint-python lint-docker lint-yaml
+
+lint-python:
 	flake8 src/
+
+lint-docker:
+	hadolint Dockerfile
+
+lint-yaml:
+	yamllint k8s/
 ```
 
-When you run `make deploy`, Make automatically ensures the execution order:
+The `-j4` flag runs up to 4 targets in parallel. Only use this when tasks are
+truly independent.
 
-1. `lint` runs first
-2. `build` runs after lint succeeds
-3. Both `test` and `push` run after build succeeds (potentially in parallel)
-4. `deploy` runs after all prerequisites succeed
+## The Help System: Make Workflows Discoverable
 
-### Validation Dependencies
+### Standard Help Pattern (Use This)
 
-Use dependencies to enforce validation steps:
-
-```makefile
-# Validation targets
-validate-environment: ##   Validate environment configuration
-	@test -n "$(ENVIRONMENT)" || (echo " ENVIRONMENT not set" && exit 1)
-	@test -n "$(VERSION)" || (echo " VERSION not set" && exit 1)
-
-validate-secrets: ##   Validate required secrets
-	@test -n "$$DATABASE_PASSWORD" || (echo " DATABASE_PASSWORD not set" && exit 1)
-	@test -n "$$API_KEY" || (echo " API_KEY not set" && exit 1)
-
-validate-tools: ##   Validate required tools
-	@command -v docker >/dev/null || (echo " Docker not found" && exit 1)
-	@command -v kubectl >/dev/null || (echo " kubectl not found" && exit 1)
-
-# Deployments require all validations
-deploy: validate-environment validate-secrets validate-tools build test ##   Deploy with validation
-	@echo "All validations passed, proceeding with deployment..."
-	kubectl apply -f k8s/
-
-# Quick deployment for development (fewer validations)
-deploy-dev: validate-tools build ##  Quick development deployment
-	@echo "Development deployment..."
-	kubectl apply -f k8s/
-```
-
-### Order-Only Prerequisites
-
-Sometimes you need prerequisites to run, but don't want to rebuild if they're newer:
-
-```makefile
-# Order-only prerequisites (after the |)
-deploy: build test | validate-cluster ##   Deploy application
-	kubectl apply -f k8s/
-
-# validate-cluster needs to run before deploy, but deploy doesn't need
-# to re-run if validate-cluster is newer
-validate-cluster: ##   Validate cluster connectivity
-	kubectl cluster-info >/dev/null
-	@echo " Cluster connectivity validated"
-```
-
-## Documentation Patterns for Self-Describing Targets
-
-### The Standard Help System
-
-Create a help system that automatically documents your targets:
+Every Makefile should start with this:
 
 ```makefile
 .DEFAULT_GOAL := help
 
-help: ##   Show available commands
-	@echo "$(APP_NAME) Operations"
-	@echo "====================="
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-
-# Example documented targets
-build: ##   Build Docker image
-	docker build -t $(IMAGE_TAG) .
-
-test: ##   Run test suite
-	pytest tests/
-
-deploy: ##   Deploy to configured environment
-	kubectl apply -f k8s/
+help: ## Show available commands
+	@echo "Available commands:"
+	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*##"}; {printf "  %-20s %s\n", $$1, $$2}'
 ```
 
-### Advanced Help with Categories
-
-Create sophisticated help systems with categorized targets:
+Then document targets like this:
 
 ```makefile
-help: ##   Show available commands
-	@echo "$(APP_NAME) Operations"
-	@echo "====================="
-	@echo ""
-	@echo " Getting Started:"
-	@awk '/^##@ Getting Started/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@echo ""
-	@echo " Development:"
-	@awk '/^##@ Development/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@echo ""
-	@echo " Deployment:"
-	@awk '/^##@ Deployment/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@echo ""
-	@echo " Operations:"
-	@awk '/^##@ Operations/,/^##@ / { if(/^[a-zA-Z_-]+:.*##/) printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-
-##@ Getting Started
-
-setup: ## Set up development environment
-	@$(MAKE) install-deps
-	@$(MAKE) setup-db
-	@echo " Setup complete! Run 'make dev' to start development"
-
-##@ Development
-
-dev: ## Start development environment
-	docker-compose up
-
-test: ## Run all tests
-	pytest tests/
-
-##@ Deployment
-
 deploy: ## Deploy to configured environment
 	kubectl apply -f k8s/
 
-deploy-prod: ## Deploy to production (requires confirmation)
-	@echo " Deploying to PRODUCTION. Continue? [y/N]" && read ans && [ $$ans = y ]
-	@$(MAKE) deploy ENVIRONMENT=production
-
-##@ Operations
-
-logs: ## Show application logs
-	kubectl logs -f deployment/$(APP_NAME)
-
-backup: ## Create data backup
-	kubectl exec deployment/database -- pg_dump myapp > backup-$(shell date +%Y%m%d).sql
+test: ## Run all tests
+	pytest tests/
 ```
 
-### Interactive Help and Guidance
+Running `make` (with no target) shows:
 
-Create help systems that guide users through common workflows:
-
-```makefile
-help-interactive: ##   Interactive help system
-	@echo "What would you like to do?"
-	@echo "1) Set up the project for development"
-	@echo "2) Start development environment"
-	@echo "3) Run tests"
-	@echo "4) Deploy to staging"
-	@echo "5) Deploy to production"
-	@echo "6) View logs"
-	@echo "7) Create backup"
-	@echo "8) Show all commands"
-	@echo -n "Choose [1-8]: "
-	@read choice; \
-	case $$choice in \
-		1) echo "Run: make setup" ;; \
-		2) echo "Run: make dev" ;; \
-		3) echo "Run: make test" ;; \
-		4) echo "Run: make deploy ENVIRONMENT=staging" ;; \
-		5) echo "Run: make deploy-prod" ;; \
-		6) echo "Run: make logs" ;; \
-		7) echo "Run: make backup" ;; \
-		8) $(MAKE) help ;; \
-		*) echo "Invalid choice" ;; \
-	esac
-
-what-next: ##   Suggest what to do based on current state
-	@echo "Checking current state..."
-	@if [ ! -f "package.json" ] && [ ! -f "requirements.txt" ]; then \
-		echo " New project detected. Run: make setup"; \
-	elif [ ! -d "node_modules" ] && [ ! -d "venv" ]; then \
-		echo " Dependencies not installed. Run: make setup"; \
-	elif ! docker ps | grep -q $(APP_NAME); then \
-		echo " Ready for development. Run: make dev"; \
-	elif [ -n "$$(git status --porcelain)" ]; then \
-		echo " Changes detected. Run: make test"; \
-	else \
-		echo " Everything looks good! Try: make help-interactive"; \
-	fi
-
-# Context-sensitive help
-help-deploy: ##   Help with deployment options
-	@echo "Deployment Help"
-	@echo "==============="
-	@echo ""
-	@echo "Available deployment targets:"
-	@echo " make deploy              # Deploy to development (default)"
-	@echo " make deploy-staging      # Deploy to staging environment"
-	@echo " make deploy-prod         # Deploy to production (with confirmation)"
-	@echo ""
-	@echo "Environment-specific deployment:"
-	@echo " make deploy ENVIRONMENT=dev        # Development"
-	@echo " make deploy ENVIRONMENT=staging    # Staging"
-	@echo " make deploy ENVIRONMENT=production # Production"
-	@echo ""
-	@echo "Current configuration:"
-	@echo " Environment: $(ENVIRONMENT)"
-	@echo " Version: $(VERSION)"
-	@echo " Image: $(IMAGE_TAG)"
+```
+Available commands:
+  deploy               Deploy to configured environment
+  test                 Run all tests
 ```
 
-## Real-World Example: Complete Target Organization
+### When to Add Advanced Help
 
-Here's how all these concepts come together in a comprehensive, well-organized Makefile:
+Only add advanced help systems when:
+- You have 25+ targets and `make help` is overwhelming
+- Team members frequently ask "what command do I use for X?"
+- You're onboarding people regularly
+
+For most teams, the standard help pattern is sufficient.
+
+## A Complete Practical Example
+
+Here's what most teams actually need:
 
 ```makefile
 # =============================================================================
 # MyApp DevOps Workflow
 # =============================================================================
 
-# Configuration
 APP_NAME = myapp
-VERSION ?= $(shell git describe --tags --always --dirty)
+VERSION ?= $(shell git describe --tags --always)
 ENVIRONMENT ?= development
 IMAGE_TAG = $(REGISTRY)/$(APP_NAME):$(VERSION)
 
-# Default target
 .DEFAULT_GOAL := help
+.PHONY: help setup dev test build deploy clean
 
 # =============================================================================
-# Help System
+# Core Workflow
 # =============================================================================
 
-help: ##   Show available commands
-	@echo "$(APP_NAME) DevOps Workflow"
-	@echo "============================="
+help: ## Show available commands
+	@echo "$(APP_NAME) workflow commands:"
 	@echo ""
-	@echo " Quick Start:"
-	@echo " make setup    # Set up development environment"
-	@echo " make dev      # Start development"
-	@echo " make test     # Run tests"
-	@echo " make deploy   # Deploy to development"
+	@grep -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*##"}; {printf "  %-20s %s\n", $$1, $$2}'
 	@echo ""
-	@echo " All Commands:"
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-18s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-	@echo ""
-	@echo " Run 'make help-interactive' for guided assistance"
+	@echo "Quick start: make setup && make dev"
 
-# =============================================================================
-# Setup and Development
-# =============================================================================
+setup: ## Set up development environment
+	@echo "Setting up development environment..."
+	@command -v docker >/dev/null || (echo "Install Docker first" && exit 1)
+	@cp -n .env.example .env 2>/dev/null || true
+	docker-compose pull
+	@echo "✓ Setup complete - run 'make dev' to start"
 
-.PHONY: setup dev dev-stop reset
+dev: ## Start development environment
+	docker-compose up
 
-setup: ##   Set up development environment
-	@echo "Setting up $(APP_NAME) development environment..."
-	@$(MAKE) check-prerequisites
-	@$(MAKE) install-dependencies
-	@$(MAKE) setup-database
-	@$(MAKE) setup-config
-	@echo " Setup complete! Run 'make dev' to start development"
+test: ## Run all tests
+	docker-compose run --rm app pytest tests/ -v
 
-dev: ##  Start development environment
-	@echo "Starting $(APP_NAME) development environment..."
-	@trap 'echo "\n Shutting down..."; $(MAKE) dev-stop; exit' INT; \
-	docker-compose up --build
-
-dev-stop: ##  Stop development environment
-	@echo "Stopping development environment..."
-	@docker-compose down
-	@echo " Development environment stopped"
-
-reset: ##   Reset development environment to clean state
-	@echo " This will destroy all local data. Continue? [y/N]" && read ans && [ $$ans = y ]
-	@$(MAKE) dev-stop
-	@$(MAKE) clean-all
-	@$(MAKE) setup
-	@echo " Environment reset complete"
-
-# =============================================================================
-# Build and Package
-# =============================================================================
-
-.PHONY: build build-dev build-prod package
-
-build: lint ##   Build application
-	@echo "Building $(APP_NAME) version $(VERSION)..."
+build: ## Build Docker image
 	docker build -t $(IMAGE_TAG) .
-	@echo " Build complete: $(IMAGE_TAG)"
 
-build-dev: ##   Build for development (with debug info)
-	@echo "Building $(APP_NAME) for development..."
-	docker build --target development -t $(IMAGE_TAG)-dev .
-
-build-prod: ##   Build optimized production image
-	@echo "Building $(APP_NAME) for production..."
-	docker build --target production -t $(IMAGE_TAG) .
-
-package: build ##   Package application for distribution
-	@echo "Creating distribution package..."
-	@mkdir -p dist
-	docker save $(IMAGE_TAG) | gzip > dist/$(APP_NAME)-$(VERSION).tar.gz
-	@echo " Package created: dist/$(APP_NAME)-$(VERSION).tar.gz"
-
-# =============================================================================
-# Testing
-# =============================================================================
-
-.PHONY: test test-unit test-integration test-e2e lint security-scan
-
-test: test-unit test-integration ##   Run all tests
-	@echo " All tests completed successfully"
-
-test-unit: build ##   Run unit tests
-	@echo "Running unit tests..."
-	docker run --rm $(IMAGE_TAG) pytest tests/unit/ -v
-
-test-integration: build ##   Run integration tests
-	@echo "Running integration tests..."
-	docker run --rm --network host $(IMAGE_TAG) pytest tests/integration/ -v
-
-test-e2e: ##   Run end-to-end tests
-	@echo "Running end-to-end tests..."
-	@$(MAKE) deploy ENVIRONMENT=test
-	@sleep 10  # Wait for services to be ready
-	docker run --rm --network host $(IMAGE_TAG) pytest tests/e2e/ -v
-
-lint: ##   Run code linting
-	@echo "Running linting..."
-	@$(MAKE) -j4 lint-python lint-docker lint-yaml
-
-lint-python: ##   Lint Python code
-	flake8 src/ tests/
-	black --check src/ tests/
-	mypy src/
-
-lint-docker: ##   Lint Dockerfile
-	hadolint Dockerfile
-
-lint-yaml: ##   Lint YAML files
-	yamllint k8s/ docker-compose.yml
-
-security-scan: build ##   Run security scan
-	@echo "Running security scan..."
-	trivy image $(IMAGE_TAG)
-	bandit -r src/
-
-# =============================================================================
-# Deployment
-# =============================================================================
-
-.PHONY: deploy deploy-dev deploy-staging deploy-prod push
-
-deploy: validate-deployment build test push ##   Deploy to configured environment
-	@echo "Deploying $(APP_NAME) to $(ENVIRONMENT)..."
-	@$(MAKE) deploy-$(ENVIRONMENT)
-	@echo " Deployment to $(ENVIRONMENT) completed"
-
-deploy-dev: ##   Deploy to development
-	kubectl apply -f k8s/base/ -f k8s/overlays/development/
-	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG) -n $(APP_NAME)-dev
-	kubectl rollout status deployment/$(APP_NAME) -n $(APP_NAME)-dev
-
-deploy-staging: ##   Deploy to staging
-	kubectl apply -f k8s/base/ -f k8s/overlays/staging/
-	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG) -n $(APP_NAME)-staging
-	kubectl rollout status deployment/$(APP_NAME) -n $(APP_NAME)-staging
-	@$(MAKE) smoke-test ENVIRONMENT=staging
-
-deploy-prod: ##   Deploy to production (requires confirmation)
-	@echo " PRODUCTION DEPLOYMENT"
-	@echo "Version: $(VERSION)"
-	@echo "Image: $(IMAGE_TAG)"
-	@echo ""
-	@echo " This will deploy to PRODUCTION. Continue? [y/N]" && read ans && [ $$ans = y ]
-	@$(MAKE) backup-production
-	kubectl apply -f k8s/base/ -f k8s/overlays/production/
-	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG) -n $(APP_NAME)-prod
-	kubectl rollout status deployment/$(APP_NAME) -n $(APP_NAME)-prod --timeout=600s
-	@$(MAKE) smoke-test ENVIRONMENT=production
-	@echo " Production deployment completed"
-
-push: build ##   Push image to registry
-	@echo "Pushing $(IMAGE_TAG)..."
+deploy: build test ## Deploy to environment (use ENVIRONMENT=staging/production)
+	@echo "Deploying to $(ENVIRONMENT)..."
 	docker push $(IMAGE_TAG)
-	@echo " Image pushed successfully"
+	kubectl apply -f k8s/$(ENVIRONMENT)/
+	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
+	@echo "✓ Deployed to $(ENVIRONMENT)"
 
 # =============================================================================
-# Operations and Monitoring
+# Additional Targets (add as needed)
 # =============================================================================
 
-.PHONY: logs status shell backup restore smoke-test
+deploy-staging: ## Deploy to staging
+	@$(MAKE) deploy ENVIRONMENT=staging
 
-logs: ##   Show application logs
-	kubectl logs -f deployment/$(APP_NAME) -n $(APP_NAME)-$(ENVIRONMENT)
+deploy-prod: ## Deploy to production (requires confirmation)
+	@echo "⚠️  Deploy to PRODUCTION? [y/N]" && read ans && [ $$ans = y ]
+	@$(MAKE) deploy ENVIRONMENT=production
 
-status: ##   Show deployment status
-	@echo "Status for $(APP_NAME) in $(ENVIRONMENT):"
-	kubectl get pods,services,ingress -n $(APP_NAME)-$(ENVIRONMENT)
-	kubectl describe deployment/$(APP_NAME) -n $(APP_NAME)-$(ENVIRONMENT)
+logs: ## Show application logs
+	kubectl logs -f deployment/$(APP_NAME) -n $(ENVIRONMENT)
 
-shell: ##   Get shell in running pod
-	kubectl exec -it deployment/$(APP_NAME) -n $(APP_NAME)-$(ENVIRONMENT) -- /bin/bash
+shell: ## Get shell in running container
+	docker-compose exec app /bin/bash
 
-backup: ##   Create backup
-	@echo "Creating backup for $(ENVIRONMENT)..."
-	kubectl exec deployment/$(APP_NAME)-db -n $(APP_NAME)-$(ENVIRONMENT) -- \
-		pg_dump $(APP_NAME) > backups/$(APP_NAME)-$(ENVIRONMENT)-$(shell date +%Y%m%d-%H%M%S).sql
-	@echo " Backup created"
-
-backup-production: ##   Create production backup (special handling)
-	@echo "Creating PRODUCTION backup..."
-	@mkdir -p backups/production
-	kubectl exec deployment/$(APP_NAME)-db -n $(APP_NAME)-prod -- \
-		pg_dump $(APP_NAME) | gzip > backups/production/$(APP_NAME)-prod-$(shell date +%Y%m%d-%H%M%S).sql.gz
-	@echo " Production backup created and compressed"
-
-smoke-test: ##   Run smoke tests against deployed environment
-	@echo "Running smoke tests against $(ENVIRONMENT)..."
-	@timeout 60 bash -c 'until curl -f http://$(APP_NAME)-$(ENVIRONMENT).example.com/health; do sleep 5; done'
-	@echo " Smoke tests passed"
-
-# =============================================================================
-# Maintenance and Cleanup
-# =============================================================================
-
-.PHONY: clean clean-images clean-containers clean-all
-
-clean: ##   Clean development environment
-	@echo "Cleaning development environment..."
-	@$(MAKE) clean-containers
-	@$(MAKE) clean-images
-	@echo " Cleanup complete"
-
-clean-images: ##   Clean Docker images
-	@echo "Cleaning Docker images..."
-	@docker images $(APP_NAME) -q | xargs -r docker rmi -f
-	@docker image prune -f
-
-clean-containers: ##   Clean Docker containers
-	@echo "Cleaning Docker containers..."
-	@docker ps -a --filter "name=$(APP_NAME)" -q | xargs -r docker rm -f
-
-clean-all: clean ##   Clean everything (including data)
-	@echo " This will delete ALL local data. Continue? [y/N]" && read ans && [ $$ans = y ]
-	@docker volume prune -f
-	@rm -rf dist/ backups/development/
-	@echo " Complete cleanup finished"
-
-# =============================================================================
-# Utilities and Validation
-# =============================================================================
-
-.PHONY: validate-deployment check-prerequisites install-dependencies setup-database
-.PHONY: setup-config help-interactive help-deploy what-next
-
-validate-deployment: ##   Validate deployment prerequisites
-	@echo "Validating deployment prerequisites..."
-	@test -n "$(VERSION)" || (echo " VERSION not set" && exit 1)
-	@test -n "$(ENVIRONMENT)" || (echo " ENVIRONMENT not set" && exit 1)
-	@command -v kubectl >/dev/null || (echo " kubectl not found" && exit 1)
-	@kubectl cluster-info >/dev/null || (echo " kubectl not configured" && exit 1)
-	@echo " Deployment validation passed"
-
-check-prerequisites: ##   Check system prerequisites
-	@echo "Checking prerequisites..."
-	@command -v docker >/dev/null || (echo " Docker required" && exit 1)
-	@command -v docker-compose >/dev/null || (echo " docker-compose required" && exit 1)
-	@command -v kubectl >/dev/null || (echo " kubectl required" && exit 1)
-	@echo " All prerequisites met"
-
-install-dependencies: ##   Install application dependencies
-	@echo "Installing dependencies..."
-	@if [ -f "package.json" ]; then npm install; fi
-	@if [ -f "requirements.txt" ]; then pip install -r requirements.txt; fi
-	@echo " Dependencies installed"
-
-setup-database: ##    Set up development database
-	@echo "Setting up database..."
-	@docker-compose up -d database
-	@echo "Waiting for database to be ready..."
-	@timeout 30 bash -c 'until docker-compose exec -T database pg_isready; do sleep 1; done'
-	@docker-compose exec -T database psql -U postgres -c "CREATE DATABASE IF NOT EXISTS $(APP_NAME);"
-	@echo " Database ready"
-
-setup-config: ##   Set up configuration files
-	@echo "Setting up configuration..."
-	@if [ ! -f ".env" ]; then \
-		cp .env.example .env; \
-		echo " Please edit .env with your configuration"; \
-	fi
-	@echo " Configuration setup complete"
-
-# Advanced help systems
-help-interactive: ##   Interactive help system
-	@echo "$(APP_NAME) Interactive Help"
-	@echo "============================"
-	@echo ""
-	@echo "What would you like to do?"
-	@echo " 1) Set up the project for the first time"
-	@echo " 2) Start development environment"  
-	@echo " 3) Run tests"
-	@echo " 4) Build and deploy to staging"
-	@echo " 5) Deploy to production"
-	@echo " 6) View logs and status"
-	@echo " 7) Create a backup"
-	@echo " 8) Clean up environment"
-	@echo " 9) Show all available commands"
-	@echo ""
-	@echo -n "Choose [1-9]: "
-	@read choice; \
-	case $choice in \
-		1) echo ""; echo "For first-time setup, run:"; echo " make setup"; echo "" ;; \
-		2) echo ""; echo "To start development, run:"; echo " make dev"; echo "" ;; \
-		3) echo ""; echo "To run tests, run:"; echo " make test"; echo "" ;; \
-		4) echo ""; echo "To deploy to staging, run:"; echo " make deploy ENVIRONMENT=staging"; echo "" ;; \
-		5) echo ""; echo "To deploy to production, run:"; echo " make deploy-prod"; echo "" ;; \
-		6) echo ""; echo "To view logs and status, run:"; echo " make logs"; echo " make status"; echo "" ;; \
-		7) echo ""; echo "To create a backup, run:"; echo " make backup"; echo "" ;; \
-		8) echo ""; echo "To clean up, run:"; echo " make clean"; echo "" ;; \
-		9) echo ""; $(MAKE) help ;; \
-		*) echo ""; echo "Invalid choice. Please run 'make help-interactive' again."; echo "" ;; \
-	esac
-
-help-deploy: ##   Deployment help and options
-	@echo "Deployment Help"
-	@echo "==============="
-	@echo ""
-	@echo "Quick deployment options:"
-	@echo " make deploy                    # Deploy to development"
-	@echo " make deploy ENVIRONMENT=staging # Deploy to staging"  
-	@echo " make deploy-prod              # Deploy to production (with confirmation)"
-	@echo ""
-	@echo "Step-by-step deployment:"
-	@echo " make build                    # Build the application"
-	@echo " make test                     # Run tests"
-	@echo " make push                     # Push to registry"
-	@echo " make deploy ENVIRONMENT=staging # Deploy to staging"
-	@echo ""
-	@echo "Current configuration:"
-	@echo " Environment: $(ENVIRONMENT)"
-	@echo " Version: $(VERSION)"
-	@echo " Image: $(IMAGE_TAG)"
-	@echo ""
-	@echo "For more help: make help-interactive"
-
-what-next: ##   Suggest next actions based on current state
-	@echo "Analyzing current state..."
-	@if [ ! -f "package.json" ] && [ ! -f "requirements.txt" ] && [ ! -f "Cargo.toml" ]; then \
-		echo ""; \
-		echo " This looks like a new project!"; \
-		echo " Next step: make setup"; \
-		echo ""; \
-	elif [ ! -f ".env" ]; then \
-		echo ""; \
-		echo " Project needs configuration setup."; \
-		echo " Next step: make setup"; \
-		echo ""; \
-	elif ! docker ps | grep -q $(APP_NAME) 2>/dev/null; then \
-		echo ""; \
-		echo " Ready to start development!"; \
-		echo " Next step: make dev"; \
-		echo ""; \
-	elif [ -n "$(git status --porcelain 2>/dev/null)" ]; then \
-		echo ""; \
-		echo " Code changes detected."; \
-		echo " Consider: make test"; \
-		echo " Then: make deploy ENVIRONMENT=staging"; \
-		echo ""; \
-	else \
-		echo ""; \
-		echo " Everything looks good!"; \
-		echo " Try: make help-interactive for guided options"; \
-		echo ""; \
-	fi
-
-# =============================================================================
-# Development Workflow Shortcuts
-# =============================================================================
-
-.PHONY: quick-start fresh-start ci-pipeline release
-
-quick-start: ##  Quick start for experienced developers
-	@echo " Quick start sequence..."
-	@$(MAKE) setup
-	@$(MAKE) dev
-
-fresh-start: ##   Fresh start (clean + setup + dev)
-	@echo " Fresh start sequence..."
-	@$(MAKE) clean-all 2>/dev/null || true
-	@$(MAKE) setup  
-	@$(MAKE) dev
-
-ci-pipeline: ##   Run CI pipeline locally
-	@echo " Running CI pipeline..."
-	@$(MAKE) lint
-	@$(MAKE) build
-	@$(MAKE) test
-	@$(MAKE) security-scan
-	@echo " CI pipeline completed successfully"
-
-release: ##   Create release (tag + build + test + package)
-	@echo " Creating release..."
-	@test -n "$(TAG)" || (echo " TAG required: make release TAG=v1.0.0" && exit 1)
-	@git tag $(TAG)
-	@$(MAKE) build VERSION=$(TAG)
-	@$(MAKE) test
-	@$(MAKE) package VERSION=$(TAG)
-	@echo " Release $(TAG) created successfully"
-	@echo " To publish: git push origin $(TAG) && make push VERSION=$(TAG)"
+clean: ## Clean up development environment
+	docker-compose down -v
+	docker system prune -f
 ```
 
-## Advanced Target Organization Patterns
+This is ~60 lines and handles what most teams need. Add more only when you have
+actual operations that don't fit.
 
-### State-Based Target Organization
+## Common Patterns Worth Knowing
 
-Organize targets around application state and lifecycle:
+### Validation Targets
+
+Add validation when it prevents actual problems:
 
 ```makefile
-# =============================================================================
-# Application State Management
-# =============================================================================
+validate: ## Validate configuration
+	@test -n "$(VERSION)" || (echo "VERSION required" && exit 1)
+	@test -n "$(ENVIRONMENT)" || (echo "ENVIRONMENT required" && exit 1)
+	@command -v kubectl >/dev/null || (echo "kubectl required" && exit 1)
 
-.PHONY: start stop restart status health
-
-# State control
-start: ## ▶  Start all services
-	@echo "Starting $(APP_NAME) services..."
-	@docker-compose up -d
-	@$(MAKE) wait-for-services
-	@echo " All services started"
-
-stop: ##    Stop all services
-	@echo "Stopping $(APP_NAME) services..."
-	@docker-compose down
-	@echo " All services stopped"
-
-restart: stop start ##   Restart all services
-	@echo " All services restarted"
-
-# State inspection
-status: ##   Show service status
-	@echo "Service Status:"
-	@docker-compose ps
-	@echo ""
-	@echo "Resource Usage:"
-	@docker stats --no-stream --format "table {{.Name}}\t{{.CPUPerc}}\t{{.MemUsage}}\t{{.MemPerc}}"
-
-health: ##   Check service health
-	@echo "Health Check Results:"
-	@for service in api database redis; do \
-		echo -n "$service: "; \
-		curl -sf http://localhost:8080/health/$service && echo " Healthy" || echo " Unhealthy"; \
-	done
-
-wait-for-services: ##   Wait for services to be ready
-	@echo "Waiting for services to be ready..."
-	@timeout 60 bash -c 'until curl -sf http://localhost:8080/health; do sleep 2; done'
-	@echo " Services are ready"
+deploy: validate build test ## Deploy with validation
+	kubectl apply -f k8s/$(ENVIRONMENT)/
 ```
 
-### Environment-Aware Target Organization
+### Confirmation for Dangerous Operations
 
-Create targets that automatically adapt to different environments:
+Require confirmation for operations that can't be easily undone:
 
 ```makefile
-# =============================================================================
-# Environment-Aware Operations
-# =============================================================================
+deploy-prod: ## Deploy to production (requires confirmation)
+	@echo "⚠️  Deploy to PRODUCTION?"
+	@echo "Version: $(VERSION)"
+	@echo "Continue? [y/N]" && read ans && [ $$ans = y ]
+	@$(MAKE) deploy ENVIRONMENT=production
 
-# Automatically use environment-specific implementations
-deploy: deploy-$(ENVIRONMENT) ##   Deploy to configured environment
+clean-prod-data: ## Delete production data (DANGEROUS)
+	@echo "⚠️  This will DELETE PRODUCTION DATA"
+	@echo "Type 'DELETE PRODUCTION DATA' to confirm:"
+	@read ans && [ "$$ans" = "DELETE PRODUCTION DATA" ]
+	kubectl delete pvc --all -n production
+```
 
-deploy-development: ##   Development deployment (fast, minimal validation)
-	@echo " Development deployment..."
-	@$(MAKE) build-dev
-	@docker-compose up -d --force-recreate
+### State Inspection
 
-deploy-staging: ##   Staging deployment (full validation)
-	@echo " Staging deployment..."
-	@$(MAKE) ci-pipeline
-	@$(MAKE) push
-	kubectl apply -f k8s/staging/
-	@$(MAKE) smoke-test
+Make it easy to see what's running:
 
-deploy-production: ##   Production deployment (maximum safety)
-	@echo " Production deployment..."
-	@$(MAKE) validate-production-readiness
-	@$(MAKE) backup-production
-	@$(MAKE) ci-pipeline
-	@$(MAKE) push
-	@echo " Deploy to PRODUCTION? [y/N]" && read ans && [ $ans = y ]
-	kubectl apply -f k8s/production/
-	kubectl rollout status deployment/$(APP_NAME) -n production --timeout=600s
-	@$(MAKE) smoke-test
-	@$(MAKE) notify-deployment-success
+```makefile
+status: ## Show deployment status
+	@echo "=== Containers ==="
+	docker-compose ps
+	@echo ""
+	@echo "=== Kubernetes Pods ==="
+	kubectl get pods -n $(ENVIRONMENT)
+	@echo ""
+	@echo "=== Recent Logs ==="
+	kubectl logs --tail=20 deployment/$(APP_NAME) -n $(ENVIRONMENT)
+```
 
-# Environment-specific validations
-validate-production-readiness: ##   Validate production deployment readiness
-	@echo "Validating production readiness..."
-	@test "$(VERSION)" != "latest" || (echo " Production requires specific version" && exit 1)
-	@git diff --quiet || (echo " Uncommitted changes detected" && exit 1)
-	@$(MAKE) security-scan
-	@echo " Production readiness validated"
+### Quick Restart
+
+Common development pattern:
+
+```makefile
+restart: ## Restart services quickly
+	docker-compose restart
+
+rebuild: clean build dev ## Full rebuild and restart
+	@echo "✓ Rebuilt and restarted"
+```
+
+## When to Use Advanced Organization
+
+Most of the advanced patterns in traditional Make books are overkill. Here's
+when they actually matter:
+
+### Multiple Environments (Common)
+Use parameterized targets with shortcut targets.
+
+### Large Codebase (20+ services)
+Group by component with prefixes (`frontend-`, `backend-`, `db-`).
+
+### Complex Dependencies (Microservices)
+Use Make's dependency resolution to ensure correct ordering.
+
+### Frequent Onboarding
+Invest in detailed help system with categories.
+
+### Platform Team
+Create reusable target patterns that projects can include.
+
+**For most teams:** 5-10 well-named targets with simple dependencies is
+sufficient.
+
+## Troubleshooting Target Organization
+
+### Target Not Found
+
+```bash
+make: *** No rule to make target 'deploy-staging'. Stop.
+```
+
+Check: Is the target declared? Is there a typo?
+
+```makefile
+.PHONY: deploy-staging
+deploy-staging: ## Deploy to staging
+	@$(MAKE) deploy ENVIRONMENT=staging
+```
+
+### Dependencies Run Unexpectedly
+
+```makefile
+# This runs test even if you just want to check syntax
+deploy: test build
+	kubectl apply -f k8s/
+
+# Better: split into quick and full deploy
+deploy-quick: build  ## Quick deploy (no tests)
+	kubectl apply -f k8s/
+
+deploy-full: test build  ## Full deploy (with tests)
+	kubectl apply -f k8s/
+```
+
+### Help Not Showing Targets
+
+Ensure `##` spacing is correct:
+
+```makefile
+# Wrong - won't show in help
+deploy:## Deploy application
+
+# Right - shows in help  
+deploy: ## Deploy application
 ```
 
 ## Key Takeaways
 
-Phony targets are the foundation of discoverable, well-organized DevOps workflows. The principles that make them effective are:
+Effective target organization is about discoverability and matching how your
+team works:
 
-1. **Clear Naming**: Use verb-object patterns that immediately communicate purpose (`build-image`, `test-unit`, `deploy-staging`)
-    
-2. **Logical Organization**: Group related targets together and organize by frequency of use, system component, or workflow stage
-    
-3. **Dependency Management**: Use prerequisites to ensure operations happen in the correct order and with proper validation
-    
-4. **Self-Documentation**: Create help systems that make your workflows discoverable without external documentation
-    
-5. **Composite Workflows**: Build complex operations from simple, reusable components that can be tested and maintained independently
-    
-6. **Environment Awareness**: Design targets that adapt intelligently to different deployment environments
-    
-7. **Progressive Disclosure**: Start with simple, common operations and provide more advanced options for power users
-    
-8. **State Management**: Organize targets around the natural lifecycle and states of your applications
-    
+1. **Start with 5-10 core targets** - setup, dev, test, build, deploy covers
+   most needs
 
-Well-organized phony targets transform your Makefile from a collection of scripts into an intuitive interface that guides team members through complex operational workflows. They make the implicit explicit, turning undocumented team lore into discoverable, executable documentation.
+2. **Declare everything phony** - One `.PHONY` line prevents weird bugs
 
-In the next chapter, we'll explore how to use Make's dependency management features to create sophisticated workflow orchestration that ensures operations happen in the correct order and with proper validation, building on the solid foundation of well-organized phony targets we've established here.
+3. **Use clear verb-object names** - `deploy-staging` beats `deploy_stg` or `ds`
+
+4. **Pick one environment pattern** - Parameterized with shortcuts works best
+
+5. **Add dependencies for safety** - Ensure tests run before production deploys
+
+6. **Create composites for common sequences** - Only if you run them regularly
+
+7. **Always have a help system** - `make` should show available commands
+
+8. **Organize around daily workflow** - Not theoretical perfection
+
+9. **Add complexity incrementally** - Start flat, add groups at ~15 targets, add
+   categories at ~25
+
+10. **Make it guessable** - New team members should guess the right command
+
+Well-organized targets transform your Makefile from a script collection into an
+intuitive interface. The goal isn't comprehensive coverage of every possible
+operation—it's making the common cases obvious and the advanced cases
+discoverable.
+
+---
+
+**For More Examples:** See the online companion repository (Appendix D) for:
+- Multi-component system organization patterns
+- Advanced help systems with categories
+- State-based target organization
+- Large-scale Makefile examples (50+ targets)
+
+In the next chapter, we'll explore advanced workflow patterns and how to handle
+complex operational scenarios while maintaining the simplicity and
+discoverability we've built through good target organization.
