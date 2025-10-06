@@ -335,16 +335,20 @@ dependencies when: \begin{itemize} \item The operation is expensive
 requirements.txt) \item Re-running unnecessarily wastes time or resources
 \end{itemize}
 
-Stick with phony targets when: \begin{itemize} \item The operation is quick
-(under 10 seconds) \item You always want it to run (deploy, test, logs) \item
-"Freshness" matters more than efficiency \end{itemize}
+Stick with phony targets when: 
+\begin{itemize} 
+\item The operation is quick (under 10 seconds) 
+\item You always want it to run (deploy, test, logs) 
+\item "Freshness" matters more than efficiency 
+\end{itemize}
 
 \textbf{Default to phony targets.} Only use file-based dependencies when you've
 identified a specific performance problem. Premature optimization makes
 Makefiles harder to understand.
 
 Most DevOps workflows should be phony. File dependencies are an optimization you
-discover through use, not something you design upfront. \end{calloutbox}
+discover through use, not something you design upfront. 
+\end{calloutbox}
 
 ### Order-Only Prerequisites
 
@@ -553,9 +557,9 @@ status: ## Show status
 	kubectl get all
 ```
 
-> Chapter 6 explores target organization patterns in depth, including
-> categorization strategies, naming conventions, and composite targets for
-> complex workflows.
+\begin{calloutbox}[See Also: Chapter 6] Chapter 6 explores target organization
+patterns in depth, including categorization strategies, naming conventions, and
+composite targets for complex workflows. \end{calloutbox}
 
 ## Putting It Together: Essential Patterns
 

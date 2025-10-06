@@ -20,23 +20,21 @@ light testing, and comprehensive test suites are usually over-engineering.**
 This chapter will teach you how to catch real problems with minimal effort, not
 how to build elaborate testing infrastructure.
 
-> [!IMPORTANT] Start Simple: The 5-Minute Makefile Validation
-> Before diving into any testing frameworks, remember that you can catch most
-> Makefile issues with just a few simple checks:
-> 
-> 1. **Dry run everything**: `make -n target` shows you exactly what would
->    execute without actually doing it
-> 2. **Test your help**: `make help` should work and be useful to newcomers
-> 3. **Check for typos**: `make nonexistent-target` should give a clear error,
->    not silent failure
-> 4. **Validate variables**: Add simple checks like `@test -n "$(REQUIRED_VAR)"
->    || (echo "REQUIRED_VAR not set" && exit 1)`
-> 5. **Use .PHONY**: Declare your action targets as `.PHONY: build test deploy
->    clean`
->
-> These basic practices will prevent most common Makefile problems. Add more
-> sophisticated testing only when you encounter actual issues that these don't
-> catch.
+Before diving into any testing frameworks, remember that you can catch most
+Makefile issues with just a few simple checks:
+ 
+1. **Dry run everything**: `make -n target` shows you exactly what would
+   execute without actually doing it
+2. **Test your help**: `make help` should work and be useful to newcomers
+3. **Check for typos**: `make nonexistent-target` should give a clear error,
+   not silent failure
+4. **Validate variables**: Add simple checks like `@test -n "$(REQUIRED_VAR)"
+   || (echo "REQUIRED_VAR not set" && exit 1)`
+5. **Use .PHONY**: Declare your action targets as `.PHONY: build test deploy clean`
+
+These basic practices will prevent most common Makefile problems. Add more
+sophisticated testing only when you encounter actual issues that these don't
+catch.
 
 \begin{calloutbox}[Testing: Start with What Breaks, Not What Could Break] Don't
 write tests before you have problems. Testing should solve actual issues you've
