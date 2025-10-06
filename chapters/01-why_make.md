@@ -86,11 +86,11 @@ to be the one who breaks the undocumented deployment process.
 ### The Knowledge Transfer Problem
 
 Let's examine a typical knowledge transfer scenario. Your senior platform
-engineer, Marcus, is going on parental leave. He's spent three years building
+engineer, Aubrey, is going on parental leave. He's spent three years building
 and refining your deployment infrastructure. He sits down to document everything
 for his backup:
 
-**Day 1**: Marcus creates a comprehensive Google Doc titled "Deployment
+**Day 1**: Aubrey creates a comprehensive Google Doc titled "Deployment
 Procedures." It's 47 pages long and covers everything from basic deploys to
 disaster recovery. It takes him two full days to write, pulling from memory, old
 tickets, and his personal notes.
@@ -102,7 +102,7 @@ doc.
 **Week 8**: A new tool was introduced. Someone adds a footnote but forgets to
 update the main procedure. Now there are two conflicting sets of instructions.
 
-**Week 12**: Marcus returns. The document has 15 comments saying "this didn't
+**Week 12**: Aubrey returns. The document has 15 comments saying "this didn't
 work" or "is this still current?" Nobody is sure which parts are accurate
 anymore. The team has developed new, undocumented workarounds. The team lore has
 grown, diverged from the document, and now exists in a parallel reality.
@@ -330,9 +330,9 @@ deploy a minor update to the user service in staging.
   about missing environment variables. Asked in Slack.
 - **Day 3**: Got pointed to a different wiki page with updated instructions.
   Those instructions referenced a script that didn't exist.
-- **Day 4**: Paired with senior engineer Marcus, who walked her through the
+- **Day 4**: Paired with senior engineer Aubrey, who walked her through the
   "actual" process, which involved several undocumented steps.
-- **Day 5**: Successfully deployed with Marcus's help. Still not confident to do
+- **Day 5**: Successfully deployed with Aubrey's help. Still not confident to do
   it alone.
 
 **Time to first independent deployment**: 3.5 weeks

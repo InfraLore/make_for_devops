@@ -10,7 +10,7 @@ arcane ritual of tabs and cryptic syntax. This chapter will help you forget
 everything you think you know about Make and see it through fresh eyes—as a
 powerful orchestration tool perfectly suited for modern DevOps workflows.
 
-The beauty of Make **for DevOps** lies not in its ability to compile code, but
+The beauty of Make *for DevOps* lies not in its ability to compile code, but
 in its capacity to define, document, and execute complex operational workflows
 with remarkable simplicity. While other tools require you to learn new
 domain-specific languages or complex configuration formats, Make leverages
