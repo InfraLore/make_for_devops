@@ -1,10 +1,20 @@
 # Chapter 3: Make Fundamentals for the Modern DevOps Engineer
 
-\chaptersubtitle{A primer on Make syntax, focusing on the features most relevant to DevOps workflows rather than traditional compilation.}
+\chaptersubtitle{A primer on Make syntax, focusing on the features most relevant
+to DevOps workflows rather than traditional compilation.}
 
-If you've encountered Make before, it was probably in the context of compiling C or C++ code. You might have run `make install` on a Linux system or struggled through a university computer science course where Makefiles seemed like an arcane ritual of tabs and cryptic syntax. This chapter will help you forget everything you think you know about Make and see it through fresh eyes—as a powerful orchestration tool perfectly suited for modern DevOps workflows.
+If you've encountered Make before, it was probably in the context of compiling C
+or C++ code. You might have run `make install` on a Linux system or struggled
+through a university computer science course where Makefiles seemed like an
+arcane ritual of tabs and cryptic syntax. This chapter will help you forget
+everything you think you know about Make and see it through fresh eyes—as a
+powerful orchestration tool perfectly suited for modern DevOps workflows.
 
-The beauty of Make **for DevOps** lies not in its ability to compile code, but in its capacity to define, document, and execute complex operational workflows with remarkable simplicity. While other tools require you to learn new domain-specific languages or complex configuration formats, Make leverages concepts you already understand: commands, dependencies, and variables.
+The beauty of Make **for DevOps** lies not in its ability to compile code, but
+in its capacity to define, document, and execute complex operational workflows
+with remarkable simplicity. While other tools require you to learn new
+domain-specific languages or complex configuration formats, Make leverages
+concepts you already understand: commands, dependencies, and variables.
 
 ## Essential Make Syntax for DevOps Use Cases
 
@@ -17,11 +27,22 @@ test:
 	pytest tests/
 ```
 
-This defines a target called `test` that runs a single command. When you run `make test`, Make executes `pytest tests/`. Simple, right? But there's already more happening here than meets the eye.
+This defines a target called `test` that runs a single command. When you run
+`make test`, Make executes `pytest tests/`. Simple, right? But there's already
+more happening here than meets the eye.
 
-First, notice the **tab character** before the `pytest` command. This isn't optional—Make requires commands to be indented with a literal tab character, not spaces. This is one of Make's most notorious quirks. Configure your editor to insert tabs for Makefiles automatically. Don't fight this—accept it and move on. Every modern editor can handle this, and once configured, you'll never think about it again. If you get an error like `*** missing separator`, you've used spaces instead of tabs.
+First, notice the **tab character** before the `pytest` command. This isn't
+optional—Make requires commands to be indented with a literal tab character, not
+spaces. This is one of Make's most notorious quirks. Configure your editor to
+insert tabs for Makefiles automatically. Don't fight this—accept it and move on.
+Every modern editor can handle this, and once configured, you'll never think
+about it again. If you get an error like `*** missing separator`, you've used
+spaces instead of tabs.
 
-Second, Make is doing something subtle but powerful: it's providing a **standardized interface** to your infrastructure. Instead of team members needing to remember `pytest tests/`, they just run `make test`. This might seem trivial, but it's the foundation of discoverability.
+Second, Make is doing something subtle but powerful: it's providing a
+**standardized interface** to your infrastructure. Instead of team members
+needing to remember `pytest tests/`, they just run `make test`. This might seem
+trivial, but it's the foundation of discoverability.
 
 ### Building Workflows with Prerequisites
 
@@ -45,11 +66,18 @@ test:
 	pytest tests/
 ```
 
-Now when someone runs `make deploy`, Make automatically ensures that tests run first, then the build, then the push, and finally the deployment. If any step fails, the entire process stops. This creates a **reliable, repeatable deployment pipeline** that enforces good practices.
+Now when someone runs `make deploy`, Make automatically ensures that tests run
+first, then the build, then the push, and finally the deployment. If any step
+fails, the entire process stops. This creates a **reliable, repeatable
+deployment pipeline** that enforces good practices.
 
-This is the crucial insight: **the dependency chain enforces your team's standards.** No one can accidentally deploy untested code because `make deploy` won't let them. The workflow itself encodes best practices.
+This is the crucial insight: **the dependency chain enforces your team's
+standards.** No one can accidentally deploy untested code because `make deploy`
+won't let them. The workflow itself encodes best practices.
 
-Notice the `@` prefix on the echo commands—it suppresses Make from printing the command itself, showing only the output. This makes the workflow output cleaner and more readable.
+Notice the `@` prefix on the echo commands—it suppresses Make from printing the
+command itself, showing only the output. This makes the workflow output cleaner
+and more readable.
 
 ### Dependency Graphs and Execution Order
 
@@ -272,24 +300,23 @@ deploy: test build k8s/deployment.yaml
 
 The pattern: use file targets as markers for expensive operations, then reference them from phony targets. This gives you both repeatability (phony) and efficiency (file-based caching).
 
-\begin{calloutbox}[File Dependencies: Optimization, Not Default]
-Use file-based dependencies when:
-\begin{itemize}
-\item The operation is expensive (multi-minute Docker builds)
-\item The inputs rarely change (Dockerfile, requirements.txt)
-\item Re-running unnecessarily wastes time or resources
+\begin{calloutbox}[File Dependencies: Optimization, Not Default] Use file-based
+dependencies when: \begin{itemize} \item The operation is expensive
+(multi-minute Docker builds) \item The inputs rarely change (Dockerfile,
+requirements.txt) \item Re-running unnecessarily wastes time or resources
 \end{itemize}
 
-Stick with phony targets when:
-\begin{itemize}
-\item The operation is quick (under 10 seconds)
-\item You always want it to run (deploy, test, logs)
-\item "Freshness" matters more than efficiency
+Stick with phony targets when: 
+\begin{itemize} 
+\item The operation is quick (under 10 seconds) 
+\item You always want it to run (deploy, test, logs) 
+\item "Freshness" matters more than efficiency 
 \end{itemize}
 
 \textbf{Default to phony targets.} Only use file-based dependencies when you've identified a specific performance problem. Premature optimization makes Makefiles harder to understand.
 
-Most DevOps workflows should be phony. File dependencies are an optimization you discover through use, not something you design upfront.
+Most DevOps workflows should be phony. File dependencies are an optimization you
+discover through use, not something you design upfront. 
 \end{calloutbox}
 
 ### Order-Only Prerequisites
@@ -383,12 +410,13 @@ Most targets should fail immediately on error. Use \texttt{-} only for cleanup o
 
 \textbf{Good use:} \texttt{-docker rm container-name} (container might not exist)
 
-\textbf{Bad use:} \texttt{-kubectl apply -f k8s/} (you want to know if deployment fails!)
+\textbf{Bad use:} \texttt{-kubectl apply -f k8s/} (you want to know if
+deployment fails!)
 
 Using \texttt{.IGNORE} is almost always wrong—it hides real problems. If you're tempted to use it, you probably need better error handling in your scripts.
 
-Default to failing fast and loud. Your future self will thank you when errors are caught immediately rather than silently ignored.
-\end{calloutbox}
+Default to failing fast and loud. Your future self will thank you when errors
+are caught immediately rather than silently ignored. \end{calloutbox}
 
 ### Validation Checks
 
@@ -485,7 +513,9 @@ status: ## Show status
 	kubectl get all
 ```
 
-> Chapter 6 explores target organization patterns in depth, including categorization strategies, naming conventions, and composite targets for complex workflows.
+\begin{calloutbox}[See Also: Chapter 6] Chapter 6 explores target organization
+patterns in depth, including categorization strategies, naming conventions, and
+composite targets for complex workflows. \end{calloutbox}
 
 ## Putting It Together: Essential Patterns
 
@@ -529,7 +559,9 @@ This demonstrates:
 - Validation checks
 - Clear prerequisites that enforce best practices
 
-Note the critical design choice: **deploy depends on test**, which depends on build. This dependency chain makes it impossible to accidentally deploy untested code. The workflow itself enforces good practices.
+Note the critical design choice: **deploy depends on test**, which depends on
+build. This dependency chain makes it impossible to accidentally deploy untested
+code. The workflow itself enforces good practices.
 
 ## Key Takeaways
 
@@ -544,7 +576,9 @@ The fundamental concepts you've learned in this chapter form the foundation of e
 - **Help systems** make capabilities discoverable
 - **Validation checks** catch problems early with clear messages
 
-Remember: the goal isn't to put all your logic in the Makefile. The goal is to create a **discoverable interface** that shows what's possible and enforces safe workflows through dependencies.
+Remember: the goal isn't to put all your logic in the Makefile. The goal is to
+create a **discoverable interface** that shows what's possible and enforces safe
+workflows through dependencies.
 
 When designing Makefiles, favor safety and clarity over convenience:
 - Always make deployment depend on tests
@@ -553,4 +587,5 @@ When designing Makefiles, favor safety and clarity over convenience:
 - Fail fast and loud rather than hiding errors
 - Let the dependency chain enforce your team's standards
 
-In the next chapter, we'll explore testing and validating Makefiles to ensure they remain reliable as your infrastructure evolves.
+In the next chapter, we'll explore testing and validating Makefiles to ensure
+they remain reliable as your infrastructure evolves.
