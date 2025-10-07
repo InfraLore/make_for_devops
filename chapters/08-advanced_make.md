@@ -510,6 +510,7 @@ Use these features when they solve real problems:
 - Recursive Make when coordinating multiple projects
 - Conditionals when workflows need to adapt
 - Frameworks when standardizing across teams
+- Functions when command sequences repeat across targets
 
 Don't use advanced features for their own sake. Simple, clear Makefiles beat clever, complex ones unless complexity solves a real problem.
 
