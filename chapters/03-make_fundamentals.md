@@ -16,6 +16,7 @@ with remarkable simplicity. While other tools require you to learn new
 domain-specific languages or complex configuration formats, Make leverages
 concepts you already understand: commands, dependencies, and variables.
 
+\newpage
 ## Essential Make Syntax for DevOps Use Cases
 
 ### The Fundamental Structure: Targets, Prerequisites, and Recipes
@@ -44,6 +45,7 @@ Second, Make is doing something subtle but powerful: it's providing a
 needing to remember `pytest tests/`, they just run `make test`. This might seem
 trivial, but it's the foundation of discoverability.
 
+\newpage
 ### Building Workflows with Prerequisites
 
 The real power of Make emerges when you start defining **prerequisites**—targets that must run before other targets:
@@ -79,6 +81,7 @@ Notice the `@` prefix on the echo commands—it suppresses Make from printing th
 command itself, showing only the output. This makes the workflow output cleaner
 and more readable.
 
+\newpage
 ### Dependency Graphs and Execution Order
 
 Prerequisites can have their own prerequisites, creating dependency graphs:
@@ -174,6 +177,7 @@ build:
 
 The `:=` operator evaluates the shell command once when the Makefile is parsed, while `=` evaluates it every time the variable is used. For expensive operations like git commands, use `:=`.
 
+\newpage
 ### Conditional Logic for Environment-Aware Workflows
 
 Make supports conditional logic for adapting behavior:
@@ -212,6 +216,7 @@ Separate targets are self-documenting and easier to understand. Each target clea
 \textbf{Exception:} Use conditionals for truly environment-specific behavior like replica counts or approval gates—small variations on the same workflow.
 \end{calloutbox}
 
+\newpage
 ### Built-in Functions
 
 Make includes useful built-in functions:
@@ -231,16 +236,19 @@ SRC_FILES := $(wildcard src/*.py)
 TEST_FILES := $(patsubst src/%.py,tests/test_%.py,$(SRC_FILES))
 ```
 
-\begin{calloutbox}[See Also: Chapter 8]
-Chapter 8 covers advanced Make features including pattern rules, recursive Make for multi-project orchestration, and creating extensible workflow frameworks.
-\end{calloutbox}
+\begin{calloutbox}[See Also: Chapter 8] Chapter 8 covers advanced Make features
+including pattern rules, functions, recursive Make for multi-project
+orchestration, and creating extensible workflow frameworks. \end{calloutbox}
 
 ## Understanding Dependencies in Deployment Workflows
 
-\begin{calloutbox}[See Also: Chapter 7]
-This section introduces dependency concepts essential for DevOps workflows. For comprehensive coverage of modeling complex deployment dependencies, parallel execution strategies, file-based dependencies, and failure handling, see Chapter 7: Dependency Management for DevOps Workflows.
-\end{calloutbox}
+\begin{calloutbox}[See Also: Chapter 7] This section introduces dependency
+concepts essential for DevOps workflows. For comprehensive coverage of modeling
+complex deployment dependencies, parallel execution strategies, file-based
+dependencies, and failure handling, see Chapter 7: Dependency Management for
+DevOps Workflows. \end{calloutbox}
 
+\newpage
 ### Phony Targets: The DevOps Default
 
 Most DevOps tasks should use **phony targets**—targets that don't correspond to actual files:
@@ -275,6 +283,7 @@ rollback:
 
 Declaring targets as `.PHONY` tells Make to always run them, even if a file with that name exists. This is critical for DevOps workflows where targets represent actions, not build artifacts.
 
+\newpage
 ### File-Based Dependencies: When They Make Sense
 
 File targets are useful when you want to avoid unnecessary work:
@@ -298,12 +307,16 @@ deploy: test build k8s/deployment.yaml
 	kubectl apply -f k8s/deployment.yaml
 ```
 
-The pattern: use file targets as markers for expensive operations, then reference them from phony targets. This gives you both repeatability (phony) and efficiency (file-based caching).
+The pattern: use file targets as markers for expensive operations, then
+reference them from phony targets. This gives you both repeatability (phony) and
+efficiency (file-based caching). If you're actually generating files, though,
+you really should be using file targets, because Make gives you a wealth of
+features you want to take advantage of.
 
 \begin{calloutbox}[File Dependencies: Optimization, Not Default] Use file-based
 dependencies when: \begin{itemize} \item The operation is expensive
 (multi-minute Docker builds) \item The inputs rarely change (Dockerfile,
-requirements.txt) \item Re-running unnecessarily wastes time or resources
+requirements.txt) \item Re-running unnecessarily wastes time or resources \item You're generating a file :-)
 \end{itemize}
 
 Stick with phony targets when: 
@@ -313,10 +326,6 @@ Stick with phony targets when:
 \item "Freshness" matters more than efficiency 
 \end{itemize}
 
-\textbf{Default to phony targets.} Only use file-based dependencies when you've identified a specific performance problem. Premature optimization makes Makefiles harder to understand.
-
-Most DevOps workflows should be phony. File dependencies are an optimization you
-discover through use, not something you design upfront. 
 \end{calloutbox}
 
 ### Order-Only Prerequisites
@@ -441,6 +450,7 @@ check-cluster:
 
 These validation targets catch problems early with clear error messages.
 
+\newpage
 ## Pattern: The Self-Documenting Help System
 
 A well-designed Makefile teaches itself. The help system pattern is essential:
@@ -474,6 +484,7 @@ Available targets:
 
 This pattern makes every Makefile self-documenting. New engineers run `make` and immediately see what's available.
 
+\newpage
 ### Enhanced Help with Categories
 
 For larger Makefiles, organize help into categories:
@@ -563,6 +574,7 @@ Note the critical design choice: **deploy depends on test**, which depends on
 build. This dependency chain makes it impossible to accidentally deploy untested
 code. The workflow itself enforces good practices.
 
+\newpage
 ## Key Takeaways
 
 Make's syntax might seem intimidating at first, especially if you're coming from modern DevOps tools with YAML configurations or graphical interfaces. But this apparent complexity masks a powerful simplicity: Make provides a way to document, organize, and execute your DevOps workflows that is both human-readable and machine-executable.

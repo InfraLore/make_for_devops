@@ -28,6 +28,7 @@ Makefile issues with just a few simple checks:
 2. **Test your help**: `make help` should work and be useful to newcomers
 3. **Check for typos**: `make nonexistent-target` should give a clear error,
    not silent failure
+\newpage
 4. **Validate variables**: Add simple checks like `@test -n "$(REQUIRED_VAR)"
    || (echo "REQUIRED_VAR not set" && exit 1)`
 5. **Use .PHONY**: Declare your action targets as `.PHONY: build test deploy clean`
@@ -69,6 +70,7 @@ actually adds value:
 - Targets have no complex logic or dependencies
 - You haven't actually encountered bugs
 
+\newpage
 ## Quick Validation with Make's Dry Run
 
 Make's `--dry-run` (or `-n`) flag is the single most valuable testing tool you
@@ -100,10 +102,11 @@ test-build-deps:
 		(echo "deploy should run test first" && exit 1)
 ```
 
+\newpage
 ## Static Analysis with Checkmake
 
-**Checkmake** is a linting tool for Makefiles. It's useful for teams but often
-overkill for individual projects.
+**Checkmake** (https://github.com/checkmake/checkmake) is a linting tool for
+Makefiles. It's useful for teams but often overkill for individual projects.
 
 \begin{calloutbox}[Linting: Useful for Teams, Overkill for Individuals]
 \textbf{Use checkmake when:}
@@ -330,7 +333,7 @@ test-docs: ## Verify documentation is complete
 	@test $(make help | wc -l) -gt 5 || \
 		echo "Warning: Help seems sparse"
 ```
-
+\newpage
 ### Performance Testing
 
 For very large Makefiles:
@@ -358,7 +361,7 @@ install-hooks:
 	@chmod +x .git/hooks/pre-commit
 	@echo "Git hook installed"
 ```
-
+\newpage
 ## Troubleshooting Common Issues
 
 When tests fail, here's how to debug:
