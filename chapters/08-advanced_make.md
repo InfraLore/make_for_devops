@@ -36,6 +36,49 @@ Look for these signals that you need advanced features:
 
 These patterns indicate that your workflow has inherent structure that isn't captured in your Makefile. The advanced features in this chapter give you tools to make that implicit structure explicit and automatic.
 
+## Applying Advanced Features to Your Workflows
+
+You understand the tools. Now here's how to recognize when to use them in your actual DevOps work.
+
+### Start with Your Pain Points
+
+Look at your current Makefile. What makes you groan?
+
+- **"I just added a fifth environment and had to update 20 targets"** → Pattern rules
+- **"I keep forgetting to run the pre-deploy checks"** → Functions that bundle checks with deployment
+- **"I have to coordinate three repos in the right order"** → Recursive Make
+- **"Production needs different validation than staging"** → Conditional execution
+- **"Every team reinvents deployment slightly differently"** → Extensible frameworks
+
+### The Incremental Adoption Pattern
+
+Don't rewrite your Makefile. Add one advanced feature to solve one specific pain point:
+
+1. **Pick the most annoying duplication** - The targets you copy-paste most often
+2. **Convert just that set** - Leave everything else alone
+3. **Live with it for a week** - Does it actually help? Is it clear to others?
+4. **Refine or revert** - If it's not clearly better, go back to simple targets
+5. **Move to the next pain point** - Only after the first one proves valuable
+
+### Example Progression
+
+**Week 1**: You have `deploy-dev`, `deploy-staging`, `deploy-prod` that are 90% identical. Convert to `deploy-%` pattern rule. Three targets become one rule.
+
+**Week 3**: You realize every deployment should notify Slack but you keep forgetting. Create a `deploy_with_notification` function. Now it's automatic.
+
+**Week 5**: You're coordinating API, frontend, and worker deployments manually. Add recursive Make to orchestrate them. The sequence is now encoded, not tribal knowledge.
+
+### Warning Signs You're Over-Engineering
+
+- You're using pattern rules for two targets (just write two targets)
+- Your functions have functions calling functions (flatten it)
+- New team members can't figure out what `make deploy-prod` does (too much indirection)
+- You're writing advanced features "because we might need this later" (YAGNI)
+
+### The Test
+
+After adding an advanced feature, run `make -n <target>` and read the output. If you can't easily understand what will happen, you've gone too far. Revert to something simpler.
+
 \begin{calloutbox}[The Glide Path: Evolving to Advanced Features]
 Don't jump straight to advanced features—evolve into them naturally as your needs grow:
 
@@ -550,6 +593,7 @@ Use these features when they solve real problems:
 
 Don't use advanced features for their own sake. Simple, clear Makefiles beat clever, complex ones unless complexity solves a real problem.
 
+\newpage
 ### The Payoff:
 Advanced features turn duplication into abstraction without sacrificing
 visibility. Pattern rules let you write `deploy-%` once instead of copying
