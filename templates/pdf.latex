@@ -463,6 +463,10 @@ $endif$
       \vskip 0.5em
       {\LatoFont\footnotesize \textcolor{gray}{Git commit: $git_sha$}\par}
     $endif$
+    $if(git_date)$
+      \vskip 0.5em
+      {\LatoFont\footnotesize \textcolor{gray}{Git date: $git_date$}\par}
+    $endif$
     $if(logo)$
       \vskip 1em
       \includegraphics{$logo$} % logo

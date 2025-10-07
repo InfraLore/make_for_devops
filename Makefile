@@ -127,6 +127,7 @@ $(TMP_METADATA):
 	echo "git_sha: $(shell git rev-parse --short HEAD)" > $(TMP_METADATA)
 	echo "git_url: $(shell git config --get remote.origin.url | \
 		sed -E 's#git@([^:]+):#\1/#; s#\.git$$##')" >> $(TMP_METADATA)
+	echo "git_date: $(shell git log -1 --format=%cd --date=short)" >> $(TMP_METADATA)
 
 epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub
 
