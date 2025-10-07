@@ -66,7 +66,7 @@ Don't rewrite your Makefile. Add one advanced feature to solve one specific pain
 
 **Week 3**: You realize every deployment should notify Slack but you keep forgetting. Create a `deploy_with_notification` function. Now it's automatic.
 
-**Week 5**: You're coordinating API, frontend, and worker deployments manually. Add recursive Make to orchestrate them. The sequence is now encoded, not tribal knowledge.
+**Week 5**: You're coordinating API, frontend, and worker deployments manually. Add recursive Make to orchestrate them. The sequence is now encoded, not team lore.
 
 ### Warning Signs You're Over-Engineering
 
