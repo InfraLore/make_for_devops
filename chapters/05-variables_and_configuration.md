@@ -3,6 +3,32 @@
 \chaptersubtitle{Practical variable patterns that eliminate configuration drift
 without over-engineering your workflows.}
 
+## The Configuration Problem in DevOps
+
+We have a conundrum: we want one deployment script that works everywhere, but
+every environment is different.
+
+The traditional solutions all have problems:
+- **Separate scripts per environment**: Leads to drift—production gets a bug fix
+  that staging doesn't
+- **Template systems**: Hide what's actually running behind layers of
+  indirection
+- **External config management**: Adds dependencies and makes local development
+  painful
+- **Hard-coded values**: Everyone knows this is wrong but we've all done it
+
+Make's variable system offers a different approach: **one workflow with
+environment-aware defaults.** The same `make deploy` command works locally, in
+staging, and in production. The differences are captured in variables, not in
+separate scripts.
+
+The key insight: **configuration should be visible, not hidden.** When you run
+`make show-config`, you should see exactly what will be used. When you run `make
+deploy ENVIRONMENT=production`, you should understand what changed from the
+defaults.
+
+## You Need Some Variables
+
 Make's variable system is often presented as a powerful configuration management
 platform. While this is technically true, the reality for most DevOps teams is
 simpler: **you need a few variables with sensible defaults that users can easily
@@ -327,88 +353,39 @@ next time.
 Here's what most teams actually need:
 
 ```makefile
-# =============================================================================
-# Configuration
-# =============================================================================
-
+# Configuration with sensible defaults
 APP_NAME = myapp
 ENVIRONMENT ?= development
 VERSION ?= $(shell git describe --tags --always)
 
-# Environment-specific defaults
+# Environment-specific settings
 ifeq ($(ENVIRONMENT),production)
   REPLICAS = 3
   REGISTRY = prod-registry.company.com
-else ifeq ($(ENVIRONMENT),staging)
-  REPLICAS = 2
-  REGISTRY = staging-registry.company.com
 else
   REPLICAS = 1
   REGISTRY = localhost:5000
 endif
 
-# Computed values
 IMAGE_TAG = $(REGISTRY)/$(APP_NAME):$(VERSION)
 
-# =============================================================================
-# Validation
-# =============================================================================
-
-validate: ## Validate configuration
+# Validate before critical operations
+validate:
 	@test -n "$(VERSION)" || (echo "VERSION required" && exit 1)
-	@case "$(ENVIRONMENT)" in \
-		development|staging|production) ;; \
-		*) echo "Invalid ENVIRONMENT" && exit 1 ;; \
-	esac
-	@if [ "$(ENVIRONMENT)" = "production" ]; then \
-		test "$(REPLICAS)" -gt 1 || (echo "Prod needs REPLICAS > 1" && exit 1); \
-	fi
+	@test -n "$$DATABASE_PASSWORD" || (echo "Set DATABASE_PASSWORD" && exit 1)
 
-check-secrets:
-	@test -n "$$DATABASE_PASSWORD" || \
-		(echo "Set DATABASE_PASSWORD" && exit 1)
-
-# =============================================================================
-# Main Targets
-# =============================================================================
-
-.PHONY: deploy build show-config
-
-deploy: validate check-secrets ## Deploy application
-	@echo "→ Deploying $(APP_NAME) v$(VERSION) to $(ENVIRONMENT)"
-	@$(MAKE) build
-	@$(MAKE) push
+# Main workflow
+deploy: validate
+	@echo "Deploying $(IMAGE_TAG) to $(ENVIRONMENT)"
+	docker build -t $(IMAGE_TAG) . && docker push $(IMAGE_TAG)
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
-	@echo "✓ Deployed successfully"
 
-build: ## Build Docker image
-	docker build -t $(IMAGE_TAG) .
-
-push: ## Push Docker image
-	docker push $(IMAGE_TAG)
-
-show-config: ## Show current configuration
-	@echo "Configuration:"
-	@echo "  App:         $(APP_NAME)"
-	@echo "  Environment: $(ENVIRONMENT)"
-	@echo "  Version:     $(VERSION)"
-	@echo "  Image:       $(IMAGE_TAG)"
-	@echo "  Replicas:    $(REPLICAS)"
-
-# =============================================================================
-# Usage Examples
-# =============================================================================
-
-# make deploy                              # Deploy to dev
-# make deploy ENVIRONMENT=staging          # Deploy to staging  
-# make deploy ENVIRONMENT=production VERSION=v1.2.3  # Deploy to prod
+show-config:
+	@echo "Environment: $(ENVIRONMENT) | Version: $(VERSION) | Replicas: $(REPLICAS)"
 ```
 
-This is 60 lines and handles what most teams need:
-- Environment-aware defaults
-- Variable validation
-- Secret checking
-- Clear usage examples
+This shows variables, environment logic, validation, and computed values working
+together. Everything you need, nothing you don't.
 
 ## When to Use Reusable Variable Libraries
 
