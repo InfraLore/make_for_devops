@@ -9,13 +9,11 @@ We have a conundrum: we want one deployment script that works everywhere, but
 every environment is different.
 
 The traditional solutions all have problems:
-- **Separate scripts per environment**: Leads to drift—production gets a bug fix
-  that staging doesn't
-- **Template systems**: Hide what's actually running behind layers of
-  indirection
-- **External config management**: Adds dependencies and makes local development
-  painful
-- **Hard-coded values**: Everyone knows this is wrong but we've all done it
+
+* **Separate scripts per environment**: Leads to drift—production gets a bug fix that staging doesn't
+* **Template systems**: Hide what's actually running behind layers of indirection
+* **External config management**: Adds dependencies and makes local development painful
+* **Hard-coded values**: Everyone knows this is wrong but we've all done it
 
 Make's variable system offers a different approach: **one workflow with
 environment-aware defaults.** The same `make deploy` command works locally, in
@@ -314,7 +312,7 @@ validate-secrets:
 		(echo "DATABASE_PASSWORD too short" && exit 1)
 	@echo "✓ Secrets validated"
 ```
-
+\newpage
 ## Validation: Only What Prevents Real Bugs
 
 Don't validate everything. Validate what has caused actual problems:
@@ -348,6 +346,7 @@ deploy: validate-config
 **Add validation reactively** - when something breaks, add a check to prevent it
 next time.
 
+\newpage
 ## A Practical Complete Example
 
 Here's what most teams actually need:
@@ -387,6 +386,7 @@ show-config:
 This shows variables, environment logic, validation, and computed values working
 together. Everything you need, nothing you don't.
 
+\newpage
 ## When to Use Reusable Variable Libraries
 
 **Short answer: probably never.**
@@ -467,6 +467,7 @@ config-help: ## Show configuration help
 	@echo "  make deploy ENVIRONMENT=production VERSION=v1.0.0"
 ```
 
+\newpage
 ## Troubleshooting Configuration
 
 When things go wrong:
@@ -485,7 +486,8 @@ debug-config: ## Debug configuration values
 	@echo "Git branch: $(shell git rev-parse --abbrev-ref HEAD)"
 	@echo ""
 	@echo "=== Environment Variables ==="
-	@echo "DATABASE_PASSWORD: $$(test -n "$$DATABASE_PASSWORD" && echo "SET" || echo "NOT SET")"
+	@echo "DATABASE_PASSWORD: $$(test -n "$$DATABASE_PASSWORD" && echo "SET" || \
+	  echo "NOT SET")"
 	@echo "API_KEY: $$(test -n "$$API_KEY" && echo "SET" || echo "NOT SET")"
 ```
 
