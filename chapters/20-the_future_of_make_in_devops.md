@@ -945,7 +945,7 @@ So where do you go from here? Some suggestions:
 
 ## Final Thoughts
 
-Make's 48-year history teaches us something profound: **good solutions to
+Make's decades-long history teaches us something profound: **good solutions to
 fundamental problems endure**. The specific technologies change—we're not
 compiling C programs anymore—but the underlying need for discoverable,
 executable workflows remains constant.
