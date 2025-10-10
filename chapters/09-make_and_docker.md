@@ -9,6 +9,109 @@ Make provides the perfect orchestration layer for Docker workflows. Instead of r
 This chapter demonstrates how to create discoverable, maintainable Docker workflows using Make. We'll explore patterns for development environments, multi-stage builds, registry management, and local development with docker-compose.
 
 \newpage
+
+## Why Make When Docker Compose Exists?
+
+Docker Compose, Lando, Tilt, Skaffold, and dozens of other tools provide sophisticated Docker orchestration. So why add Make to the stack?
+
+**Make isn't replacing these tools—it's providing the discoverable interface to them.**
+
+Consider a typical project using Docker Compose:
+
+```bash
+# New engineer arrives, asks: "How do I start this?"
+# The answer is scattered across:
+- README.md (if current)
+- docker-compose.yml (configuration, not instructions)
+- .env.example (needs copying and editing)
+- Slack messages ("oh yeah, you need to run the migrations first")
+- Team lore ("restart Redis if it acts weird")
+```
+
+With Make as the interface:
+
+```makefile
+help: ## Show available commands
+	@echo "Development:"
+	@echo "  make dev        Start everything"
+	@echo "  make dev-reset  Fresh start (destroys data)"
+	@echo "  make logs       Show all logs"
+	@echo "  make shell      Get shell in app container"
+
+dev: ## Start development environment
+	@if [ ! -f .env ]; then \
+		cp .env.example .env; \
+		echo "Created .env - edit if needed"; \
+	fi
+	@docker-compose up -d
+	@$(MAKE) _wait-for-services
+	@$(MAKE) migrate
+	@echo "✓ Dev ready: http://localhost:8000"
+	@echo "  Logs: make logs"
+	@echo "  Shell: make shell"
+
+_wait-for-services:
+	@./scripts/wait-for-postgres.sh
+	@./scripts/wait-for-redis.sh
+```
+
+**Make provides what orchestration tools don't:**
+
+1. **Discoverability**: Docker Compose is powerful but doesn't tell you what to do. `docker-compose up` doesn't explain that you need to copy `.env.example` first, or run migrations, or wait for Postgres to be ready.
+
+2. **Workflow coordination**: Orchestration tools start services. They don't capture the sequence: "copy config, start services, wait for readiness, run migrations, show next steps."
+
+3. **Progressive disclosure**: `make help` shows common tasks. `make dev` handles the happy path. `make dev-reset` handles "my database is corrupted." The complexity is there when you need it, hidden when you don't.
+
+4. **Tool composition**: Your project might use Docker Compose for services, `go run` for the app during development, and `kubectl` for deployment. Make provides one consistent interface across all of them.
+
+5. **Team patterns**: Different engineers prefer different tools. Some use Docker Desktop, some use Colima, some use Podman. Make abstracts over these choices while still allowing them.
+
+**The pattern**: Use specialized tools for what they're good at, use Make for discoverability and coordination.
+
+```makefile
+# Make doesn't replace Docker Compose
+# It makes Docker Compose discoverable and composable
+
+dev: ## Start development (using Docker Compose)
+	@docker-compose up -d
+	@$(MAKE) dev-ready
+
+dev-ready:
+	@./scripts/wait-for-services.sh
+	@$(MAKE) migrate
+	@echo "Ready at http://localhost:8000"
+
+# Make doesn't replace Lando
+# It provides a consistent interface whether you use Lando or not
+
+dev-lando: ## Start development (using Lando)
+	@lando start
+	@$(MAKE) dev-ready  # Same post-startup steps
+
+# Make doesn't replace kubectl
+# It makes kubectl commands discoverable and safer
+
+deploy: ## Deploy to staging
+	@$(MAKE) build
+	@$(MAKE) test
+	@kubectl apply -f k8s/staging/
+	@$(MAKE) wait-for-rollout
+```
+
+**When to skip Make**: If your project is simple enough that `docker-compose up` is literally all anyone needs, skip Make. But the moment you have:
+- Pre-startup steps (copying config, checking prerequisites)
+- Post-startup steps (migrations, seeding data, health checks)
+- Multiple environments (dev, test, CI)
+- Multiple ways to run locally (Compose, Lando, native)
+- Testing, building, or deployment workflows
+
+...then Make's discoverability layer starts providing real value.
+
+**The test**: Can a new engineer run one command to get started? Can they discover what else is possible? Can they understand the workflow without reading documentation?
+
+If yes, you probably have Make (or something like it) providing that interface. If no, you're relying on documentation staying current and team lore.
+
 ## Discovering Docker Workflows
 
 The traditional approach to Docker involves remembering complex commands:

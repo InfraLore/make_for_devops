@@ -148,6 +148,7 @@ specific reason not to. \end{calloutbox}
 
 Here's how to handle different environments without over-engineering:
 
+\pagebreak
 ### Level 1: Simple Conditionals (Start Here)
 
 For 2-3 environments with a few different settings:
@@ -209,6 +210,7 @@ BACKUP_ENABLED = true
 
 The `-include` (with dash) means Make won't error if the file doesn't exist.
 
+\newpage
 ### Level 3: External Config Systems (For Large Organizations)
 
 Only reach for external systems when:
@@ -416,7 +418,7 @@ VERSION ?= $(shell git describe --tags --always --dirty)
 GIT_COMMIT = $(shell git rev-parse --short HEAD)
 GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 ```
-
+\pagebreak
 ### Build Metadata
 
 ```makefile
@@ -439,7 +441,7 @@ CLEAN_BRANCH = $(shell git branch --show-current | \
 	sed 's/[^a-z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
 NAMESPACE = $(APP_NAME)-$(CLEAN_BRANCH)
 ```
-
+\newpage
 ## Configuration Help and Documentation
 
 Make your configuration discoverable:

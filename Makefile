@@ -18,7 +18,7 @@ PART_3 = parts/part-3.md chapters/09-make_and_docker.md chapters/10-make_and_kub
 PART_4 = parts/part-4.md chapters/13-make_for_infrastructure_provisioning.md chapters/14-make_for_infrastructure_reliability.md chapters/15-make_for_monitoring_and_metrics.md chapters/16-make_for_logging_and_incident_response.md chapters/17-security_and_compliance_workflows.md
 PART_5 = parts/part-5.md chapters/18-scaling_make_across_teams_and_projects.md chapters/19-troubleshooting_and_debugging_make_workflows.md chapters/20-the_future_of_make_in_devops.md
 
-APPENDICES = chapters/Appendix_A-quick_referrence_guide.md chapters/Appendix_B-migration_strategies.md
+APPENDICES = chapters/Appendix_A-quick_referrence_guide.md chapters/Appendix_B-migration_strategies.md chapters/Appendix_C-prompt_templates.md
 
 CHAPTERS = $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) $(APPENDICES)
 
