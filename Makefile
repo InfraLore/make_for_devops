@@ -16,7 +16,7 @@ PART_1 = parts/part-1.md chapters/01-why_make.md chapters/02-executable_readme.m
 PART_2 = parts/part-2.md chapters/04-testing_and_validating.md chapters/05-variables_and_configuration.md chapters/06-phony_targets_and_task_organization.md chapters/07-dependency_management.md chapters/08-advanced_make.md
 PART_3 = parts/part-3.md chapters/09-make_and_docker.md chapters/10-make_and_kubernetes.md chapters/11-make_and_ci_cd.md chapters/12-make_in_the_ci_cd_ecosystem.md
 PART_4 = parts/part-4.md chapters/13-make_for_infrastructure_provisioning.md chapters/14-make_for_infrastructure_reliability.md chapters/15-make_for_monitoring_and_metrics.md chapters/16-make_for_logging_and_incident_response.md chapters/17-security_and_compliance_workflows.md
-PART_5 = parts/part-5.md chapters/18-scaling_make_across_teams_and_projects.md chapters/19-troubleshooting_and_debugging_make_workflows.md chapters/20-the_future_of_make_in_devops.md
+PART_5 = parts/part-5.md chapters/18-scaling_make_across_teams_and_projects.md chapters/19-troubleshooting_and_debugging_make_workflows.md chapters/20-the_future_of_make_in_devops.md chapters/21-make_as_your_personal_learning_tool.md
 
 APPENDICES = chapters/Appendix_A-quick_referrence_guide.md chapters/Appendix_B-migration_strategies.md chapters/Appendix_C-prompt_templates.md
 
