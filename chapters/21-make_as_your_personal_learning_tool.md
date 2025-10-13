@@ -1,77 +1,42 @@
 # Chapter 21: Make as Your Personal Learning Tool
 
-\chaptersubtitle{Building your DevOps knowledge base one command at a time,
-transforming the steep learning curve into accumulated expertise.}
+\chaptersubtitle{Building your DevOps knowledge base one command at a time, transforming the steep learning curve into accumulated expertise.}
 
-Chapter 20 explored Make's future in an AI-augmented, cloud-native world. But
-there's a more immediate, personal reason to use Make: **it's the best tool for
-managing your own learning journey through the overwhelming complexity of modern
-DevOps.**
+Chapter 20 explored Make's future in an AI-augmented, cloud-native world. But there's a more immediate, personal reason to use Make: **it's the best tool for managing your own learning journey through the overwhelming complexity of modern DevOps.**
 
-You're learning Kubernetes. Every `kubectl` command has flags you can't
-remember. You Google "kubernetes get pod logs" for the tenth time. You finally
-craft the perfect command to debug a failing deployment, and three weeks later
-you need it again—but you've forgotten it.
+You're learning Kubernetes. Every `kubectl` command has flags you can't remember. You Google "kubernetes get pod logs" for the tenth time. You finally craft the perfect command to debug a failing deployment, and three weeks later you need it again—but you've forgotten it.
 
-You're working with Docker. Was it `docker system prune` or `docker prune
-system`? Does `-a` remove all images or just unused ones? You found the answer
-last month, but now you're Googling again.
+You're working with Docker. Was it `docker system prune` or `docker prune system`? Does `-a` remove all images or just unused ones? You found the answer last month, but now you're Googling again.
 
-You're using the AWS CLI. That command to list all S3 buckets with their
-sizes—you know you've written it before. It had some `jq` magic to format the
-output nicely. Where did you save it? Was it in that Slack thread? That terminal
-history is long gone.
+You're using the AWS CLI. That command to list all S3 buckets with their sizes—you know you've written it before. It had some `jq` magic to format the output nicely. Where did you save it? Was it in that Slack thread? That terminal history is long gone.
 
-This chapter isn't about team workflows or organizational standards. It's about
-you, learning complex tools, trying to remember what you've learned, and
-building expertise over time. Make can be your personal knowledge
-base—executable, searchable, and always current.
+This chapter isn't about team workflows or organizational standards. It's about you, learning complex tools, trying to remember what you've learned, and building expertise over time. Make can be your personal knowledge base—executable, searchable, and always current.
 
 ## The One-Liner Problem
 
-Modern DevOps involves dozens of specialized tools, each with hundreds of
-commands, each command with dozens of flags. The learning curve isn't a
-curve—it's a cliff.
+Modern DevOps involves dozens of specialized tools, each with hundreds of commands, each command with dozens of flags. The learning curve isn't a curve—it's a cliff.
 
 Consider what you need to know:
 
-**Kubernetes**: `kubectl` has over 50 subcommands. Getting logs from a crashed
-pod requires knowing about `--previous`. Debugging network issues means
-understanding `kubectl exec`, port-forwarding, and pod DNS resolution. You learn
-these through painful experience, one incident at a time.
+**Kubernetes**: `kubectl` has over 50 subcommands. Getting logs from a crashed pod requires knowing about `--previous`. Debugging network issues means understanding `kubectl exec`, port-forwarding, and pod DNS resolution. You learn these through painful experience, one incident at a time.
 
-**Docker**: Building images, managing containers, cleaning up volumes,
-inspecting networks, debugging networking, security scanning. Each operation has
-its own syntax, its own flags, its own gotchas.
+**Docker**: Building images, managing containers, cleaning up volumes, inspecting networks, debugging networking, security scanning. Each operation has its own syntax, its own flags, its own gotchas.
 
-**Git**: Beyond basic commits, there's rebasing, cherry-picking, bisecting,
-reflog archaeology, submodule management. The commands you need once a month but
-can never quite remember.
+**Git**: Beyond basic commits, there's rebasing, cherry-picking, bisecting, reflog archaeology, submodule management. The commands you need once a month but can never quite remember.
 
-**Cloud CLIs**: AWS CLI has thousands of commands. Each one returns JSON you
-need to parse with `jq`. The command to find unused security groups involves
-three AWS API calls and complex filtering.
+**Cloud CLIs**: AWS CLI has thousands of commands. Each one returns JSON you need to parse with `jq`. The command to find unused security groups involves three AWS API calls and complex filtering.
 
-**Infrastructure as Code**: Terraform commands, Ansible playbooks, Helm charts.
-Each tool has its own way of doing things, its own debugging approach, its own
-"why isn't this working?" investigation pattern.
+**Infrastructure as Code**: Terraform commands, Ansible playbooks, Helm charts. Each tool has its own way of doing things, its own debugging approach, its own "why isn't this working?" investigation pattern.
 
-You learn these tools gradually. You encounter a problem, search Stack Overflow,
-find a solution, solve the problem. Two weeks later, you encounter the same
-problem and can't remember the solution. The cycle repeats.
+You learn these tools gradually. You encounter a problem, search Stack Overflow, find a solution, solve the problem. Two weeks later, you encounter the same problem and can't remember the solution. The cycle repeats.
 
-**The traditional approach**: Keep notes. Maybe a personal wiki. Or a notes app.
-Or bookmarked Stack Overflow answers. Or saved Slack messages. Or comments in
-your terminal history. The knowledge is scattered, inconsistent, and divorced
-from the actual work.
+**The traditional approach**: Keep notes. Maybe a personal wiki. Or a notes app. Or bookmarked Stack Overflow answers. Or saved Slack messages. Or comments in your terminal history. The knowledge is scattered, inconsistent, and divorced from the actual work.
 
-**The Make approach**: When you learn something, add it to your Makefile. The
-knowledge lives where you need it, in executable form.
+**The Make approach**: When you learn something, add it to your Makefile. The knowledge lives where you need it, in executable form.
 
 ## Your Personal Runbook
 
-A Makefile can be your personal command reference—a living document that grows
-with your knowledge:
+A Makefile can be your personal command reference—a living document that grows with your knowledge:
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -105,8 +70,7 @@ The pattern is: learn it, capture it, never look it up again.
 
 ## Building Your kubectl Knowledge Base
 
-Kubernetes is the poster child for "commands you can never remember." Here's how
-Make helps:
+Kubernetes is the poster child for "commands you can never remember." Here's how Make helps:
 
 ### Starting Point: Basic Operations
 
@@ -137,9 +101,7 @@ k8s-pod-shell: ## Get shell in pod
 	kubectl exec -it $pod -- /bin/sh
 ```
 
-You learn these through necessity. A pod won't start—you learn `kubectl
-describe`. A service isn't reachable—you learn how to debug networking from
-inside a pod. Each lesson gets captured.
+You learn these through necessity. A pod won't start—you learn `kubectl describe`. A service isn't reachable—you learn how to debug networking from inside a pod. Each lesson gets captured.
 
 ### Expert Level: Complex Operations
 
@@ -157,14 +119,11 @@ k8s-check-certificate: ## Check certificate expiration
 		openssl x509 -noout -dates
 ```
 
-These are commands you built up over time. Some came from Stack Overflow. Some
-you crafted yourself through trial and error. Some a senior engineer showed you
-during an incident. Now they're all in one place, ready to use.
+These are commands you built up over time. Some came from Stack Overflow. Some you crafted yourself through trial and error. Some a senior engineer showed you during an incident. Now they're all in one place, ready to use.
 
 ## Docker Operations You Always Forget
 
-Docker has the same problem—commands you use regularly but can never quite
-remember:
+Docker has the same problem—commands you use regularly but can never quite remember:
 
 ```makefile
 docker-clean-containers: ## Remove all stopped containers
@@ -180,8 +139,7 @@ docker-logs-tail: ## Tail logs from container
 	docker logs -f --tail=100 $container
 ```
 
-Every time you Google "docker remove all stopped containers," you're reminded:
-this should be in your Makefile.
+Every time you Google "docker remove all stopped containers," you're reminded: this should be in your Makefile.
 
 ## Git Archaeology and Complex Operations
 
@@ -201,26 +159,13 @@ git-branch-cleanup: ## Delete local branches that are merged
 	git branch --merged main | grep -v "main" | xargs -n 1 git branch -d
 ```
 
-That `git-find-large-files` command took you 20 minutes to craft when you needed
-to figure out why your repository was so large. You found it on Stack Overflow,
-tested it, modified it. Now it's saved forever.
+That `git-find-large-files` command took you 20 minutes to craft when you needed to figure out why your repository was so large. You found it on Stack Overflow, tested it, modified it. Now it's saved forever.
 
-**A word about Git aliases**: Git has its own alias system (`git config --global
-alias.undo 'reset --soft HEAD~1'`), and if you want to be taken seriously as a
-developer, you should learn to use it. Git aliases are the proper tool for Git
-commands.
+**A word about Git aliases**: Git has its own alias system (`git config --global alias.undo 'reset --soft HEAD~1'`), and if you want to be taken seriously as a developer, you should learn to use it. Git aliases are the proper tool for Git commands.
 
-But here's the thing: Make might be more familiar to you right now. If you're
-just learning Git's more advanced features, capturing them in your Makefile is
-fine—it's empowering to use a tool you already understand. Just be prepared to
-migrate them to proper Git aliases once you're comfortable. Think of Make as
-training wheels for complex Git operations.
+But here's the thing: Make might be more familiar to you right now. If you're just learning Git's more advanced features, capturing them in your Makefile is fine—it's empowering to use a tool you already understand. Just be prepared to migrate them to proper Git aliases once you're comfortable. Think of Make as training wheels for complex Git operations.
 
-The same applies to any tool-specific commands. Most tools have their own alias
-or configuration systems. Make can temporarily fill that role while you're
-learning, but eventually you should use the tool's native features. Make is best
-for **orchestrating multiple tools**, not replacing each tool's built-in
-capabilities.
+The same applies to any tool-specific commands. Most tools have their own alias or configuration systems. Make can temporarily fill that role while you're learning, but eventually you should use the tool's native features. Make is best for **orchestrating multiple tools**, not replacing each tool's built-in capabilities.
 
 ## Cloud CLI Complexity
 
@@ -243,9 +188,7 @@ aws-list-unencrypted-volumes: ## Find unencrypted EBS volumes
 		--query 'Volumes[*].[VolumeId,Size,State]' --output table
 ```
 
-These commands often involve multiple API calls, JSON parsing with `jq`, date
-arithmetic, and complex filtering. You figure them out once, capture them, never
-look them up again.
+These commands often involve multiple API calls, JSON parsing with `jq`, date arithmetic, and complex filtering. You figure them out once, capture them, never look them up again.
 
 ## The Learning Progression
 
@@ -290,8 +233,7 @@ docker-network-debug: ## Debug container networking
 	docker inspect $$c | jq -r '.[0].NetworkSettings'
 ```
 
-You're writing commands you couldn't have written three months ago. Each one
-represents a problem you solved, a lesson learned.
+You're writing commands you couldn't have written three months ago. Each one represents a problem you solved, a lesson learned.
 
 ### Month 6: Teaching Others
 ```makefile
@@ -310,41 +252,31 @@ k8s-incident-checklist: ## Run through incident debugging checklist
 	@echo "Next: 'make k8s-debug-pod' for specific pod investigation"
 ```
 
-Your Makefile has become a teaching tool. New team members can follow your
-incident response process.
+Your Makefile has become a teaching tool. New team members can follow your incident response process.
 
 ## From Personal to Team Knowledge
 
-At some point, your personal Makefile becomes valuable to your team. This
-transition happens naturally:
+At some point, your personal Makefile becomes valuable to your team. This transition happens naturally:
 
 A teammate asks: "How do you find which pods are crashlooping?"
 
-You answer: "I have a Make target for that. Check out `make
-k8s-find-crashlooping` in my Makefile."
+You answer: "I have a Make target for that. Check out `make k8s-find-crashlooping` in my Makefile."
 
-They look at your Makefile and find a dozen other useful commands. They ask if
-they can copy it.
+They look at your Makefile and find a dozen other useful commands. They ask if they can copy it.
 
-**This is the transition point**: your personal learning tool becomes team
-documentation.
+**This is the transition point**: your personal learning tool becomes team documentation.
 
 You might:
 
-1. **Share it directly**: "Here's my personal runbook Makefile, copy what's
-   useful"
+1. **Share it directly**: "Here's my personal runbook Makefile, copy what's useful"
 
-2. **Create a team version**: Extract the most useful commands into a team
-   Makefile
+2. **Create a team version**: Extract the most useful commands into a team Makefile
 
-3. **Contribute to project Makefiles**: Add your learned commands to
-   project-specific Makefiles
+3. **Contribute to project Makefiles**: Add your learned commands to project-specific Makefiles
 
-4. **Build a library**: Create `~/.make/personal.mk` that you include in all
-   your projects
+4. **Build a library**: Create `~/.make/personal.mk` that you include in all your projects
 
-The knowledge you captured personally becomes institutional knowledge. The
-commands you learned through painful experience become accessible to everyone.
+The knowledge you captured personally becomes institutional knowledge. The commands you learned through painful experience become accessible to everyone.
 
 ## Making It Searchable
 
@@ -370,9 +302,7 @@ aws-list-buckets:
 aws-cost-by-service:
 ```
 
-Now you can use shell completion: `make k8s-<TAB>` shows all Kubernetes
-commands. `make docker-<TAB>` shows all Docker commands. Your Makefile becomes a
-searchable command index.
+Now you can use shell completion: `make k8s-<TAB>` shows all Kubernetes commands. `make docker-<TAB>` shows all Docker commands. Your Makefile becomes a searchable command index.
 
 Some people take this further:
 
@@ -384,36 +314,36 @@ search: ## Search for commands by keyword
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-30s %s\n", $$1, $$2}'
 ```
 
-Now `make search` lets you find commands by description: "logging", "network",
-"debug", etc.
+Now `make search` lets you find commands by description: "logging", "network", "debug", etc.
 
 ## AI-Augmented Learning
 
-Recall from Chapter 20 that AI tools amplify existing good practices. Your
-personal learning Makefile becomes even more powerful with AI assistance:
+Recall from Chapter 20 that AI tools amplify existing good practices. Your personal learning Makefile becomes even more powerful with AI assistance:
 
 ```makefile
-ai-explain: ## Explain a command before running it
+LLM_MODEL ?= qwen3:4B
+
+llm-explain: ## Explain what a target does before running it
 	@echo "Target name:"
 	@read target; \
-	echo "Explaining: make $$target"; \
-	make -n $$target | ai-cli explain-command
+	echo "Explaining: make $target"; \
+	make -n $target | llm -m $(LLM_MODEL) "Explain what this command does in simple terms"
 
-ai-suggest: ## Get AI suggestion for a task
-	@echo "What do you want to do?"
-	@read task; \
-	llm cmd "$$task" "Available targets: $$(make -qp | grep -E '^[a-zA-Z_-]+:' | cut -d: -f1 | sort)"
+llm-improve: ## Get suggestions for improving a command
+	@echo "Target name:"
+	@read target; \
+	make -n $target | llm -m $(LLM_MODEL) "Suggest improvements to this command for safety and clarity"
 ```
+
+This uses `llm`, Simon Willison's CLI tool for working with language models. It works with local models (free) or various cloud APIs. The examples above use Qwen3:4B, a capable open model you can run locally. The open-source LLM space changes fast, so this model is probably very outdated. Use whichever model you prefer.
 
 AI can help you:
 - Explain complex commands before you run them
-- Suggest relevant targets based on what you're trying to do
-- Generate new targets from descriptions
-- Find similar commands you've already captured
+- Suggest improvements for safety and clarity
+- Understand what unfamiliar flags do
+- Learn from commands you've captured
 
-But the foundation—your captured knowledge in the Makefile—is what makes AI
-assistance effective. AI without context generates generic solutions. AI with
-your accumulated expertise generates personalized, relevant help.
+But the foundation—your captured knowledge in the Makefile—is what makes AI assistance effective. AI without context generates generic solutions. AI with your accumulated expertise generates personalized, relevant help.
 
 ## The Compound Effect
 
@@ -424,18 +354,15 @@ The real power emerges over time. Each command you capture:
 - Builds toward a comprehensive personal reference
 - Compounds with every addition
 
-After a year, you have hundreds of captured commands. Operations that used to
-require Google searches now just require `make <tab>`. Problems that used to
-require asking senior engineers now have solutions in your Makefile.
+After a year, you have hundreds of captured commands. Operations that used to require Google searches now just require `make <tab>`. Problems that used to require asking senior engineers now have solutions in your Makefile.
 
-You've built your own DevOps reference manual, customized to the tools you use,
-the problems you face, and the way you think.
+You've built your own DevOps reference manual, customized to the tools you use, the problems you face, and the way you think.
 
 ## Practical Patterns
 
 ### The Personal `.make` Directory
 
-Keep your personal commands separate from project commands:
+Keep your personal commands in a dedicated file:
 
 ```bash
 # ~/.make/personal.mk
@@ -448,18 +375,50 @@ docker-clean:
 	docker system prune -af
 ```
 
-Then in any project:
+Then add a shell alias to make it easy to use:
+
+```bash
+# In your ~/.bashrc or ~/.zshrc
+alias pmake='make -f ~/.make/personal.mk'
+```
+
+Now from anywhere: `pmake k8s-contexts`, `pmake docker-clean`.
+
+Your personal commands are always available, separate from project-specific Makefiles. As you learn new commands, add them to `~/.make/personal.mk`. Over time, you build a comprehensive personal runbook that follows you across all your projects.
+
+**For project-specific learning**: You can also include your personal commands in project Makefiles:
 
 ```makefile
 # Project Makefile
 -include ~/.make/personal.mk
 
-# Project-specific targets
 dev:
 	docker-compose up
-
-# Now you have both project commands and personal commands
 ```
+
+Now `make k8s-contexts` works in the project directory alongside project-specific targets.
+
+**For team learning**: Consider creating a team runbook alongside your personal one:
+
+```makefile
+# In the project repository: .make/team-runbook.mk
+# Useful commands anyone on the team might need
+
+k8s-production-pods: ## List production pods
+	kubectl --context production get pods -n $(APP_NAME)
+
+debug-production-logs: ## Get recent production logs
+	kubectl --context production logs \
+		-n $(APP_NAME) -l app=$(APP_NAME) --tail=100
+```
+
+Include it in the project Makefile:
+
+```makefile
+-include .make/team-runbook.mk
+```
+
+The team runbook captures commands that are useful across the team but don't belong in the main workflow. It's a place to document "how do I check production logs?" or "how do I debug this service?" without cluttering the primary Makefile. Team members add commands as they learn them, building shared knowledge over time.
 
 ### Command Templates
 
@@ -492,8 +451,7 @@ Future you will appreciate the context.
 
 ## The Meta-Benefit
 
-Here's the surprising benefit: **building your Makefile teaches you the tools
-better**.
+Here's the surprising benefit: **building your Makefile teaches you the tools better**.
 
 When you capture a command, you think about:
 - What does this actually do?
@@ -501,18 +459,15 @@ When you capture a command, you think about:
 - What are the parameters?
 - What could go wrong?
 
-This reflection deepens your understanding. You're not just copying
-commands—you're building mental models of how the tools work.
+This reflection deepens your understanding. You're not just copying commands—you're building mental models of how the tools work.
 
-The Makefile becomes a scaffold for learning. Each captured command is a lesson
-learned and preserved.
+The Makefile becomes a scaffold for learning. Each captured command is a lesson learned and preserved.
 
 ## Key Takeaways
 
 Make as a personal learning tool:
 
-1. **Capture knowledge immediately** - When you learn a useful command, add it
-   to your Makefile
+1. **Capture knowledge immediately** - When you learn a useful command, add it to your Makefile
 2. **Start simple** - Even basic commands are worth capturing
 3. **Grow organically** - Your Makefile grows with your expertise
 4. **Use consistent naming** - Prefixes make commands discoverable
@@ -521,36 +476,22 @@ Make as a personal learning tool:
 7. **Make it searchable** - Use `make help` and tab completion
 8. **Leverage AI** - Your captured knowledge makes AI assistance more effective
 
-The steep learning curve of modern DevOps tools becomes manageable when you have
-a personal knowledge base that grows with you. Each command captured is time
-saved in the future. Each problem solved becomes a lesson preserved.
+The steep learning curve of modern DevOps tools becomes manageable when you have a personal knowledge base that grows with you. Each command captured is time saved in the future. Each problem solved becomes a lesson preserved.
 
 You don't need to remember everything. You just need to capture it once.
 
 ## Where This Leads
 
-We've come full circle. This book started with Make as a tool for team workflows
-and organizational standards. We explored discoverability, executable
-documentation, and reducing cognitive load. We looked at the future with AI and
-cloud-native technologies.
+We've come full circle. This book started with Make as a tool for team workflows and organizational standards. We explored discoverability, executable documentation, and reducing cognitive load. We looked at the future with AI and cloud-native technologies.
 
-But ultimately, Make's value starts with you: one engineer, learning complex
-tools, trying to remember what you've learned, building expertise one command at
-a time.
+But ultimately, Make's value starts with you: one engineer, learning complex tools, trying to remember what you've learned, building expertise one command at a time.
 
-Your personal Makefile becomes team documentation. Team documentation becomes
-organizational knowledge. Organizational knowledge becomes the culture of
-executable documentation that makes systems understandable, maintainable, and
-improvable.
+Your personal Makefile becomes team documentation. Team documentation becomes organizational knowledge. Organizational knowledge becomes the culture of executable documentation that makes systems understandable, maintainable, and improvable.
 
-It starts with: "I found this useful command. I should save it so I don't have
-to look it up again."
+It starts with: "I found this useful command. I should save it so I don't have to look it up again."
 
-That simple act—capturing knowledge in executable form—is the foundation of
-everything else.
+That simple act—capturing knowledge in executable form—is the foundation of everything else.
 
-Start there. Run `make help` in any project. If there's no Makefile, create one.
-Add one command. Then another. Let it grow.
+Start there. Run `make help` in any project. If there's no Makefile, create one. Add one command. Then another. Let it grow.
 
-The steep learning curve becomes a gentle slope when you build your knowledge
-base as you climb.
+The steep learning curve becomes a gentle slope when you build your knowledge base as you climb.
