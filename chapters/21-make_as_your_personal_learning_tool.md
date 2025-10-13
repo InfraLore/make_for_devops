@@ -386,7 +386,7 @@ Now from anywhere: `pmake k8s-contexts`, `pmake docker-clean`.
 
 Your personal commands are always available, separate from project-specific Makefiles. As you learn new commands, add them to `~/.make/personal.mk`. Over time, you build a comprehensive personal runbook that follows you across all your projects.
 
-However, you should consider moving your learning into a dedicated project space—this gives you significant advantages: you train your muscle memory to remember to type `make` instead of `pmake`, and you have a project you can share directly with others using GitHub or some other code sharing platform.
+However, you should consider moving your learning into a dedicated project space—this gives you significant advantages: you train your muscle memory to remember to type `make` instead of `pmake`, and you have a project you can share directly with others using GitHub or some other code sharing platform. Create a repository like devops-runbook with just a Makefile, and work there instead of ~/.make/personal.mk.
 
 **For project-specific learning**: You can also include your personal commands in project Makefiles:
 
