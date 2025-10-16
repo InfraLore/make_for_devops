@@ -172,9 +172,10 @@ sync-pdf: pdf
 	@echo "Copying PDF to iCloud Drive..."
 	@if [ -d "$(ICLOUD_PATH)" ]; then \
 		cp "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" "$(ICLOUD_PATH)/$(OUTPUT_FILENAME).pdf"; \
+		figlet "Make for Devops!"; \
 		echo "✅ PDF copied to iCloud Drive: $(ICLOUD_PATH)/$(OUTPUT_FILENAME).pdf"; \
 	else \
-		echo "✗ iCloud Drive not found at: $(ICLOUD_PATH)"; \
+		echo "❌ iCloud Drive not found at: $(ICLOUD_PATH)"; \
 		echo "  You can override with: make sync-pdf ICLOUD_PATH=/path/to/your/icloud"; \
 	fi
 
