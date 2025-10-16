@@ -111,7 +111,7 @@ endef
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx
+.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats
 
 all:	book
 
@@ -168,6 +168,7 @@ check-long-lines:
 	done
 
 sync-pdf: pdf
+	@echo ""
 	@echo "Copying PDF to iCloud Drive..."
 	@if [ -d "$(ICLOUD_PATH)" ]; then \
 		cp "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" "$(ICLOUD_PATH)/$(OUTPUT_FILENAME).pdf"; \
@@ -176,6 +177,65 @@ sync-pdf: pdf
 		echo "✗ iCloud Drive not found at: $(ICLOUD_PATH)"; \
 		echo "  You can override with: make sync-pdf ICLOUD_PATH=/path/to/your/icloud"; \
 	fi
+
+publish: sync-pdf stats
+	@echo ""
+	@echo "🚀 Publish complete! Our book is ready to read."
+
+stats:
+	@echo ""
+	@echo "📚 Book Statistics"
+	@echo "========================"
+	@main_chapters=$$(echo $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) | wc -w); \
+	appendix_count=$$(echo $(APPENDICES) | wc -w); \
+	total_chapters=$$(echo $(CHAPTERS) | wc -w); \
+	total_words=$$(cat $(CHAPTERS) 2>/dev/null | wc -w); \
+	total_lines=$$(cat $(CHAPTERS) 2>/dev/null | wc -l); \
+	main_words=$$(cat $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) 2>/dev/null | wc -w); \
+	appendix_words=$$(cat $(APPENDICES) 2>/dev/null | wc -w); \
+	echo "📖 Main chapters: $$main_chapters"; \
+	echo "📋 Appendices: $$appendix_count"; \
+	echo "📄 Total files: $$total_chapters"; \
+	echo ""; \
+	echo "📝 Main content: $$main_words words"; \
+	echo "📎 Appendices: $$appendix_words words"; \
+	echo "📊 Total words: $$total_words"; \
+	echo "📏 Total lines: $$total_lines"; \
+	echo ""; \
+	if [ -f "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" ]; then \
+		if command -v pdfinfo >/dev/null 2>&1; then \
+			pages=$$(pdfinfo "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" | grep "Pages:" | awk '{print $$2}'); \
+			title=$$(pdfinfo "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" | grep "Title:" | cut -d: -f2- | sed 's/^ *//'); \
+			author=$$(pdfinfo "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" | grep "Author:" | cut -d: -f2- | sed 's/^ *//'); \
+			creator=$$(pdfinfo "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" | grep "Creator:" | cut -d: -f2- | sed 's/^ *//'); \
+			echo "📑 PDF pages: $$pages"; \
+			echo "📖 PDF title: $$title"; \
+			echo "👤 PDF author: $$author"; \
+			echo "🔧 PDF creator: $$creator"; \
+		elif command -v mdls >/dev/null 2>&1; then \
+			pages=$$(mdls -name kMDItemNumberOfPages "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" | awk '{print $$3}'); \
+			title=$$(mdls -name kMDItemTitle "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" | cut -d= -f2 | sed 's/^ *"//;s/"$$//'); \
+			author=$$(mdls -name kMDItemAuthors "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" | cut -d= -f2 | sed 's/^ *"//;s/"$$//'); \
+			echo "📑 PDF pages: $$pages"; \
+			echo "📖 PDF title: $$title"; \
+			echo "👤 PDF author: $$author"; \
+		else \
+			echo "📑 PDF pages: (install pdfinfo to see metadata)"; \
+		fi; \
+		echo ""; \
+		echo "🔍 Git info embedded in PDF:"; \
+		git_sha=$$(grep -o "git_sha: [a-f0-9]*" $(TMP_METADATA) 2>/dev/null | cut -d: -f2 | sed 's/^ *//'); \
+		git_date=$$(grep -o "git_date: [0-9-]*" $(TMP_METADATA) 2>/dev/null | cut -d: -f2 | sed 's/^ *//'); \
+		if [ -n "$$git_sha" ]; then \
+			echo "📝 Git commit: $$git_sha"; \
+			echo "📅 Git date: $$git_date"; \
+		else \
+			echo "📝 Git info: (run 'make clean && make pdf' to embed)"; \
+		fi; \
+	else \
+		echo "📑 PDF pages: (run 'make pdf' first)"; \
+	fi; \
+	echo "";
 
 ####################################################################################################
 # File builders
