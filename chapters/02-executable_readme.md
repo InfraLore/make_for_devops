@@ -508,155 +508,71 @@ APP_NAME := legacyapp
 VERSION := $(shell git describe --tags --always --dirty)
 REGISTRY := registry.company.com
 IMAGE_NAME := $(REGISTRY)/$(APP_NAME)
-DATABASE_URL ?= postgresql://legacyapp:dev@localhost:5432/legacyapp
 
 .DEFAULT_GOAL := help
-.PHONY: help setup dev test build deploy clean
 
 help: ## Show available commands
 	@echo "LegacyApp Development Commands"
 	@echo "============================="
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
-		printf "  \033[36m%-15s\033[0m %s\n", $$1, \
-		(substr($$2, 1, 65) (length($$2)>65?"...":"")) \
+		printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
 	}' $(MAKEFILE_LIST)
 
-##@ Getting Started
-
-setup: ##   Complete project setup
-	@echo "Setting up LegacyApp development environment..."
-	@$(MAKE) check-system-requirements
-	@$(MAKE) create-env-file
+setup: ## Complete project setup
+	@echo "Setting up LegacyApp..."
+	@$(MAKE) check-requirements
 	@$(MAKE) install-dependencies
 	@$(MAKE) setup-database
-	@echo " Setup complete! Run 'make dev' to start development."
+	@echo "✓ Setup complete! Run 'make dev' to start."
 
-setup-system: ##   Install system requirements (Node.js, Python)
-	@echo "Installing system requirements..."
-	@command -v brew >/dev/null && $(MAKE) setup-macos || $(MAKE) setup-linux
-
-setup-macos:
-	brew install node@14 python@3.8 postgresql
-
-setup-linux:
-	sudo apt-get update
-	sudo apt-get install nodejs npm python3.8 python3-pip postgresql
-
-##@ Development
-
-dev: ##  Start development environment
-	@echo "Starting LegacyApp development environment..."
+dev: ## Start development environment
+	@echo "Starting development environment..."
 	@$(MAKE) ensure-database-running
-	@trap 'echo "Shutting down..."; kill %1 %2 %3; exit' INT; \
-	python app.py & \
-	npm start & \
-	python worker.py & \
-	echo " All services started. Press Ctrl+C to stop."; \
+	@trap 'kill %1 %2 %3; exit' INT; \
+	python app.py & npm start & python worker.py & \
+	echo "✓ All services started. Press Ctrl+C to stop."; \
 	wait
 
-test: ##   Run all tests
-	@echo "Running LegacyApp test suite..."
-	@$(MAKE) test-backend
-	@$(MAKE) test-frontend
-	@echo " All tests passed!"
+test: ## Run all tests
+	@echo "Running tests..."
+	@pytest -v && npm test
+	@echo "✓ All tests passed!"
 
-test-backend: ##  Run Python tests
-	pytest -v
-
-test-frontend: ##   Run JavaScript tests
-	npm test
-
-##@ Build & Deploy
-
-build: ##   Build Docker image
+build: ## Build Docker image
 	@echo "Building $(IMAGE_NAME):$(VERSION)..."
-	docker build -t $(IMAGE_NAME):$(VERSION) .
-	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo " Build complete"
+	@docker build -t $(IMAGE_NAME):$(VERSION) .
 
-deploy: build test ##   Deploy to staging
-	@echo "Deploying $(APP_NAME) version $(VERSION)..."
-	docker push $(IMAGE_NAME):$(VERSION)
-	kubectl apply -f k8s/
-	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_NAME):$(VERSION)
-	kubectl rollout status deployment/$(APP_NAME)
-	@echo " Deployment complete!"
+deploy: build test ## Deploy to staging
+	@echo "Deploying version $(VERSION)..."
+	@docker push $(IMAGE_NAME):$(VERSION)
+	@kubectl apply -f k8s/
+	@kubectl set image deployment/$(APP_NAME) \
+		app=$(IMAGE_NAME):$(VERSION)
 
-##@ Utilities
-
-check-system-requirements: ##   Verify system requirements
-	@echo "Checking system requirements..."
+check-requirements: ## Verify system requirements
 	@command -v node >/dev/null || \
-		(echo " Node.js required. Run 'make setup-system'" && exit 1)
+		(echo "✗ Node.js required" && exit 1)
 	@command -v python3 >/dev/null || \
-		(echo " Python 3 required. Run 'make setup-system'" && exit 1)
-	@command -v docker >/dev/null || \
-		(echo " Docker required. Please install Docker." && exit 1)
-	@echo " All system requirements met"
+		(echo "✗ Python required" && exit 1)
+	@echo "✓ Requirements met"
 
-create-env-file: ##  Create .env configuration file
-	@if [ ! -f .env ]; then \
-		echo "Creating .env file..."; \
-		echo "DATABASE_URL=$(DATABASE_URL)" > .env; \
-		echo "SECRET_KEY=$$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" >> .env; \
-		echo "API_KEY=your-api-key-here" >> .env; \
-		echo " Please edit .env and set your API_KEY"; \
-	else \
-		echo ".env file already exists"; \
-	fi
+install-dependencies: ## Install dependencies
+	@npm install --silent && \
+		pip install -r requirements.txt --quiet
 
-install-dependencies: ##   Install all dependencies
-	@echo "Installing dependencies..."
-	npm install --silent
-	pip install -r requirements.txt --quiet
-	@echo " Dependencies installed"
-
-setup-database: ##    Set up development database
-	@echo "Setting up database..."
-	@$(MAKE) start-database
-	@echo "Waiting for database to be ready..."
-	@timeout 30 bash -c 'until docker exec legacyapp-db pg_isready -U legacyapp; do sleep 1; done'
-	python manage.py migrate
-	@echo " Database ready"
-
-start-database: ## ▶  Start PostgreSQL database
+setup-database: ## Set up database
 	@docker run -d --name legacyapp-db \
 		-e POSTGRES_DB=legacyapp \
-		-e POSTGRES_USER=legacyapp \
-		-e POSTGRES_PASSWORD=dev \
-		-p 5432:5432 \
-		postgres:13 >/dev/null 2>&1 || echo "Database already running"
+		-p 5432:5432 postgres:13
+	@sleep 5 && python manage.py migrate
 
-ensure-database-running: ##   Ensure database is running
-	@docker ps | grep -q legacyapp-db || $(MAKE) start-database
+ensure-database-running: ## Ensure database is running
+	@docker ps | grep -q legacyapp-db || \
+		$(MAKE) setup-database
 
-config-help: ##   Show configuration help
-	@echo "LegacyApp Configuration"
-	@echo "====================="
-	@echo "Environment variables (set in .env file):"
-	@echo " DATABASE_URL  - PostgreSQL connection string"
-	@echo " SECRET_KEY    - Application secret (auto-generated)"
-	@echo " API_KEY       - External service API key (required)"
-	@echo ""
-	@echo "Current configuration:"
-	@echo " DATABASE_URL: $(DATABASE_URL)"
-	@echo " SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | \
-sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
-	@echo " API_KEY: $$(test -f .env && grep API_KEY .env | cut -d= -f2 | \
-sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
-
-clean: ##   Clean up development environment
-	@echo "Cleaning up..."
-	-docker stop legacyapp-db
-	-docker rm legacyapp-db
-	-docker rmi $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo " Cleanup complete"
-
-logs: ##   Show application logs (in Kubernetes)
-	kubectl logs -f deployment/$(APP_NAME)
-
-shell: ##   Get shell in running container
-	kubectl exec -it deployment/$(APP_NAME) -- /bin/bash
+clean: ## Clean up development environment
+	@docker stop legacyapp-db && docker rm legacyapp-db
+	@echo "✓ Cleanup complete"
 ````
 
 The transformation is dramatic. What was once a multi-step, error-prone setup

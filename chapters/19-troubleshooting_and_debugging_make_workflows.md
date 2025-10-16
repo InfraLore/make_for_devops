@@ -588,7 +588,8 @@ doctor: ## Run diagnostic checks
 _check-make-version:
 	@version=$$(make --version | head -1 | grep -o '[0-9.]\+'); \
 	required="4.0"; \
-	if [ "$$(printf '%s\n' "$$required" "$$version" | sort -V | head -n1)" != "$$required" ]; then \
+	if [ "$$(printf '%s\n' "$$required" "$$version" | \
+		sort -V | head -n1)" != "$$required" ]; then \
 		echo "Make version too old ($$version < $$required)"; \
 		exit 1; \
 	else \

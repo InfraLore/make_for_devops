@@ -444,7 +444,7 @@ Make helps prevent this:
 
 ```makefile
 # Enforce that AI agents (and humans) follow the full process
-deploy-production: check-required-approvals validate test security-scan ## Deploy to production
+deploy-production: check-required-approvals validate test security-scan
 	@echo "All checks passed. Deploying..."
 	@$(MAKE) _do-production-deploy
 

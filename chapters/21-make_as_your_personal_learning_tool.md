@@ -174,7 +174,10 @@ Cloud provider CLIs are particularly notorious for complex commands:
 ```makefile
 aws-list-buckets-sizes: ## List S3 buckets with sizes
 	aws s3 ls | awk '{print $3}' | \
-		xargs -I {} sh -c 'echo "{}:" && aws s3 ls s3://{} --recursive --summarize | grep "Total Size"'
+		xargs -I {} sh -c \
+		'echo "{}:" && \
+		aws s3 ls s3://{} --recursive --summarize | \
+		grep "Total Size"'
 
 aws-cost-by-service: ## Show costs by service this month
 	aws ce get-cost-and-usage \
@@ -327,12 +330,16 @@ llm-explain: ## Explain what a target does before running it
 	@echo "Target name:"
 	@read target; \
 	echo "Explaining: make $target"; \
-	make -n $target | llm -m $(LLM_MODEL) "Explain what this command does in simple terms"
+	make -n $target | \
+		llm -m $(LLM_MODEL) \
+		"Explain what this command does in simple terms"
 
 llm-improve: ## Get suggestions for improving a command
 	@echo "Target name:"
 	@read target; \
-	make -n $target | llm -m $(LLM_MODEL) "Suggest improvements to this command for safety and clarity"
+	make -n $target | \
+		llm -m $(LLM_MODEL) \
+		"Suggest improvements to this command for safety and clarity"
 ```
 
 This uses `llm`, Simon Willison's CLI tool for working with language models. It works with local models (free) or various cloud APIs. The examples above use Qwen3:4B, a capable open model you can run locally. The open-source LLM space changes fast, so this model is probably very outdated. Use whichever model you prefer.

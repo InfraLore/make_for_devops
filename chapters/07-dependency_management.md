@@ -394,7 +394,7 @@ Document parallelization decisions in your Makefile:
 validate-code: lint security-scan type-check ## Run code validations (parallel safe)
 
 # Sequential execution required - quality gate
-deploy-production: test push deploy verify ## Production deployment (sequential for safety)
+deploy-production: test push deploy verify ## Prod deployment (sequential for safety)
 	@echo "Production deployment follows strict sequence"
 
 # Parallel builds, sequential deployment

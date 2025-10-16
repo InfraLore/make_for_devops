@@ -191,13 +191,16 @@ Add categories to your help system:
 ```makefile
 help: ## Show available commands
 	@echo "Development:"
-	@grep -E '^(setup|dev).*##' $(MAKEFILE_LIST) | awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^(setup|dev).*##' $(MAKEFILE_LIST) | \
+		awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
 	@echo ""
 	@echo "Testing:"
-	@grep -E '^test.*##' $(MAKEFILE_LIST) | awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^test.*##' $(MAKEFILE_LIST) | \
+		awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
 	@echo ""
 	@echo "Deployment:"
-	@grep -E '^deploy.*##' $(MAKEFILE_LIST) | awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^deploy.*##' $(MAKEFILE_LIST) | \
+		awk -F ':.*##' '{printf "  %-20s %s\n", $$1, $$2}'
 ```
 
 Only add this when `make help` becomes overwhelming (25+ targets).

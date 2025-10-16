@@ -10,6 +10,10 @@ OUTPUT_FILENAME = MakeForDevops
 METADATA = metadata.yml
 TMP_METADATA = $(BUILD)/tmp-metadata.yml
 
+# Line length limits for code blocks
+OVERFLOW_LIMIT ?= 87
+LONG_LINE_LIMIT ?= 95
+
 
 # Chapters content organized by parts
 PART_1 = parts/part-1.md chapters/01-why_make.md chapters/02-executable_readme.md chapters/03-make_fundamentals.md
@@ -134,6 +138,31 @@ validate:
 	else \
 		echo "Validation passed."; \
 	fi
+
+check-overflow:
+	@echo "Checking for potentially overflowing code lines..."
+	@echo "Lines longer than $(OVERFLOW_LIMIT) characters in code blocks:"
+	@echo "================================================"
+	@for file in $(CHAPTERS); do \
+		if [ -f "$$file" ]; then \
+			awk -v limit=$(OVERFLOW_LIMIT) '/^```/ { in_code = !in_code; next } \
+			     in_code && length($$0) > limit { \
+			       print FILENAME ":" NR ":" length($$0) " chars: " substr($$0, 1, 60) "..." \
+			     }' "$$file"; \
+		fi; \
+	done
+
+check-long-lines:
+	@echo "Checking for very long lines ($(LONG_LINE_LIMIT)+ chars) in code blocks..."
+	@echo "=========================================================="
+	@for file in $(CHAPTERS); do \
+		if [ -f "$$file" ]; then \
+			awk -v limit=$(LONG_LINE_LIMIT) '/^```/ { in_code = !in_code; next } \
+			     in_code && length($$0) > limit { \
+			       print FILENAME ":" NR ":" length($$0) " chars: " substr($$0, 1, 40) "..." \
+			     }' "$$file"; \
+		fi; \
+	done
 
 ####################################################################################################
 # File builders
