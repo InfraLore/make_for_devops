@@ -37,6 +37,9 @@ MATH_FORMULAS = --webtex
 CONTENT = awk 'FNR==1 && NR!=1 {print "\n\n"}{print}' $(CHAPTERS)
 CONTENT_FILTERS = tee # Use this to add sed filters or other piped commands
 
+# iCloud Drive path (can be overridden)
+ICLOUD_PATH ?= /Users/hpottinger/Library/Mobile Documents/com~apple~CloudDocs
+
 # Debugging
 
 # DEBUG_ARGS = --verbose
@@ -101,7 +104,7 @@ define PROGRESS_BAR
 		fi; \
 		sleep 3; \
 	done; \
-	printf "\r$(1): ✓          \n"
+	printf "\r$(1): ✅          \n"
 endef
 
 ####################################################################################################
@@ -163,6 +166,16 @@ check-long-lines:
 			     }' "$$file"; \
 		fi; \
 	done
+
+sync-pdf: pdf
+	@echo "Copying PDF to iCloud Drive..."
+	@if [ -d "$(ICLOUD_PATH)" ]; then \
+		cp "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" "$(ICLOUD_PATH)/$(OUTPUT_FILENAME).pdf"; \
+		echo "✅ PDF copied to iCloud Drive: $(ICLOUD_PATH)/$(OUTPUT_FILENAME).pdf"; \
+	else \
+		echo "✗ iCloud Drive not found at: $(ICLOUD_PATH)"; \
+		echo "  You can override with: make sync-pdf ICLOUD_PATH=/path/to/your/icloud"; \
+	fi
 
 ####################################################################################################
 # File builders
