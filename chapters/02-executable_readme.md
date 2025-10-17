@@ -506,73 +506,37 @@ Run `make config-help` for configuration details.
 # LegacyApp Development Workflow
 APP_NAME := legacyapp
 VERSION := $(shell git describe --tags --always --dirty)
-REGISTRY := registry.company.com
-IMAGE_NAME := $(REGISTRY)/$(APP_NAME)
+IMAGE_NAME := registry.company.com/$(APP_NAME)
 
 .DEFAULT_GOAL := help
 
 help: ## Show available commands
-	@echo "LegacyApp Development Commands"
-	@echo "============================="
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
-		printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
+		printf "  %-15s %s\n", $$1, $$2 \
 	}' $(MAKEFILE_LIST)
 
 setup: ## Complete project setup
-	@echo "Setting up LegacyApp..."
-	@$(MAKE) check-requirements
-	@$(MAKE) install-dependencies
-	@$(MAKE) setup-database
-	@echo "✓ Setup complete! Run 'make dev' to start."
+	@command -v node >/dev/null || (echo "Node.js required" && exit 1)
+	@npm install --silent && pip install -r requirements.txt --quiet
+	@docker run -d --name legacyapp-db -e POSTGRES_DB=legacyapp \
+		-p 5432:5432 postgres:13
+	@sleep 5 && python manage.py migrate
+	@echo "✓ Setup complete!"
 
 dev: ## Start development environment
-	@echo "Starting development environment..."
-	@$(MAKE) ensure-database-running
+	@docker ps | grep -q legacyapp-db || $(MAKE) setup
 	@trap 'kill %1 %2 %3; exit' INT; \
-	python app.py & npm start & python worker.py & \
-	echo "✓ All services started. Press Ctrl+C to stop."; \
-	wait
+	python app.py & npm start & python worker.py & wait
 
 test: ## Run all tests
-	@echo "Running tests..."
 	@pytest -v && npm test
-	@echo "✓ All tests passed!"
 
 build: ## Build Docker image
-	@echo "Building $(IMAGE_NAME):$(VERSION)..."
 	@docker build -t $(IMAGE_NAME):$(VERSION) .
 
 deploy: build test ## Deploy to staging
-	@echo "Deploying version $(VERSION)..."
 	@docker push $(IMAGE_NAME):$(VERSION)
 	@kubectl apply -f k8s/
-	@kubectl set image deployment/$(APP_NAME) \
-		app=$(IMAGE_NAME):$(VERSION)
-
-check-requirements: ## Verify system requirements
-	@command -v node >/dev/null || \
-		(echo "✗ Node.js required" && exit 1)
-	@command -v python3 >/dev/null || \
-		(echo "✗ Python required" && exit 1)
-	@echo "✓ Requirements met"
-
-install-dependencies: ## Install dependencies
-	@npm install --silent && \
-		pip install -r requirements.txt --quiet
-
-setup-database: ## Set up database
-	@docker run -d --name legacyapp-db \
-		-e POSTGRES_DB=legacyapp \
-		-p 5432:5432 postgres:13
-	@sleep 5 && python manage.py migrate
-
-ensure-database-running: ## Ensure database is running
-	@docker ps | grep -q legacyapp-db || \
-		$(MAKE) setup-database
-
-clean: ## Clean up development environment
-	@docker stop legacyapp-db && docker rm legacyapp-db
-	@echo "✓ Cleanup complete"
 ````
 
 The transformation is dramatic. What was once a multi-step, error-prone setup
