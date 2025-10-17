@@ -61,7 +61,7 @@ Teams get useful defaults but retain complete control. They can use shared targe
 
 ## Building Discoverable Shared Libraries
 
-Shared libraries should be discoverable, not just documented:
+Shared libraries should be discoverable, not just documented (see next page):
 
 ```makefile
 # .make/docker.mk - Shared Docker workflows
@@ -130,7 +130,7 @@ VERSION         # Version being built/deployed
 ENVIRONMENT     # Target environment
 IMAGE_NAME      # Full Docker image name
 ```
-
+\pagebreak
 ### Help System Conventions
 
 ```makefile
@@ -144,7 +144,7 @@ help: ## Show available commands
 		awk 'BEGIN {FS = ":.*?## "}; \
 		{printf "  %-20s %s\n", $$1, $$2}'
 ```
-
+\pagebreak
 ## Creating Template Projects
 
 Templates help teams start with good patterns:

@@ -167,7 +167,7 @@ check-long-lines:
 		fi; \
 	done
 
-sync-pdf: pdf
+sync-pdf: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
 	@echo ""
 	@echo "Copying PDF to iCloud Drive..."
 	@if [ -d "$(ICLOUD_PATH)" ]; then \
@@ -182,6 +182,12 @@ sync-pdf: pdf
 publish: sync-pdf stats
 	@echo ""
 	@echo "🚀 Publish complete! Our book is ready to read."
+
+find_blank_pages: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+	@bin/pdf_blank_scanner.py $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+
+blank_pages_report: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+	@bin/pdf_blank_scanner.py $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf --create-report
 
 stats:
 	@echo ""

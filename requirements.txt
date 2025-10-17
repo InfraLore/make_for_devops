@@ -1,2 +1,4 @@
-ollama
 click
+pdf2image
+Pillow
+numpy

@@ -133,20 +133,16 @@ documentation should be updated. In practice, this rarely happens consistently:
 Consider this sequence:
 
 ```bash
-# Version 1 (documented 6 months ago)
-kubectl apply -f k8s/deployment.yaml
+kubectl apply -f k8s/deployment.yaml                 # v1 (documented 6 months ago)
 
-# Version 2 (documented 3 months ago)
+kubectl apply -f k8s/deployment.yaml                 # v2 (documented 3 months ago)
+kubectl rollout status deployment/myapp
+
+kubectl apply -f k8s/configmap.yaml                    # v3 (documented last month)
 kubectl apply -f k8s/deployment.yaml
 kubectl rollout status deployment/myapp
 
-# Version 3 (documented last month)
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/deployment.yaml
-kubectl rollout status deployment/myapp
-
-# Version 4 (current, undocumented)
-./scripts/validate-config.sh
+./scripts/validate-config.sh                           # v4 (current, undocumented)
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secrets.yaml
 kubectl apply -f k8s/deployment.yaml
@@ -592,6 +588,7 @@ don't need to be a Linux guru—we'll explain the shell concepts as we go.
 What you do need is a willingness to challenge your assumptions about how
 infrastructure should be documented and operated.
 
+\pagebreak
 ## Key Takeaways
 
 - **Institutional knowledge crisis**: Critical operational knowledge lives in

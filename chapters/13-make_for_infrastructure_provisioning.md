@@ -62,7 +62,7 @@ The challenge is compounded by:
 Rather than trying to document every step and flag, Make lets you create a
 discoverable interface that reveals workflows as you need them.
 
-Here's how that same workflow becomes discoverable:
+Here's how that same workflow becomes discoverable (see next page):
 
 ```makefile
 .DEFAULT_GOAL := help

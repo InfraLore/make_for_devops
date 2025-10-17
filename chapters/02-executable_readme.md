@@ -21,6 +21,7 @@ begins to decay as the underlying system evolves.
 The Executable README concept offers a radical solution: **what if your
 documentation could run itself?**
 
+\pagebreak
 ## Moving Beyond Static Documentation
 
 Traditional project documentation follows a predictable pattern. A well-meaning
@@ -70,7 +71,6 @@ what to do, you create executable targets that **do the things directly**. Your
 README becomes a menu of available actions rather than a set of instructions to
 follow manually.
 
-\pagebreak
 Here's how the same project might look with an Executable README approach:
 
 ### README.md
@@ -216,10 +216,9 @@ setup:
 	npm install
 	echo "done"
 ```
-\pagebreak
 ## The Anatomy of a Discoverable Makefile
 A well-designed Executable README Makefile follows a predictable structure that
-makes it easy for newcomers to understand and use:
+makes it easy for newcomers to understand and use (see next page):
 ```makefile
 #################### MyApp Development Workflow ###########################
 # Configuration - all customizable values in one place
@@ -253,7 +252,7 @@ build: ##   Build Docker image
 	# ... implementation
 deploy: build test ##   Deploy to staging
 	# ... implementation
-clean: ##   Clean up development environment
+clean: ##   Clean up development environmentop
 	# ... implementation
 ################# Utility Targets - Supporting functionality ##############
 check-prerequisites: ## Check required tools

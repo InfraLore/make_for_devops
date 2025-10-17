@@ -521,6 +521,18 @@ $endif$
 
 \usepackage{needspace}
 
+% Enhanced widow/orphan penalties (aggressive, the way we like it)
+\widowpenalty=500
+\clubpenalty=500
+\brokenpenalty=10000
+\raggedbottom
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+
+% Add page break penalties
+\predisplaypenalty=10000
+\postdisplaypenalty=10000
+\displaywidowpenalty=10000
+
 % Add chapter subtitle support
 \makeatletter
 \newcommand{\chaptersubtitle}[1]{%
