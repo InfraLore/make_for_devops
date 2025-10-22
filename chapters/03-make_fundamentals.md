@@ -21,7 +21,10 @@ concepts you already understand: commands, dependencies, and variables.
 
 ### The Fundamental Structure: Targets, Prerequisites, and Recipes
 
-Every Makefile is built around a simple concept: **targets**. In the compilation world, targets are usually files you want to create. In DevOps, targets represent **actions you want to perform**. Let's start with the most basic example:
+Every Makefile is built around a simple concept: **targets**. In the compilation
+world, targets are usually files you want to create. In DevOps, targets
+represent **actions you want to perform**. Let's start with the most basic
+example:
 
 ```makefile
 test:
@@ -108,19 +111,25 @@ lint:
 	flake8 src/
 ```
 
-Make is smart about dependencies. It will run `lint` first, then `build`. After `build` completes, both `test` and `push` can run (they don't depend on each other). Finally, `deploy` runs after both complete.
+Make is smart about dependencies. It will run `lint` first, then `build`. After
+`build` completes, both `test` and `push` can run (they don't depend on each
+other). Finally, `deploy` runs after both complete.
 
-This declarative approach means you describe what depends on what, and Make figures out the optimal execution order. You're not writing imperative scripts with explicit sequencing—you're declaring relationships.
+This declarative approach means you describe what depends on what, and Make
+figures out the optimal execution order. You're not writing imperative scripts
+with explicit sequencing—you're declaring relationships.
 
-\begin{calloutbox}[See Also: Chapter 7] 
-For comprehensive coverage of modeling complex deployment dependencies, parallel execution strategies, and handling failures gracefully, see Chapter 7: Dependency Management for DevOps Workflows.
+\begin{calloutbox}[See Also: Chapter 7] For comprehensive coverage of modeling
+complex deployment dependencies, parallel execution strategies, and handling
+failures gracefully, see Chapter 7: Dependency Management for DevOps Workflows.
 \end{calloutbox}
 
 ## Variables, Functions, and Conditional Logic
 
 ### Variables: Configuration Made Visible
 
-Variables in Make serve a crucial role: they make configuration **visible and modifiable** without editing the workflow logic:
+Variables in Make serve a crucial role: they make configuration **visible and
+modifiable** without editing the workflow logic:
 
 ```makefile
 # Configuration with sensible defaults
@@ -251,7 +260,8 @@ DevOps Workflows. \end{calloutbox}
 \newpage
 ### Phony Targets: The DevOps Default
 
-Most DevOps tasks should use **phony targets**—targets that don't correspond to actual files:
+Most DevOps tasks should use **phony targets**—targets that don't correspond to
+actual files:
 
 ```makefile
 .PHONY: deploy test clean logs status rollback
@@ -281,7 +291,9 @@ rollback:
 	kubectl rollout undo deployment/myapp
 ```
 
-Declaring targets as `.PHONY` tells Make to always run them, even if a file with that name exists. This is critical for DevOps workflows where targets represent actions, not build artifacts.
+Declaring targets as `.PHONY` tells Make to always run them, even if a file with
+that name exists. This is critical for DevOps workflows where targets represent
+actions, not build artifacts.
 
 \newpage
 ### File-Based Dependencies: When They Make Sense
@@ -341,9 +353,12 @@ check-cluster:
 	  (echo "Cannot connect to cluster" && exit 1)
 ```
 
-The `|` creates an order-only prerequisite. `check-cluster` runs before `deploy`, but changes to the check script won't trigger re-deployment.
+The `|` creates an order-only prerequisite. `check-cluster` runs before
+`deploy`, but changes to the check script won't trigger re-deployment.
 
-This is useful for validation checks that should run first but shouldn't cause the entire workflow to re-run when they change. Use sparingly—regular prerequisites are clearer in most cases.
+This is useful for validation checks that should run first but shouldn't cause
+the entire workflow to re-run when they change. Use sparingly—regular
+prerequisites are clearer in most cases.
 
 ## Debugging and Troubleshooting Makefile Execution
 
@@ -365,11 +380,13 @@ make -p
 make -p | grep "^VERSION"
 ```
 
-The `-n` flag (dry run) is particularly useful for validating complex workflows before executing them.
+The `-n` flag (dry run) is particularly useful for validating complex workflows
+before executing them.
 
 ### Visibility: Showing What's Happening
 
-By default, Make prints commands as it runs them. For cleaner output, use `@` to suppress command echoing:
+By default, Make prints commands as it runs them. For cleaner output, use `@` to
+suppress command echoing:
 
 ```makefile
 # Without @: shows the command
@@ -384,7 +401,8 @@ deploy:
 	@echo "Deployment complete"
 ```
 
-For debugging, temporarily remove the `@` to see exactly what commands are running.
+For debugging, temporarily remove the `@` to see exactly what commands are
+running.
 
 ### Error Handling Patterns
 
@@ -399,30 +417,38 @@ clean:
 # Continue on error for the entire target
 .IGNORE: clean
 
-# Always run cleanup, even on failure
+# Always run cleanup, even on failure (notice the || "or")
 deploy:
 	@kubectl apply -f k8s/ || \
 	  (kubectl rollout undo deployment/myapp && exit 1)
 
-# Multi-line with error handling
-backup-deploy:
+# Multi-line with error handling - all steps must succeed
+deploy-verified:
 	@set -e; \
-	kubectl create configmap backup --from-file=config.yaml; \
+	echo "Applying manifests..."; \
 	kubectl apply -f k8s/; \
-	kubectl rollout status deployment/myapp
+	echo "Waiting for rollout..."; \
+	kubectl rollout status deployment/myapp; \
+	echo "Deployment verified"
 ```
 
-The `-` prefix ignores errors for that command. The `.IGNORE` directive ignores errors for the entire target. The `set -e` in shell blocks makes them fail on first error.
+The `-` prefix ignores errors for that command. The `.IGNORE` directive ignores
+errors for the entire target. And borrowing a pattern from shell scripting,
+connecting commands with a double-pipe || "or" lets you ignore the success or
+failure of the first command. And the safety net, the `set -e` in shell blocks
+makes the whole block fail on first error.
 
-\begin{calloutbox}[Error Handling: Fail Fast by Default]
-Most targets should fail immediately on error. Use \texttt{-} only for cleanup operations where failure is acceptable:
+\begin{calloutbox}[Error Handling: Fail Fast by Default] Most targets should
+fail immediately on error. Use \texttt{-} only for cleanup operations where
+failure is acceptable:
 
 \textbf{Good use:} \texttt{-docker rm container-name} (container might not exist)
 
 \textbf{Bad use:} \texttt{-kubectl apply -f k8s/} (you want to know if
 deployment fails!)
 
-Using \texttt{.IGNORE} is almost always wrong—it hides real problems. If you're tempted to use it, you probably need better error handling in your scripts.
+Using \texttt{.IGNORE} is almost always wrong—it hides real problems. If you're
+tempted to use it, you probably need better error handling in your scripts.
 
 Default to failing fast and loud. Your future self will thank you when errors
 are caught immediately rather than silently ignored. \end{calloutbox}
@@ -482,7 +508,8 @@ Available targets:
   logs            Show application logs
 ```
 
-This pattern makes every Makefile self-documenting. New engineers run `make` and immediately see what's available.
+This pattern makes every Makefile self-documenting. New engineers run `make` and
+immediately see what's available.
 
 \newpage
 ### Enhanced Help with Categories
@@ -577,9 +604,14 @@ code. The workflow itself enforces good practices.
 \newpage
 ## Key Takeaways
 
-Make's syntax might seem intimidating at first, especially if you're coming from modern DevOps tools with YAML configurations or graphical interfaces. But this apparent complexity masks a powerful simplicity: Make provides a way to document, organize, and execute your DevOps workflows that is both human-readable and machine-executable.
+Make's syntax might seem intimidating at first, especially if you're coming from
+modern DevOps tools with YAML configurations or graphical interfaces. But this
+apparent complexity masks a powerful simplicity: Make provides a way to
+document, organize, and execute your DevOps workflows that is both
+human-readable and machine-executable.
 
-The fundamental concepts you've learned in this chapter form the foundation of everything that follows:
+The fundamental concepts you've learned in this chapter form the foundation of
+everything that follows:
 
 - **Targets and prerequisites** create self-documenting workflow graphs
 - **Dependencies enforce best practices** (like always testing before deploying)
