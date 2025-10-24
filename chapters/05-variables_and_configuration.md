@@ -214,6 +214,7 @@ The `-include` (with dash) means Make won't error if the file doesn't exist.
 ### Level 3: External Config Systems (For Large Organizations)
 
 Only reach for external systems when:
+
 - Multiple teams share configuration
 - Secrets management is required
 - Audit trails are needed
@@ -402,6 +403,7 @@ include lib/kubernetes.mk
 ```
 
 But they add complexity without much benefit unless:
+
 - You maintain 10+ similar projects
 - Variables are genuinely identical across projects
 - You have dedicated DevOps team maintaining libraries
@@ -520,6 +522,7 @@ simple overrides for other environments.
 ---
 
 **For More Examples:** See the online companion repository (Appendix D) for:
+
 - External config system integrations (AWS, GCP, Vault)
 - Multi-format config file support (YAML, JSON, TOML)
 - Configuration drift detection

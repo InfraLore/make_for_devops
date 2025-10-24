@@ -345,6 +345,7 @@ llm-improve: ## Get suggestions for improving a command
 This uses `llm`, Simon Willison's CLI tool for working with language models. It works with local models (free) or various cloud APIs. The examples above use Qwen3:4B, a capable open model you can run locally. The open-source LLM space changes fast, so this model is probably very outdated. Use whichever model you prefer.
 
 AI can help you:
+
 - Explain complex commands before you run them
 - Suggest improvements for safety and clarity
 - Understand what unfamiliar flags do
@@ -463,6 +464,7 @@ Future you will appreciate the context.
 Here's the surprising benefit: **building your Makefile teaches you the tools better**.
 
 When you capture a command, you think about:
+
 - What does this actually do?
 - When would I use this?
 - What are the parameters?

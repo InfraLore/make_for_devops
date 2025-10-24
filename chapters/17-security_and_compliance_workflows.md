@@ -252,11 +252,15 @@ Developers can run these locally before the CI pipeline catches issues.
 
 ```
 Week 1: Compliance team requests evidence
+
 Week 2-3: Engineering scrambles to gather:
+
   - Screenshots of security scan results
   - Manual exports of audit logs  
   - Written attestations about secret rotation
+
 Week 4: Submit evidence, hope it's sufficient
+
 Result: 3 weeks disruption, inconsistent evidence
 ```
 

@@ -261,6 +261,7 @@ test-environment:
 ```
 
 This gives you three levels of testing:
+
 - `make test-quick`: 2 seconds, catches syntax and basic issues
 - `make test-critical`: 10 seconds, validates key workflows
 - `make test`: Everything, run before important changes
@@ -419,6 +420,7 @@ impact your team's productivity.
 ---
 
 **For More Examples:** See the online companion repository (Appendix D) for:
+
 - Complete test suite examples
 - CI/CD pipeline configurations
 - Advanced testing patterns

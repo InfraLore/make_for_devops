@@ -250,6 +250,7 @@ check-libs: ## Check library versions
 ```
 
 Use semantic versioning:
+
 - **Major** (2.0 → 3.0): Breaking changes
 - **Minor** (2.0 → 2.1): New features, backward compatible
 - **Patch** (2.0.0 → 2.0.1): Bug fixes only
@@ -305,6 +306,7 @@ adoption-report: ## Report on Make usage
 ```
 
 Success indicators:
+
 - Onboarding time reduced
 - Cross-team mobility improved
 - Incident response faster

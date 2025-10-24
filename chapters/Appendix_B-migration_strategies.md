@@ -676,12 +676,14 @@ clean-logs: ## Clean old logs
 ## Migration Checklist
 
 Before you begin:
+
 - [ ] Identify 3-5 high-value workflows to automate first
 - [ ] Check team's Make knowledge level
 - [ ] Decide on naming conventions
 - [ ] Plan rollout communication
 
 During migration:
+
 - [ ] Start with `help` target
 - [ ] Add targets incrementally
 - [ ] Keep existing workflows running
@@ -691,6 +693,7 @@ During migration:
 - [ ] Gather feedback regularly
 
 After initial migration:
+
 - [ ] Measure adoption (who's using Make?)
 - [ ] Track time savings
 - [ ] Identify pain points
@@ -703,17 +706,20 @@ After initial migration:
 Track these to measure migration success:
 
 **Adoption Metrics**:
+
 - Number of developers using Make regularly
 - Number of Make targets per project
 - Make target invocations per day
 
 **Impact Metrics**:
+
 - Onboarding time (before/after)
 - Time to first successful deployment
 - Incident response time (MTTR)
 - Documentation freshness
 
 **Quality Metrics**:
+
 - Number of "how do I...?" questions
 - Deployment failures due to human error
 - Consistency of environments across team

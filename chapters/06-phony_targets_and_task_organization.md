@@ -350,6 +350,7 @@ Available commands:
 ### When to Add Advanced Help
 
 Only add advanced help systems when:
+
 - You have 25+ targets and `make help` is overwhelming
 - Team members frequently ask "what command do I use for X?"
 - You're onboarding people regularly
@@ -596,6 +597,7 @@ discoverable.
 ---
 
 **For More Examples:** See the online companion repository (Appendix D) for:
+
 - Multi-component system organization patterns
 - Advanced help systems with categories
 - State-based target organization

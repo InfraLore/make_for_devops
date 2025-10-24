@@ -48,6 +48,7 @@ kubectl apply -f k8s/staging/
 ```
 
 This is invaluable for:
+
 - Verifying variable expansion
 - Checking command correctness
 - Understanding execution order
@@ -69,6 +70,7 @@ make --debug=a deploy-staging
 ```
 
 Output shows:
+
 - Which targets need rebuilding and why
 - Dependency relationships
 - File timestamp comparisons
@@ -87,6 +89,7 @@ make -p -f /dev/null
 ```
 
 This reveals:
+
 - All defined variables and their values
 - All targets and their prerequisites
 - Implicit rules being applied
@@ -150,6 +153,7 @@ deploy:
 ```
 
 **Common causes**:
+
 - Variables defined too late
 - Recursive vs. simple expansion confusion
 - Environment variables conflicting

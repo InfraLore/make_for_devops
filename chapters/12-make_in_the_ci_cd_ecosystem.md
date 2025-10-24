@@ -157,6 +157,7 @@ The `--output-sync=target` flag is critical—it prevents output from different
 parallel jobs from interleaving, making logs readable.
 
 **Key considerations**:
+
 - Don't parallelize tasks that compete for the same resources (e.g., multiple
   database tests)
 - Respect CPU limits in CI environments
@@ -411,17 +412,20 @@ together.
 This chapter covered practical CI/CD integration patterns:
 
 **Optimization Strategies**:
+
 - **Layered validation** provides fast feedback (< 2 min) while maintaining
   comprehensive testing
 - **Intelligent parallelization** reduces pipeline time by 40-60%
 - **Smart caching** can reduce build time by 50-80%
 
 **Platform Integration**:
+
 - Make provides a consistent interface across all CI platforms
 - Minimal YAML, maximum Make—let Make handle complexity
 - The same Makefile works locally and in any CI system
 
 **Core Patterns**:
+
 - Build once, deploy everywhere via artifact management
 - GitOps integration for declarative deployments
 - Environment detection for adaptive behavior

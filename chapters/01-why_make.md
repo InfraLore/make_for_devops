@@ -312,6 +312,7 @@ services across three environments, managed by a DevOps team of 8 engineers.
 ### Before: The Documentation Swamp
 
 DataFlow's infrastructure documentation was scattered across:
+
 - A 127-page Confluence wiki (last comprehensive update: 8 months ago)
 - 15 README files in various repositories (inconsistent formats, varying ages)
 - A Slack channel with pinned "important commands" (73 pinned messages)
@@ -447,32 +448,38 @@ designed."
 ### Measurable Impact
 
 **Onboarding Time**:
+
 - Before: 3.5 weeks average
 - After: 5 days average
 - Improvement: 75% reduction
 
 **Deployment Consistency**:
+
 - Before: 40% of deployments required assistance or correction
 - After: 95% of deployments completed successfully on first try
 - Improvement: 2.4x increase in success rate
 
 **Incident Response**:
+
 - Before: Average incident response time 54 minutes
 - After: Average incident response time 18 minutes
 - Improvement: 67% reduction
 
 **Documentation Maintenance**:
+
 - Before: Wiki last updated 8 months ago, 30+ outdated sections
 - After: Makefiles tested in every CI run, always current
 - Improvement: Zero documentation drift
 
 **Engineer Satisfaction**:
+
 - Before: 45% of engineers rated operational procedures as "frustrating" or
   "confusing"
 - After: 82% of engineers rated operational procedures as "clear" or "excellent"
 - Improvement: Near-universal satisfaction
 
 **Unexpected Benefits**:
+
 - Senior engineers spent 60% less time answering "how do I..." questions
 - Cross-team contributions increased as engineers could easily work with
   unfamiliar services
@@ -484,6 +491,7 @@ designed."
 Let's quantify the business impact using DataFlow Inc.'s actual numbers:
 
 **Cost of Poor Documentation** (Annual, Before):
+
 - Onboarding inefficiency: 8 new hires × 2.5 weeks wasted × $2,000/week =
   $40,000
 - Incident response delays: 24 incidents × 36 minutes extra × $200/hour =
@@ -494,18 +502,21 @@ Let's quantify the business impact using DataFlow Inc.'s actual numbers:
 - **Total annual cost**: $212,800
 
 **Investment in Make Implementation**:
+
 - Initial development: 2 weeks × 1 FTE × $2,000/week = $4,000
 - Training and adoption: 8 engineers × 4 hours × $100/hour = $3,200
 - Ongoing maintenance: ~2 hours/week × 50 weeks × $100/hour = $10,000
 - **Total first-year investment**: $17,200
 
 **ROI Calculation**:
+
 - Net benefit: $212,800 - $17,200 = $195,600
 - Return on investment: ($195,600 / $17,200) × 100 = **1,137% ROI**
 - Payback period: **Less than 1 month**
 
 And these numbers only capture the direct, measurable costs. They don't account
 for:
+
 - Reduced stress and improved engineer morale
 - Faster time-to-market for features
 - Reduced risk of major incidents
@@ -539,6 +550,7 @@ The answer lies in the complexity inflection point we've reached:
 
 We've reached the point where the ad-hoc approaches of the past decade no longer
 scale. Teams need:
+
 - **Discoverability**: "What can I do?" should be answerable
 - **Consistency**: Same interface across all projects
 - **Reliability**: Workflows that always work
@@ -568,6 +580,7 @@ infrastructure, reliability, monitoring, logging, and security
 troubleshooting, and building a culture of discoverable workflows
 
 By the end of this book, you'll be able to:
+
 - Design and implement self-documenting workflow systems
 - Eliminate documentation drift in your organization
 - Dramatically reduce onboarding time for new engineers
@@ -577,6 +590,7 @@ By the end of this book, you'll be able to:
 ## What You Need to Know
 
 This book assumes you're a DevOps, SRE, or Platform Engineer with:
+
 - 2-5 years of experience
 - Familiarity with Docker, CI/CD, and cloud platforms
 - Basic scripting ability (bash/shell)

@@ -20,6 +20,7 @@ Remember: You're responsible for the final Makefile. AI generates, you validate 
 I need help creating a Makefile for my project. Follow these core principles:
 
 DISCOVERABILITY PRINCIPLES:
+
 - Set .DEFAULT_GOAL := help so running plain "make" shows available commands
 - Every target should have a ## comment explaining what it does
 - The help target should parse and display these comments
@@ -27,24 +28,28 @@ DISCOVERABILITY PRINCIPLES:
 - Each target should suggest relevant next steps after completing
 
 PROGRESSIVE DISCLOSURE:
+
 - Start with simple, common tasks (dev, test, build, deploy)
 - More complex operations should be discoverable but not overwhelming
 - Use underscore prefix for internal targets (_internal-task)
 - Provide menu targets that show related operations (make docker shows Docker commands)
 
 EXECUTABLE DOCUMENTATION:
+
 - The Makefile is both documentation and implementation
 - Targets should be self-explanatory from their names
 - Complex logic should live in scripts, Makefile provides interface
 - Include usage examples in comments
 
 SAFETY AND VALIDATION:
+
 - Validate prerequisites before dangerous operations
 - Use .PHONY for all non-file targets
 - Include dry-run capabilities where appropriate
 - Build validation into workflows (deploy depends on test)
 
 PROJECT DETAILS:
+
 - Project type: [web application / CLI tool / library / microservice / etc.]
 - Languages: [Python / Go / Node.js / etc.]
 - Key tools: [Docker / Kubernetes / Terraform / etc.]
@@ -52,6 +57,7 @@ PROJECT DETAILS:
 - Team size: [solo / small team / large organization]
 
 COMMON WORKFLOWS NEEDED:
+
 - Development environment setup
 - Running tests
 - Building artifacts
@@ -59,12 +65,14 @@ COMMON WORKFLOWS NEEDED:
 - [Add any specific workflows]
 
 CONSTRAINTS:
+
 - Assume all engineers run on [macOS / Linux / Windows with WSL]
 - Never use localStorage or sessionStorage (this is Make, not a browser)
 - Keep it simple - only add complexity that solves real problems
 - Extract complex operations to scripts in ./scripts/
 
 Generate a Makefile that embodies these principles. Include:
+
 1. A comprehensive help target
 2. Common workflow targets (dev, test, build)
 3. Appropriate validation
@@ -124,6 +132,7 @@ SPECIFIC ISSUES TO ADDRESS:
 repetitive code, unsafe operations, etc.]
 
 CONSTRAINTS:
+
 - Maintain backward compatibility where possible
 - Preserve existing target names if they're already in use
 - Don't break existing CI/CD pipelines
@@ -144,6 +153,7 @@ Generate an improved version of this Makefile. Highlight:
 I need to add multi-environment support to my Makefile following these patterns:
 
 CURRENT SITUATION:
+
 - Environments: [development, staging, production]
 - Current approach: [describe current approach or "none - everything hardcoded"]
 - Pain points: [duplication, environment-specific logic scattered, etc.]
@@ -194,6 +204,7 @@ show-config:
 ```
 
 REQUIREMENTS:
+
 - Default to development environment
 - Make environment overridable: ENVIRONMENT=staging make deploy
 - Validate environment names
@@ -201,6 +212,7 @@ REQUIREMENTS:
 - Show current configuration clearly
 
 PROJECT SPECIFICS:
+
 - Build tool: [Docker / native / etc.]
 - Deployment target: [Kubernetes / AWS / Heroku / etc.]
 - Environment-specific values: [list key differences]
@@ -222,12 +234,14 @@ Include:
 I need to add Docker workflows to my Makefile following these principles:
 
 DOCKER ORCHESTRATION CONTEXT:
+
 - Currently using: [Docker Compose / Dockerfile only / Lando / etc.]
 - Services: [database, cache, app, etc.]
 - Environments: [dev, test, production]
 
 KEY PRINCIPLE: Make doesn't replace Docker tools, it provides the discoverable 
 interface to them. Make should:
+
 - Show what Docker operations are available (make docker or make help)
 - Coordinate pre/post Docker operations
 - Handle environment-specific differences
@@ -262,12 +276,14 @@ push: build-prod login ## Push to registry
 ```
 
 PROJECT DETAILS:
+
 - Application: [type and language]
 - Dockerfile stages: [development, test, production, etc.]
 - Registry: [Docker Hub / private / etc.]
 - Testing approach: [in container / on host / etc.]
 
 REQUIRED WORKFLOWS:
+
 - Start development environment
 - Run tests in container
 - Build production image
@@ -292,12 +308,14 @@ Generate Makefile code for Docker workflows. Include:
 I need CI/CD pipeline support in my Makefile following these principles:
 
 CI/CD PHILOSOPHY:
+
 - Same commands should work locally and in CI
 - CI should just be "make ci" - everything else is implementation
 - Local engineers should be able to run CI steps individually
 - No surprises in CI that can't be reproduced locally
 
 CURRENT CI SETUP:
+
 - Platform: [GitHub Actions / GitLab CI / Jenkins / etc.]
 - Current approach: [describe or "starting fresh"]
 - Pain points: [different commands locally vs CI, hard to debug, etc.]
@@ -327,6 +345,7 @@ ci-security: ## CI: Security scanning
 ```
 
 PIPELINE STAGES NEEDED:
+
 - Linting / code quality checks
 - Unit tests
 - Integration tests
@@ -336,6 +355,7 @@ PIPELINE STAGES NEEDED:
 - [Other stages]
 
 PROJECT SPECIFICS:
+
 - Languages: [list]
 - Test frameworks: [list]
 - Build tools: [list]
@@ -343,6 +363,7 @@ PROJECT SPECIFICS:
 - Security tools: [list if any]
 
 REQUIREMENTS:
+
 - Each stage should be independently runnable
 - Full pipeline should be one command: make ci
 - Should work identically locally and in CI
@@ -350,6 +371,7 @@ REQUIREMENTS:
 - Clear output showing what's happening
 
 Generate Makefile code for CI/CD. Include:
+
 1. Individual targets for each pipeline stage
 2. Combined ci target that runs everything
 3. Validation and error handling
@@ -368,6 +390,7 @@ CURRENT REPETITIVE TARGETS:
 [Paste the repetitive targets here]
 
 PATTERN RULE PRINCIPLES:
+
 - Use when you have 3+ similar targets that differ only in one parameter
 - The % matches any string, $* contains the matched portion
 - Pattern rules can have prerequisites: deploy-%: validate-%
@@ -402,6 +425,7 @@ validate-prod: validate-dev
 ```
 
 REQUIREMENTS:
+
 - Convert repetitive targets to pattern rules where appropriate
 - Keep exceptions as explicit targets (don't force everything into patterns)
 - Maintain or improve discoverability
@@ -409,12 +433,14 @@ REQUIREMENTS:
 - Include usage examples
 
 QUESTIONS TO CONSIDER:
+
 - Are the targets truly identical except for one parameter?
 - Do any environments need special handling?
 - Would pattern rules make the Makefile clearer or more confusing?
 - Can new engineers still understand what's happening?
 
 Generate improved Makefile code using pattern rules. Explain:
+
 1. Which targets you converted and why
 2. Which targets you left explicit and why
 3. How to use the new pattern rules
@@ -429,6 +455,7 @@ Generate improved Makefile code using pattern rules. Explain:
 I have repetitive command sequences that should use Make functions.
 
 FUNCTION PRINCIPLES FROM THE BOOK:
+
 - Use functions when multi-line command sequences repeat across 3+ targets
 - Functions accept parameters via $(1), $(2), etc.
 - Invoke with $(call function_name,arg1,arg2)
@@ -472,6 +499,7 @@ CURRENT REPETITIVE SEQUENCES:
 [Paste the repetitive command sequences here]
 
 REQUIREMENTS:
+
 - Convert repetitive multi-line sequences to functions
 - Keep single-line commands as variables
 - Maintain readability - targets should still be understandable
@@ -479,12 +507,14 @@ REQUIREMENTS:
 - Consider if functions are actually simpler than inline code
 
 QUESTIONS TO CONSIDER:
+
 - Does this sequence repeat 3+ times?
 - Is it truly identical each time?
 - Would a function make this clearer or more obscure?
 - Can someone unfamiliar with Make functions understand this?
 
 Generate improved Makefile code using functions where appropriate. Explain:
+
 1. Which sequences you converted to functions and why
 2. What you left inline and why
 3. How to use the new functions
@@ -499,6 +529,7 @@ Generate improved Makefile code using functions where appropriate. Explain:
 I need to add secret management to my Makefile following security best practices.
 
 SECURITY PRINCIPLES:
+
 - NEVER put secrets in Makefiles or config files
 - NEVER commit secrets to version control
 - Secrets come from environment variables or secure stores
@@ -542,12 +573,14 @@ setup-dev-env: ## Create .env template for development
 ```
 
 PROJECT DETAILS:
+
 - Required secrets: [list them]
 - Environment: [local dev / staging / production]
 - Secret store if any: [AWS Secrets Manager / Vault / etc.]
 - Deployment target: [Kubernetes / AWS / etc.]
 
 REQUIREMENTS:
+
 - Validate all required secrets before critical operations
 - Never expose secret values in output
 - Provide clear error messages when secrets are missing
@@ -555,6 +588,7 @@ REQUIREMENTS:
 - Document where secrets should be set
 
 Generate Makefile code for secret management. Include:
+
 1. Secret validation targets
 2. Clear documentation of required secrets
 3. Development environment setup if applicable
@@ -573,6 +607,7 @@ CURRENT MAKEFILE:
 [Paste your Makefile here]
 
 DISCOVERABILITY PROBLEMS:
+
 - No help target - running "make" gives an error or does something unexpected
 - Targets have unclear names or no documentation
 - No guidance on what to do first or next
@@ -639,6 +674,7 @@ docker: ## Show Docker commands
 ```
 
 REQUIREMENTS:
+
 - Add comprehensive help target
 - Add ## comments to all public targets
 - Set .DEFAULT_GOAL := help
@@ -648,6 +684,7 @@ REQUIREMENTS:
 - Keep existing functionality - don't break things
 
 Generate an improved version focused on discoverability. Explain:
+
 1. What you changed and why
 2. How new engineers should start using it
 3. How to gradually adopt changes without breaking existing usage
@@ -662,6 +699,7 @@ After getting initial results, use these follow-up prompts to refine:
 ### For More Safety
 ```
 Add more validation to this Makefile:
+
 - Check prerequisites before running (required tools installed)
 - Validate environment names
 - Require confirmation for destructive operations
@@ -671,6 +709,7 @@ Add more validation to this Makefile:
 ### For Better Organization
 ```
 Improve the organization of this Makefile:
+
 - Group related targets with comment headers
 - Order targets logically (common tasks first)
 - Extract complex logic to scripts
@@ -680,6 +719,7 @@ Improve the organization of this Makefile:
 ### For Better Testing
 ```
 Make this Makefile more testable:
+
 - Add targets that show what would happen without doing it
 - Add validation-only targets
 - Make it easier to test individual components

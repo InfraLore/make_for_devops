@@ -388,11 +388,13 @@ sections like:
 # Database Recovery Procedure
 
 Prerequisites:
+
 - Access to AWS console
 - Database backup location documented
 - Recovery time objective: 4 hours
 
 Steps:
+
 1. Identify the backup to restore...
    [detailed steps]
 2. Stop the application servers...
@@ -411,6 +413,7 @@ Run quarterly. Steps:
 ```
 
 Problems:
+
 - Runbook was always outdated
 - 2 AM incidents meant searching through 30 pages
 - Different engineers followed different steps
@@ -454,6 +457,7 @@ Recovery complete!
 ```
 
 Results:
+
 - Mean time to recovery decreased from 90 minutes to 20 minutes
 - Runbook reduced to: "Run `make recover`"
 - Procedures tested monthly (automated)

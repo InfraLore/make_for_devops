@@ -256,6 +256,7 @@ info: ## Show build info
 ```
 
 This Makefile:
+
 - Works identically locally and in CI
 - Adapts behavior automatically (image tags, registry)
 - Keeps implementation in scripts

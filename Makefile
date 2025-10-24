@@ -111,7 +111,7 @@ endef
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats
+.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats find_bullets find_blank_pages blank_pages_report
 
 all:	book
 
@@ -188,6 +188,9 @@ find_blank_pages: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
 
 blank_pages_report: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
 	@bin/pdf_blank_scanner.py $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf --create-report
+
+find_bullets:
+	@awk 'prev ~ /:$$/ && $$0 ~ /^[[:space:]]*[-*+][[:space:]]/ {print FILENAME ":" FNR ":" prev "\n" $$0} {prev=$$0}' chapters/*.md
 
 stats:
 	@echo ""

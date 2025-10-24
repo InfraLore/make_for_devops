@@ -196,6 +196,7 @@ practices—they amplify them.\footnote{Simon Willison, "Vibe engineering,"
 October 7, 2025, https://simonwillison.net/2025/Oct/7/vibe-engineering/}
 
 Willison observed that AI coding agents work best when they have:
+
 - Automated testing to validate their changes
 - Comprehensive documentation to understand the system
 - Good version control to track and undo mistakes
@@ -517,6 +518,7 @@ validate-makefile: ## Check Makefile for common issues
 ```
 
 AI agents can work with this structure effectively because:
+
 - Dependencies are explicit
 - Documentation is inline
 - Validation is built-in
@@ -528,6 +530,7 @@ Willison's insight applies directly to Make: **AI tools amplify existing good
 practices.**
 
 If your Makefile already provides:
+
 - Clear discoverability (`make help`)
 - Good documentation (inline comments and `## descriptions`)
 - Automated testing (`make test`)

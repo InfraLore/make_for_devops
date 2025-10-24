@@ -159,6 +159,7 @@ _deploy:
 ```
 
 Notice the pattern:
+
 - Public targets (`deploy-dev`, `deploy-staging`) are simple and clear
 - Implementation details are in `_deploy` (underscore prefix indicates internal)
 - Each environment has appropriate safety levels
@@ -475,12 +476,14 @@ Guide":
 # Deploying to Staging
 
 Prerequisites:
+
 - AWS CLI installed (version 2.x)
 - Terraform 1.5.0 or higher
 - Access to 1Password for credentials
 - VPN connected to staging network
 
 Steps:
+
 1. Configure AWS credentials...
    [15 lines of instructions]
 2. Initialize Terraform backend...
@@ -492,6 +495,7 @@ Steps:
 ```
 
 New engineers faced:
+
 - 2-3 days to read and understand the guide
 - Instructions that were outdated
 - No confidence about what commands to run
@@ -538,6 +542,7 @@ Review plan above. To apply:
 ```
 
 Results after migration:
+
 - Onboarding time: 2-3 days → 2-3 hours
 - Wiki reduced from 50 pages to: "Run `make help`"
 - Zero deployments to wrong environment

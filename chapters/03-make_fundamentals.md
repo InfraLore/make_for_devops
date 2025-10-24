@@ -591,6 +591,7 @@ check-cluster:
 ```
 
 This demonstrates:
+
 - Help system for discoverability
 - Safe dependencies (deploy → test → build, ensuring no untested code deploys)
 - Variables for configuration
@@ -625,6 +626,7 @@ create a **discoverable interface** that shows what's possible and enforces safe
 workflows through dependencies.
 
 When designing Makefiles, favor safety and clarity over convenience:
+
 - Always make deployment depend on tests
 - Use phony targets by default, file dependencies only for optimization
 - Keep conditionals simple or use separate targets instead

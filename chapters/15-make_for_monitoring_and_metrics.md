@@ -591,6 +591,7 @@ critical problems:
    monitoring infrastructure
 
 The key is designing monitoring workflows that are:
+
 - **Immediately useful**: Running a target provides actionable information
 - **Self-documenting**: Targets include context about what results mean
 - **Composable**: Complex checks built from simple, focused targets
