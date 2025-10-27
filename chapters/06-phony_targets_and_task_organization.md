@@ -143,7 +143,7 @@ For projects with 10 or fewer targets, keep it flat:
 .PHONY: setup dev test build deploy clean help
 
 setup:    ## Set up development environment
-dev:      ## Start development environment  
+dev:      ## Start development environment
 test:     ## Run all tests
 build:    ## Build application
 deploy:   ## Deploy to configured environment
@@ -171,11 +171,6 @@ test-integration: ## Run integration tests
 deploy:        ## Deploy to environment
 deploy-staging: ## Deploy to staging
 deploy-prod:   ## Deploy to production
-
-# Database
-db-start:      ## Start database
-db-migrate:    ## Run migrations
-db-backup:     ## Create backup
 
 # Maintenance
 clean:         ## Clean development environment
@@ -218,6 +213,8 @@ procedures)
 
 Don't organize by what sounds good in theory. Organize by what your team types
 most often. \end{calloutbox}
+
+\pagebreak
 
 ## Dependencies: Enforcing the Right Order
 
@@ -535,6 +532,8 @@ deploy-staging: ## Deploy to staging
 	@$(MAKE) deploy ENVIRONMENT=staging
 ```
 
+\pagebreak
+
 ### Dependencies Run Unexpectedly
 
 ```makefile
@@ -558,7 +557,7 @@ Ensure `##` spacing is correct:
 # Wrong - won't show in help
 deploy:## Deploy application
 
-# Right - shows in help  
+# Right - shows in help
 deploy: ## Deploy application
 ```
 
