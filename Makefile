@@ -2,6 +2,8 @@
 # Configuration
 ####################################################################################################
 
+.DEFAULT_GOAL := help
+
 # Build configuration
 
 BUILD = build
@@ -55,7 +57,7 @@ FILTER_ARGS = --lua-filter=codeblock-border.lua
 # Combined arguments
 
 ARGS = $(TOC) $(MATH_FORMULAS) $(METADATA_ARGS) $(FILTER_ARGS) $(DEBUG_ARGS)
-	
+
 PANDOC_COMMAND = pandoc
 
 # Per-format options
@@ -265,14 +267,14 @@ help:  ## Show this help message
 # File builders
 ####################################################################################################
 
-$(TMP_METADATA): 
+$(TMP_METADATA):
 	$(MKDIR_CMD) $(BUILD)
 	echo "git_sha: $(shell git rev-parse --short HEAD)" > $(TMP_METADATA)
 	echo "git_url: $(shell git config --get remote.origin.url | \
 		sed -E 's#git@([^:]+):#\1/#; s#\.git$$##')" >> $(TMP_METADATA)
 	echo "git_date: $(shell git log -1 --format=%cd --date=short)" >> $(TMP_METADATA)
 
-epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format
+epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format (warning, not functional)
 
 html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html ## Generate HTML format
 
