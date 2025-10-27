@@ -113,11 +113,11 @@ endef
 
 .PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats find_bullets find_blank_pages blank_pages_report
 
-all:	book
+all:	book ## Build all formats (epub, html, pdf, docx)
 
-book:	epub html pdf docx
+book:	epub html pdf docx ## Build all formats (epub, html, pdf, docx)
 
-clean:
+clean: ## Remove build directory and all generated files
 	@if [ -d "$(BUILD)" ]; then \
 		echo "Removing $(BUILD) directory..."; \
 		$(RMDIR_CMD) $(BUILD); \
@@ -129,7 +129,7 @@ clean:
 # Utilities
 ####################################################################################################
 
-validate:
+validate: ### Validate chapter contents for forbidden words
 	@echo "Validating chapter contents..."
 	@result=$$(grep -Ein '\btribal\b' $(CHAPTERS)); \
 	if [ -n "$$result" ]; then \
@@ -142,7 +142,7 @@ validate:
 		echo "Validation passed."; \
 	fi
 
-check-overflow:
+check-overflow: ### Check for potentially overflowing code lines
 	@echo "Checking for potentially overflowing code lines..."
 	@echo "Lines longer than $(OVERFLOW_LIMIT) characters in code blocks:"
 	@echo "================================================"
@@ -155,7 +155,7 @@ check-overflow:
 		fi; \
 	done
 
-check-long-lines:
+check-long-lines: ### Check for very long lines in code blocks
 	@echo "Checking for very long lines ($(LONG_LINE_LIMIT)+ chars) in code blocks..."
 	@echo "=========================================================="
 	@for file in $(CHAPTERS); do \
@@ -167,7 +167,7 @@ check-long-lines:
 		fi; \
 	done
 
-sync-pdf: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+sync-pdf: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Sync the generated PDF to iCloud Drive
 	@echo ""
 	@echo "Copying PDF to iCloud Drive..."
 	@if [ -d "$(ICLOUD_PATH)" ]; then \
@@ -179,20 +179,20 @@ sync-pdf: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
 		echo "  You can override with: make sync-pdf ICLOUD_PATH=/path/to/your/icloud"; \
 	fi
 
-publish: sync-pdf stats
+publish: sync-pdf stats ## Publish the book by syncing the PDF to iCloud and showing stats
 	@echo ""
 	@echo "🚀 Publish complete! Our book is ready to read."
 
-find_blank_pages: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+find_blank_pages: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Find blank pages in the PDF
 	@bin/pdf_blank_scanner.py $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
 
-blank_pages_report: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+blank_pages_report: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Generate a report of blank pages in the PDF
 	@bin/pdf_blank_scanner.py $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf --create-report
 
-find_bullets:
+find_bullets: ## Find bullet points that may be incorrectly formatted
 	@awk 'prev ~ /:$$/ && $$0 ~ /^[[:space:]]*[-*+][[:space:]]/ {print FILENAME ":" FNR ":" prev "\n" $$0} {prev=$$0}' chapters/*.md
 
-stats:
+stats: ## Show book statistics
 	@echo ""
 	@echo "📚 Book Statistics"
 	@echo "========================"
@@ -247,6 +247,20 @@ stats:
 	fi; \
 	echo "";
 
+help:  ## Show this help message
+	@echo "📖 Make for DevOps - Build System"
+	@echo "=================================="
+	@echo ""
+	@echo "Available targets:"
+	@echo ""
+	@awk 'BEGIN {FS = ":.*##"; printf ""} /^[a-zA-Z_-]+:.*##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@echo ""
+	@echo "Configuration:"
+	@echo "  OVERFLOW_LIMIT=$(OVERFLOW_LIMIT)   # Line length limit for code blocks"
+	@echo "  LONG_LINE_LIMIT=$(LONG_LINE_LIMIT) # Very long line limit"
+	@echo "  ICLOUD_PATH=$(ICLOUD_PATH)"
+	@echo ""
+
 ####################################################################################################
 # File builders
 ####################################################################################################
@@ -258,13 +272,13 @@ $(TMP_METADATA):
 		sed -E 's#git@([^:]+):#\1/#; s#\.git$$##')" >> $(TMP_METADATA)
 	echo "git_date: $(shell git log -1 --format=%cd --date=short)" >> $(TMP_METADATA)
 
-epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub
+epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format
 
-html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html
+html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html ## Generate HTML format
 
-pdf:	validate $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf
+pdf:	validate $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Generate PDF format
 
-docx:	validate $(BUILD)/docx/$(OUTPUT_FILENAME).docx
+docx:	validate $(BUILD)/docx/$(OUTPUT_FILENAME).docx ## Generate DOCX format
 
 $(BUILD)/epub/$(OUTPUT_FILENAME).epub:	$(EPUB_DEPENDENCIES) $(TMP_METADATA)
 	$(ECHO_BUILDING)
