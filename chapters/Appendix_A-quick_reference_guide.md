@@ -335,7 +335,7 @@ endif
 ifdef CI
   DOCKER_ARGS := --no-cache
 else
-  DOCKER_ARGS := 
+  DOCKER_ARGS :=
 endif
 
 # Detect if running in container
@@ -539,7 +539,7 @@ docker-build:
 docker-push:
 	docker push $(IMAGE)
 
-# .make/kubernetes.mk  
+# .make/kubernetes.mk
 k8s-apply:
 	kubectl apply -f k8s/
 ```
@@ -747,7 +747,7 @@ test-unit test-integration test-e2e:
 - Use `.DEFAULT_GOAL := help` to show help by default
 - Mark all non-file targets as `.PHONY`
 - Use `##` comments for self-documenting help
-- Prefix internal targets with `_` 
+- Prefix internal targets with `_`
 - Validate prerequisites before executing
 - Provide confirmation for destructive operations
 - Use `:=` for immediate expansion, `?=` for defaults
@@ -775,8 +775,8 @@ VERSION := $(shell git describe --tags --always --dirty)
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>
-	\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", 
-	$$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", 
+	\033[0m\n"} /^[a-zA-Z_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n",
+	$$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n",
 	substr($$0, 5) } ' $(MAKEFILE_LIST)
 
 setup: ## Set up development environment
