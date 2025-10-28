@@ -390,6 +390,11 @@ setup: ## Set up development environment
 	docker-compose pull
 	@echo "✓ Setup complete - run 'make dev' to start"
 
+# continues on next page...
+```
+```makefile
+# ...continued from previous page
+
 dev: ## Start development environment
 	docker-compose up
 
@@ -605,3 +610,5 @@ discoverable.
 In the next chapter, we'll explore advanced workflow patterns and how to handle
 complex operational scenarios while maintaining the simplicity and
 discoverability we've built through good target organization.
+
+![Target Organization Levels](images/chapter6a.png)

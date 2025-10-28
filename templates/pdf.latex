@@ -521,17 +521,43 @@ $endif$
 
 \usepackage{needspace}
 
-% Enhanced widow/orphan penalties (aggressive, the way we like it)
-\widowpenalty=500
-\clubpenalty=500
-\brokenpenalty=10000
+% AGGRESSIVE orphan/widow control - prevent headings from being orphaned
+\clubpenalty=10000        % penalty for breaking after first line of paragraph (orphan)
+\widowpenalty=10000       % penalty for breaking before last line of paragraph (widow)
+\brokenpenalty=10000      % penalty for page break after hyphenated line
 \raggedbottom
-\setlength{\parskip}{6pt plus 2pt minus 1pt}
 
-% Add page break penalties
-\predisplaypenalty=10000
-\postdisplaypenalty=10000
-\displaywidowpenalty=10000
+% Prevent bad page breaks around displays (code blocks, etc.)
+\predisplaypenalty=10000  % penalty for page break before display
+\postdisplaypenalty=2500  % penalty for page break after display
+\displaywidowpenalty=10000 % penalty for breaking before last line before display
+
+% Add space requirements for headings
+\usepackage{needspace}
+
+% Redefine section commands to require space after them
+\let\oldsection\section
+\renewcommand{\section}[1]{\needspace{4\baselineskip}\oldsection{#1}}
+
+\let\oldsubsection\subsection
+\renewcommand{\subsection}[1]{\needspace{3\baselineskip}\oldsubsection{#1}}
+
+\let\oldsubsubsection\subsubsection
+\renewcommand{\subsubsection}[1]{\needspace{2\baselineskip}\oldsubsubsection{#1}}
+
+% Prevent code blocks from breaking badly
+\AtBeginEnvironment{Shaded}{\needspace{3\baselineskip}}
+\AtBeginEnvironment{verbatim}{\needspace{3\baselineskip}}
+
+% More aggressive paragraph control
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\tolerance=1414
+\hbadness=1414
+\emergencystretch=1.5em
+\hfuzz=0.3pt
+\widowpenalties 1 10000
+\raggedbottom
+
 
 % Add chapter subtitle support
 \makeatletter

@@ -316,6 +316,474 @@ deploy-update:
 Workflows adapt to system state automatically.
 
 \newpage
+## Robust Shell Configuration and Error Handling
+
+DevOps workflows fail in production for predictable reasons: a command in the
+middle of a deployment script fails silently, environment variables don't
+persist between commands, or a script that worked on your laptop breaks in CI
+because of different shell behavior. These aren't exotic edge cases—they're the
+daily reality of operational automation.
+
+Make executes each line of a target in a separate shell by default. This
+isolation protects you from side effects but creates problems when your workflow
+needs commands to work together:
+
+```makefile
+# This doesn't work as expected
+deploy-broken:
+	cd infrastructure/
+	terraform apply  # Runs in original directory, not infrastructure/
+```
+
+The `cd` command executes in one shell, which exits. The `terraform` command
+runs in a new shell, back in the original directory. Your deployment fails and
+you don't understand why.
+
+Similarly, Make continues executing after non-critical failures by default:
+
+```makefile
+# Silent failures
+deploy-database:
+	./scripts/backup-db.sh      # Might fail silently
+	./scripts/migrate-schema.sh # Runs anyway
+	./scripts/deploy-db.sh      # Deploys broken schema
+```
+
+If the backup fails but returns exit code 0, or if you don't check its return
+code, the deployment continues with no backup. Production data loss becomes
+possible.
+
+Make's shell configuration directives solve these problems by changing how
+targets execute. The key is knowing when the default behavior helps you and
+when it hurts you.
+
+\newpage
+### Understanding Make's Default Shell Behavior
+
+Make's default shell execution has specific characteristics that affect
+reliability:
+
+```makefile
+# Make's default behavior (implicit):
+# .SHELL := /bin/sh
+# Each line runs in separate subshell
+# Lines with errors stop that target but exit code may vary
+
+standard-target:
+	echo "Line 1" # Shell process 1
+	echo "Line 2" # Shell process 2
+	echo "Line 3" # Shell process 3
+```
+
+Each line spawns a new shell process. This isolation means:
+
+- **Variables don't persist**: `VAR=value` on one line doesn't affect the next
+- **Directory changes don't persist**: `cd` commands have no effect on
+subsequent lines
+- **Pipelines can hide failures**: `command1 | command2` reports only the last
+command's exit code
+
+For simple targets, this behavior is fine. For complex DevOps workflows, it
+causes subtle failures.
+
+\newpage
+### The .ONESHELL Directive
+
+`.ONESHELL` runs all lines of a target in a single shell session:
+
+```makefile
+.ONESHELL:
+
+# Now this works
+deploy-with-context:
+	cd infrastructure/
+	export TF_VAR_env=production
+	terraform apply
+	cd ..
+
+# All four commands run in the same shell
+# Variables persist, directory changes persist
+```
+
+Benefits for DevOps workflows:
+
+- **Environment setup persists**: Export variables once, use them throughout
+- **Directory context maintained**: Navigate into subdirectories naturally
+- **Complex sequences simplified**: Multi-step operations read linearly
+
+The tradeoff: if one line fails, Make might not stop the target immediately
+unless you configure error handling explicitly.
+
+\newpage
+### Advanced .SHELLFLAGS Configuration
+
+`.SHELLFLAGS` controls which flags Make passes to the shell. The default is
+`-c`, meaning "execute the following string as a command." For robust DevOps
+workflows, add flags that catch errors early:
+
+```makefile
+.ONESHELL:
+.SHELLFLAGS := -euo pipefail -c
+
+deploy-safe:
+	cd infrastructure/
+	terraform plan
+	terraform apply
+```
+
+Each flag provides specific protection:
+
+- **`-e`**: Exit immediately if any command fails (errexit)
+- **`-u`**: Treat unset variables as errors (nounset)
+- **`-o pipefail`**: Fail if any command in a pipeline fails
+
+The `-c` at the end tells the shell to execute what follows as a command (this
+is Make's requirement).
+
+\newpage
+#### Why Each Flag Matters
+
+**`-e` (errexit)**: Without this, commands continue after failures:
+
+```makefile
+# Without -e
+deploy-dangerous:
+	./scripts/backup.sh      # Fails, but execution continues
+	./scripts/destructive-migration.sh  # Runs anyway!
+
+# With .SHELLFLAGS := -e -c
+.ONESHELL:
+.SHELLFLAGS := -e -c
+
+deploy-safe:
+	./scripts/backup.sh      # If this fails, target stops
+	./scripts/destructive-migration.sh  # Never runs
+```
+
+**`-u` (nounset)**: Catches typos and undefined variables:
+
+```makefile
+# Without -u, typos fail silently
+deploy-with-typo:
+	./scripts/deploy.sh $(ENVIRONMNT)  # Typo! Passes empty string
+
+# With -u, Make stops and reports the error
+.SHELLFLAGS := -eu -c
+
+deploy-catches-typos:
+	./scripts/deploy.sh $(ENVIRONMNT)  # Error: ENVIRONMNT unbound
+```
+\newpage
+**`-o pipefail`**: Pipelines hide failures without this flag:
+
+```makefile
+# Without pipefail
+check-broken:
+	grep "ERROR" app.log | wc -l  # grep fails, but wc succeeds
+	                               # Target reports success!
+
+# With pipefail
+.SHELLFLAGS := -eo pipefail -c
+
+check-correct:
+	grep "ERROR" app.log | wc -l  # grep failure stops target
+```
+
+### Handling Expected Non-Zero Exit Codes
+
+Strict error handling breaks commands that legitimately return non-zero:
+
+```makefile
+.ONESHELL:
+.SHELLFLAGS := -euo pipefail -c
+
+# grep returns 1 when no matches found
+check-errors:
+	grep "ERROR" app.log || echo "No errors found"
+	# The || operator handles the expected failure
+```
+
+Common patterns for expected failures:
+
+```makefile
+# Pattern 1: Provide alternative
+check-logs:
+	grep "CRITICAL" logs/*.log || echo "No critical errors"
+
+# Pattern 2: Explicitly allow failure
+check-optional:
+	- ./scripts/optional-check.sh  # Prefix with - to allow failure
+
+# Pattern 3: Test the exit code
+check-conditional:
+	if grep -q "ERROR" app.log; then \
+		echo "Errors found"; \
+		exit 1; \
+	fi
+```
+
+The `-` prefix tells Make to ignore the exit code for that specific line, even
+with `-e` enabled.
+
+\newpage
+### Adding a DEBUG Flag
+
+DevOps workflows need visibility during development and troubleshooting. A DEBUG
+flag adds shell tracing without modifying target code:
+
+```makefile
+DEBUG ?= 0
+
+.ONESHELL:
+ifeq ($(DEBUG),1)
+	.SHELLFLAGS := -xeuo pipefail -c
+else
+	.SHELLFLAGS := -euo pipefail -c
+endif
+
+deploy-api:
+	./scripts/health-check.sh
+	./scripts/deploy.sh api
+	./scripts/verify.sh
+```
+
+The `-x` flag prints each command before executing it:
+
+```bash
+# Normal execution
+$ make deploy-api
+Checking health...
+Deploying API...
+Verifying deployment...
+
+# Debug mode shows every command
+$ make DEBUG=1 deploy-api
++ ./scripts/health-check.sh
+Checking health...
++ ./scripts/deploy.sh api
+Deploying API...
++ ./scripts/verify.sh
+Verifying deployment...
+```
+
+This visibility helps debug CI failures where you can't easily add `echo`
+statements. You see exactly which command failed and what preceded it.
+
+\newpage
+### Conditional Debug Configuration
+
+More sophisticated projects use conditional configuration:
+
+```makefile
+DEBUG ?= 0
+VERBOSE ?= 0
+
+.ONESHELL:
+ifeq ($(DEBUG),1)
+	.SHELLFLAGS := -xeuo pipefail -c
+else ifeq ($(VERBOSE),1)
+	.SHELLFLAGS := -veuo pipefail -c
+else
+	.SHELLFLAGS := -euo pipefail -c
+endif
+```
+
+The `-v` flag prints lines as read (before variable expansion), while `-x`
+prints commands as executed (after expansion). Use `-v` for build debugging,
+`-x` for runtime debugging.
+
+\newpage
+### Real-World Example: Database Migration
+
+Here's how these configurations solve a common DevOps scenario:
+
+```makefile
+.ONESHELL:
+.SHELLFLAGS := -euo pipefail -c
+
+DB_BACKUP_DIR := /backups/$(shell date +%Y%m%d)
+
+migrate-database: ## Migrate database with safety checks
+	echo "Starting migration for $(DB_NAME)"
+	mkdir -p $(DB_BACKUP_DIR)
+	./scripts/backup-db.sh $(DB_NAME) $(DB_BACKUP_DIR)
+	./scripts/verify-backup.sh $(DB_BACKUP_DIR)
+	./scripts/run-migrations.sh $(DB_NAME)
+	./scripts/verify-migrations.sh $(DB_NAME)
+	echo "Migration complete"
+```
+
+What this configuration guarantees:
+
+- If `DB_NAME` isn't set, the target fails immediately (`-u`)
+- If backup fails, migrations never run (`-e`)
+- If backup verification fails, migrations never run (`-e`)
+- All commands run in the same shell context (`.ONESHELL`)
+- The backup directory path is consistent throughout
+
+Without these configurations, any step could fail silently, and you'd migrate
+production with no valid backup.
+
+\newpage
+### Real-World Example: Multi-Environment Deploy
+
+Configuration management across environments benefits from strict shell
+handling:
+
+```makefile
+.ONESHELL:
+.SHELLFLAGS := -euo pipefail -c
+
+REQUIRED_VARS := AWS_REGION CLUSTER_NAME APP_VERSION
+
+deploy-%: ## Deploy to specified environment
+	echo "Deploying to $* environment"
+	$(foreach var,$(REQUIRED_VARS),\
+		test -n "$($(var))" || \
+		(echo "Error: $(var) not set" && exit 1);)
+	./scripts/configure-$*.sh
+	./scripts/deploy.sh $*
+	./scripts/health-check.sh $* || \
+		(echo "Deployment unhealthy, rolling back" && \
+		 ./scripts/rollback.sh $* && exit 1)
+```
+
+The strict flags ensure:
+
+- All required variables must be set before deployment starts
+- Configuration must succeed before deploy runs
+- Health check failure triggers automatic rollback
+- Any unexpected error stops the deployment immediately
+
+\newpage
+### Pitfalls and Workarounds
+
+Strict shell configuration changes behavior that some commands rely on:
+
+#### Problem: grep Returns 1 When No Match
+
+```makefile
+.SHELLFLAGS := -e -c
+
+# This fails if no errors exist
+check-errors:
+	grep "ERROR" app.log  # Returns 1 if no matches, stops target
+```
+
+**Solution**: Handle the expected exit code:
+
+```makefile
+check-errors:
+	grep "ERROR" app.log || true  # Continue if no matches
+	# Or provide meaningful output:
+	grep "ERROR" app.log || echo "No errors found"
+```
+
+#### Problem: Commands with Intentional Non-Zero Exits
+
+Some tools return different exit codes for different conditions:
+
+```makefile
+# diff returns 0 if identical, 1 if different, 2 if error
+check-config-drift:
+	- diff config.yaml deployed-config.yaml  # Allow 1, but not 2
+```
+
+**Better solution**: Test the exit code explicitly:
+
+```makefile
+check-config-drift:
+	if diff config.yaml deployed-config.yaml > /dev/null; then \
+		echo "No configuration drift"; \
+	else \
+		exit_code=$$?; \
+		if [ $$exit_code -eq 1 ]; then \
+			echo "Configuration has drifted"; \
+			exit 1; \
+		else \
+			echo "Error comparing configs"; \
+			exit 2; \
+		fi; \
+	fi
+```
+
+\newpage
+### When to Use Strict Shell Configuration
+
+Use `.ONESHELL` and strict `.SHELLFLAGS` when:
+
+- **Multi-step operations need shared context**: Database migrations, deployment
+sequences, infrastructure provisioning
+- **Errors must halt immediately**: Production deployments, destructive
+operations, data migrations
+- **Variable typos could cause silent failures**: Configuration management,
+environment-specific deployments
+- **Pipeline failures matter**: Log analysis, data processing, backup
+verification
+
+**Don't use strict configuration for**:
+
+- **Simple, independent commands**: Building artifacts, running tests, basic
+checks
+- **Targets that intentionally continue after failures**: Cleanup operations,
+best-effort notifications
+- **Compatibility with varied environments**: Shared Makefiles across teams with
+different shells
+
+### Configuration Scope
+
+Apply strict configurations selectively:
+
+```makefile
+# Strict configuration for production targets
+.ONESHELL:
+.SHELLFLAGS := -euo pipefail -c
+
+deploy-prod: strict-deploy-prod
+
+strict-deploy-prod:
+	./scripts/deploy.sh production
+
+# Reset for development targets
+.SHELLFLAGS := -c
+
+deploy-dev:
+	./scripts/deploy.sh dev || echo "Dev deploy failed, continuing"
+```
+
+This pattern gives you safety where it matters and flexibility where you need
+it.
+
+\newpage
+### Summary: Building Reliability Into Your Workflows
+
+Shell configuration directives transform Make from a simple task runner into a
+robust execution environment for critical DevOps operations. The defaults work
+for basic automation. Advanced configurations prevent the silent failures that
+cause production incidents.
+
+**Key techniques**:
+
+- **`.ONESHELL`**: Runs target commands in one shell, preserving context
+- **`.SHELLFLAGS := -euo pipefail -c`**: Strict error handling that catches
+failures early
+  - `-e`: Stop on any error
+  - `-u`: Treat undefined variables as errors
+  - `-o pipefail`: Catch pipeline failures
+  - `-c`: Execute command (Make requirement)
+- **`DEBUG` flag**: Add `-x` for command tracing during troubleshooting
+- **Explicit exit code handling**: Use `|| true` or `- command` for expected
+non-zero exits
+
+The discipline: apply strict configurations to targets where failures have real
+consequences—deployments, migrations, production operations. Keep simple targets
+simple. Let the importance of the operation dictate the complexity of its error
+handling.
+
+The result: workflows that fail fast with clear error messages rather than
+continuing with corrupt state. That's the difference between an incident you
+catch in staging and one that wakes you up at 3 AM.
+\newpage
 ### Git-Based Conditional Execution
 
 Different actions for different branches:

@@ -101,7 +101,7 @@ endif
 MKDIR_CMD = mkdir -p
 RMDIR_CMD = rm -r
 ECHO_BUILDING = @echo "building $@..."
-ECHO_BUILT = @echo "$@ was built\n"
+ECHO_BUILT = @echo "$@ was built" & echo
 
 # Progress bar function - shows countdown blocks that disappear over time
 define PROGRESS_BAR

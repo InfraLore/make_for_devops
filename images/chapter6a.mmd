@@ -1,0 +1,32 @@
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+flowchart TD
+    %% Styling
+    classDef target fill:#e1f5fe,stroke:#01579b,stroke-width:2px,color:#000
+    classDef prereq fill:#fff3e0,stroke:#e65100,stroke-width:2px,color:#000
+    classDef var fill:#f3e5f5,stroke:#4a148c,stroke-width:2px,color:#000
+
+    subgraph "Make Workflow Concepts"
+        direction TB
+
+        subgraph "Target Types"
+            P[".PHONY Target<br/><i>Always executes</i>"]:::target
+            F["File Target<br/><i>Executes when outdated</i>"]:::target
+        end
+
+        subgraph "Dependency Chain"
+            T["Test Target"]:::prereq
+            B["Build Target"]:::prereq
+            D["Deploy Target"]:::prereq
+            T -->|"must complete first"| B
+            B -->|"must complete first"| D
+        end
+
+        subgraph "Variable Usage"
+            V["Configuration Variables<br/>#8226; ENVIRONMENT<br/>#8226; VERSION<br/>#8226; REGISTRY"]:::var
+            V -.->|"controls"| D
+        end
+    end
