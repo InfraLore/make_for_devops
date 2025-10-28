@@ -6,7 +6,11 @@
 
 # Improve Error Handling
 .ONESHELL:
+ifdef DEBUG
+.SHELLFLAGS := -eux -o pipefail -c
+else
 .SHELLFLAGS := -eu -o pipefail -c
+endif
 
 # catch errors in pipe chains
 SHELL := /bin/bash
