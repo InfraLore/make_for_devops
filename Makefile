@@ -39,8 +39,8 @@ MATH_FORMULAS = --webtex
 CONTENT = awk 'FNR==1 && NR!=1 {print "\n\n"}{print}' $(CHAPTERS)
 CONTENT_FILTERS = tee # Use this to add sed filters or other piped commands
 
-# iCloud Drive path (can be overridden)
-ICLOUD_PATH ?= /Users/hpottinger/Library/Mobile Documents/com~apple~CloudDocs
+# Path to publish (can be overridden)
+PUBLISH_PATH ?= /Users/hpottinger/Library/Mobile Documents/com~apple~CloudDocs
 
 # Debugging
 
@@ -169,19 +169,19 @@ check-long-lines: ### Check for very long lines in code blocks
 		fi; \
 	done
 
-sync-pdf: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Sync the generated PDF to iCloud Drive
+sync-pdf: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Sync the generated PDF to PUBLISH_PATH
 	@echo ""
-	@echo "Copying PDF to iCloud Drive..."
-	@if [ -d "$(ICLOUD_PATH)" ]; then \
-		cp "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" "$(ICLOUD_PATH)/$(OUTPUT_FILENAME).pdf"; \
+	@echo "Copying PDF to PUBLISH_PATH..."
+	@if [ -d "$(PUBLISH_PATH)" ]; then \
+		cp "$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf" "$(PUBLISH_PATH)/$(OUTPUT_FILENAME).pdf"; \
 		figlet "Make for Devops!"; \
-		echo "✅ PDF copied to iCloud Drive: $(ICLOUD_PATH)/$(OUTPUT_FILENAME).pdf"; \
+		echo "✅ PDF copied to PUBLISH_PATH: $(PUBLISH_PATH)/$(OUTPUT_FILENAME).pdf"; \
 	else \
-		echo "❌ iCloud Drive not found at: $(ICLOUD_PATH)"; \
-		echo "  You can override with: make sync-pdf ICLOUD_PATH=/path/to/your/icloud"; \
+		echo "❌ PUBLISH_PATH not found at: $(PUBLISH_PATH)"; \
+		echo "  You can override with: make sync-pdf PUBLISH_PATH=/path/to/your/publish"; \
 	fi
 
-publish: sync-pdf stats ## Publish the book by syncing the PDF to iCloud and showing stats
+publish: sync-pdf stats ## Publish the book by syncing the PDF to PUBLISH_PATH and showing stats
 	@echo ""
 	@echo "🚀 Publish complete! Our book is ready to read."
 
@@ -258,9 +258,10 @@ help:  ## Show this help message
 	@awk 'BEGIN {FS = ":.*##"; printf ""} /^[a-zA-Z_-]+:.*##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
 	@echo "Configuration:"
-	@echo "  OVERFLOW_LIMIT=$(OVERFLOW_LIMIT)   # Line length limit for code blocks"
-	@echo "  LONG_LINE_LIMIT=$(LONG_LINE_LIMIT) # Very long line limit"
-	@echo "  ICLOUD_PATH=$(ICLOUD_PATH)"
+	@echo "  OVERFLOW_LIMIT=$(OVERFLOW_LIMIT)     # Line length limit for code blocks"
+	@echo "  LONG_LINE_LIMIT=$(LONG_LINE_LIMIT)    # Very long line limit"
+	@echo
+	@echo "  PUBLISH_PATH=$(PUBLISH_PATH)"
 	@echo ""
 
 ####################################################################################################
