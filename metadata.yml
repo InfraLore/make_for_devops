@@ -16,11 +16,12 @@ papersize: letter
 # - pandoc-crossref
 linkReferences: true
 geometry: twoside
+logo: images/cover.png
 header-includes:
   - \widowpenalty=10000
   - \clubpenalty=10000
   - \usepackage{setspace}
-  - \setstretch{1.50}  # Increase line spacing by 50%
+  - \setstretch{1.50} # Increase line spacing by 50%
   - \usepackage[most]{tcolorbox}
   - |
     \newtcblisting{codeblock}{
@@ -41,3 +42,4 @@ header-includes:
   - \hyphenpenalty=10000
   - \exhyphenpenalty=10000
 ---
+
