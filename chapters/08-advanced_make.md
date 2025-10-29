@@ -755,7 +755,7 @@ Some tools return different exit codes for different conditions:
 check-config-drift:
 	- diff config.yaml deployed-config.yaml  # Allow 1, but not 2
 ```
-
+\newpage
 **Better solution**: Test the exit code explicitly:
 
 ```makefile
@@ -774,7 +774,6 @@ check-config-drift:
 	fi
 ```
 
-\newpage
 ### When to Use Strict Shell Configuration
 
 Use `.ONESHELL` and strict `.SHELLFLAGS` when:
@@ -1021,6 +1020,7 @@ if any are missing or any prerequisite is newer.
 engines, code generators, Terraform, CloudFormation, or any script that writes
 multiple artifacts.
 
+\newpage
 **Gotcha**: Requires Make 4.3 or later (released 2020). Check your version with
 `make --version`. If you're stuck on an older version, use a marker file pattern
 instead:
@@ -1034,7 +1034,6 @@ instead:
 deployment.yaml service.yaml: .k8s-generated
 ```
 
-\newpage
 ### .RECIPEPREFIX: Escaping Tab Hell
 
 Make's tab requirement causes problems: editors insert spaces, copying from
@@ -1074,7 +1073,6 @@ Makefile:
 .RECIPEPREFIX = >
 ```
 
-\newpage
 ### Advanced Automatic Variable Modifiers
 
 You know `$@` (target name) and `$<` (first prerequisite). Make provides
@@ -1154,7 +1152,7 @@ app: api-schema.json code.compiled
 api-schema.json: api.yaml
 	./scripts/generate-schema.sh $< $@
 ```
-
+\newpage
 `.NOTINTERMEDIATE` (Make 4.4+) explicitly prevents intermediate deletion:
 
 ```makefile
@@ -1177,7 +1175,6 @@ over which generated files persist.
 **Gotcha**: Intermediate files are only deleted if the build succeeds. Failed
 builds leave them around for debugging, which is usually what you want.
 
-\newpage
 ### Parallel Build Output Synchronization
 
 Parallel builds with `make -j` improve speed but create unreadable output when
@@ -1192,7 +1189,7 @@ ervic]ice...
 Test pPass[edWorkering tes d!
 eployed!
 ```
-
+\newpage
 The `--output-sync` flag groups output by target:
 
 ```bash
@@ -1218,6 +1215,7 @@ Available modes:
 - `--output-sync=target` - Buffer entire target output (most readable)
 - `--output-sync=recurse` - Synchronize recursive make calls
 
+\newpage
 For DevOps workflows, `target` mode works best—you see complete output for each
 service/component without interleaving:
 
@@ -1375,9 +1373,6 @@ The discipline remains the same: simple Makefiles beat clever ones unless the
 cleverness eliminates real pain. These hidden features are in your toolkit now.
 Use them when the problem appears, not before.
 
-
-
-\newpage
 ## Creating Extensible Frameworks
 
 Build frameworks teams can customize:
@@ -1415,12 +1410,42 @@ Framework provides structure, teams add customization through hooks.
 \newpage
 ### Configuration-Driven Workflows
 
-Adapt based on configuration files:
+Configuration-driven workflows separate **what to execute** from **how to execute it**. Instead of hardcoding deployment strategies in your Makefile, you store them in configuration files that Make reads at runtime. The Makefile becomes an execution engine that interprets configuration, rather than a collection of hardcoded procedures.
 
+This pattern excels when you have multiple teams with different requirements deploying to the same infrastructure. Marketing needs blue-green deployments with immediate rollback capability. Engineering prefers canary deployments with gradual traffic shifting. Finance requires extra compliance checks. Rather than maintaining separate Makefiles or complex conditionals, each team maintains a simple configuration file that declares their requirements. The Makefile reads the configuration and executes the appropriate workflow.
+
+The key insight: configuration files change frequently (every project, every team), but the execution logic changes rarely (deployment strategies are stable). By separating these concerns, you reduce the blast radius of changes. Teams modify configurations without touching the Makefile. Infrastructure engineers improve deployment strategies without updating team configurations.
+
+![Configuration-driven Workflows](images/chapter8.png)
+
+\newpage
+#### Basic Configuration Pattern
+
+Here's a practical example with a configuration file:
+
+**workflow-config.yaml:**
+```yaml
+workflow_type: canary
+validation_level: strict
+rollout_stages:
+  - percentage: 10
+    duration: 300
+  - percentage: 50
+    duration: 600
+  - percentage: 100
+    duration: 0
+notification_channels:
+  - slack
+  - email
+health_check_retries: 5
+auto_rollback: true
+```
+\newpage
+**Makefile:**
 ```makefile
 # Load configuration
 load-config: ## Load workflow configuration
-	@./scripts/load-config.sh
+	@./scripts/load-config.sh workflow-config.yaml
 
 # Execute workflow based on config
 execute-workflow: load-config ## Execute configured workflow
@@ -1429,16 +1454,107 @@ execute-workflow: load-config ## Execute configured workflow
 		standard) $(MAKE) workflow-standard ;; \
 		canary) $(MAKE) workflow-canary ;; \
 		blue-green) $(MAKE) workflow-blue-green ;; \
+		*) echo "Unknown workflow: $$WORKFLOW" && exit 1 ;; \
 	esac
 
 workflow-standard:
-	@./scripts/workflow-standard.sh
+	@./scripts/workflow-standard.sh workflow-config.yaml
 
 workflow-canary:
-	@./scripts/workflow-canary.sh
+	@./scripts/workflow-canary.sh workflow-config.yaml
+
+workflow-blue-green:
+	@./scripts/workflow-blue-green.sh workflow-config.yaml
 ```
 
-Configuration determines workflow without changing the Makefile.
+The `load-config` target validates the configuration file and ensures required fields exist. The `execute-workflow` target reads the `workflow_type` field and dispatches to the appropriate implementation. Each workflow script receives the full configuration and extracts the parameters it needs.
+
+\newpage
+#### Multi-Environment Configuration
+
+Real deployments need environment-specific configurations:
+
+```makefile
+# Environment-specific configurations
+CONFIG_DIR := configs
+
+# Deploy with environment-specific config
+deploy-%: ## Deploy to environment with its configuration
+	@echo "Loading configuration for $* environment..."
+	@[ -f $(CONFIG_DIR)/$*.yaml ] || \
+		(echo "Missing config: $(CONFIG_DIR)/$*.yaml" && exit 1)
+	@./scripts/validate-config.sh $(CONFIG_DIR)/$*.yaml
+	@WORKFLOW=$$(./scripts/get-workflow-type.sh $(CONFIG_DIR)/$*.yaml); \
+	./scripts/deploy-$$WORKFLOW.sh $(CONFIG_DIR)/$*.yaml $*
+
+# List available configurations
+list-configs: ## List available environment configurations
+	@echo "Available configurations:"
+	@ls -1 $(CONFIG_DIR)/*.yaml | xargs -n1 basename | sed 's/\.yaml//'
+```
+
+**configs/production.yaml:**
+```yaml
+workflow_type: blue-green
+validation_level: strict
+approval_required: true
+replicas: 5
+health_check_timeout: 300
+monitoring:
+  - datadog
+  - pagerduty
+```
+\newpage
+**configs/staging.yaml:**
+```yaml
+workflow_type: canary
+validation_level: standard
+approval_required: false
+replicas: 2
+health_check_timeout: 60
+monitoring:
+  - slack
+```
+
+Each environment declares its requirements. Production gets stricter validation and approval gates. Staging deploys faster with fewer checks. The Makefile doesn't care—it reads the configuration and executes accordingly.
+
+#### When to Use Configuration-Driven Workflows
+
+Use this pattern when you have:
+
+- **Multiple teams with different deployment requirements** - Each team maintains their own configuration without modifying shared infrastructure
+- **Frequent changes to deployment parameters** - Updating a YAML file is easier and safer than modifying Makefile logic
+- **Complex conditional logic growing in your Makefile** - If you have many `if` statements based on environment or team, configuration extraction simplifies the Makefile
+- **Standardized workflows with parameterized differences** - The deployment steps are the same, but timeouts, replica counts, or validation levels vary
+
+**Don't use this pattern when:**
+
+- **You have 1-3 simple environments** - Just write separate targets. Configuration-driven workflows add unnecessary indirection for simple cases.
+- **Your deployment logic is still evolving** - Keep it in the Makefile where you can iterate quickly. Extract to configuration once the patterns stabilize.
+- **Configuration would duplicate Makefile content** - If your YAML file just lists Make targets to run in order, you haven't actually separated concerns.
+- **Your team is unfamiliar with YAML/JSON parsing** - The scripts that read configuration become critical infrastructure. Make sure your team can maintain them.
+
+#### The Premature Abstraction Trap
+
+Configuration-driven workflows feel sophisticated. They promise flexibility and scalability. But they introduce complexity:
+
+1. **Indirection**: Understanding what `make deploy-prod` does now requires reading both the Makefile and the configuration file
+2. **Validation burden**: You need scripts to validate configuration files, handle missing fields, and provide clear error messages
+3. **Debugging difficulty**: When deployments fail, you're debugging the configuration interpretation layer, not just the deployment
+
+Start with explicit targets for each environment. When you have three environments that differ only in timeouts and replica counts, extract those as variables. Only move to configuration-driven workflows when you have:
+
+- 5+ environments or teams with their own requirements
+- Stable deployment patterns that rarely change
+- A team comfortable maintaining the configuration interpretation layer
+
+The progression:
+1. **Explicit targets** (`deploy-dev`, `deploy-staging`, `deploy-prod`)
+2. **Variables** (`REPLICAS_DEV=1`, `REPLICAS_STAGING=2`, `REPLICAS_PROD=5`)
+3. **Pattern rules with variables** (`deploy-%` with `REPLICAS_$*`)
+4. **Configuration files** (only when variables become unwieldy)
+
+Each step adds capability at the cost of indirection. Stop at the simplest solution that solves your problem. Configuration-driven workflows are powerful, but they're the solution to a specific scaling problem, not a universal best practice.
 
 \newpage
 ### Reusable Components with Functions

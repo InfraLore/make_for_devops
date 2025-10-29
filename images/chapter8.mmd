@@ -1,0 +1,34 @@
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+flowchart LR
+    subgraph Config["Configuration Layer"]
+        direction TB
+        CF["workflow-config.yaml"] -->|"Defines"| Params["Deployment Parameters:
+        • workflow_type
+        • validation_level
+        • rollout_stages"]
+    end
+
+    subgraph Makefile["Makefile"]
+        direction TB
+        Load["load-config:
+        Validates config"] --> Execute["execute-workflow:
+        Dispatches to correct
+        workflow handler"]
+
+        Execute --> Handlers["Workflow Handlers:
+        • workflow-canary.sh
+        • workflow-blue-green.sh
+        • workflow-standard.sh"]
+    end
+
+    Params -->|"Controls"| Handlers
+
+    classDef config fill:#fff,stroke:#333,color:#000
+    classDef exec fill:#fff,stroke:#333,color:#000
+
+    class Config,CF,Params config
+    class Makefile,Load,Execute,Handlers exec
