@@ -637,7 +637,6 @@ is invaluable when debugging a specific target in a complex Makefile with dozens
 of targets—you get detailed shell execution traces without wading through Make's
 internal dependency resolution.
 
-\newpage
 ### Conditional Debug Configuration
 
 More sophisticated projects use conditional configuration:
