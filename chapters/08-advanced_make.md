@@ -1,58 +1,102 @@
 # Chapter 8: Advanced Make Features for Workflow Automation
 
-\chaptersubtitle{Exploring Make's powerful advanced features that enable sophisticated workflow automation while maintaining simplicity and discoverability.}
+\chaptersubtitle{Exploring Make's powerful advanced features that enable
+sophisticated workflow automation while maintaining simplicity and
+discoverability.}
 
-Up to this point, we've explored Make's fundamental features: variables, targets, dependencies, and organization patterns. These basics handle most DevOps workflow needs effectively. But Make has a deeper toolkit of advanced features that can transform complex, repetitive operational tasks into elegant, maintainable automation.
+Up to this point, we've explored Make's fundamental features: variables,
+targets, dependencies, and organization patterns. These basics handle most
+DevOps workflow needs effectively. But Make has a deeper toolkit of advanced
+features that can transform complex, repetitive operational tasks into elegant,
+maintainable automation.
 
-This chapter explores Make's sophisticated features: pattern rules that eliminate repetitive target definitions, recursive Make for coordinating multiple projects, external tool integration patterns, and conditional execution based on system state.
+This chapter explores Make's sophisticated features: pattern rules that
+eliminate repetitive target definitions, recursive Make for coordinating
+multiple projects, external tool integration patterns, and conditional execution
+based on system state.
 
 ## The DevOps Automation Dilemma
 
-DevOps work inherently involves managing **multiplicity at scale**: multiple environments (dev, staging, prod), multiple services (api, frontend, worker), multiple deployment strategies (rolling, canary, blue-green), and multiple cloud providers or regions. This multiplicity creates a tension between three competing needs:
+DevOps work inherently involves managing **multiplicity at scale**: multiple
+environments (dev, staging, prod), multiple services (api, frontend, worker),
+multiple deployment strategies (rolling, canary, blue-green), and multiple cloud
+providers or regions. This multiplicity creates a tension between three
+competing needs:
 
-**Consistency**: Every environment should deploy the same way. Every service should follow the same standards. When you fix a bug in one workflow, that fix should apply everywhere automatically.
+**Consistency**: Every environment should deploy the same way. Every service
+should follow the same standards. When you fix a bug in one workflow, that fix
+should apply everywhere automatically.
 
-**Flexibility**: Production needs extra safety checks that dev doesn't. The payment service needs PCI compliance steps that other services don't. Some teams use Docker, others use native builds.
+**Flexibility**: Production needs extra safety checks that dev doesn't. The
+payment service needs PCI compliance steps that other services don't. Some teams
+use Docker, others use native builds.
 
-**Maintainability**: When deployment requirements change, you shouldn't need to update fifty similar targets. When a new team member reads your Makefile, they should understand the pattern, not memorize individual cases.
+**Maintainability**: When deployment requirements change, you shouldn't need to
+update fifty similar targets. When a new team member reads your Makefile, they
+should understand the pattern, not memorize individual cases.
 
-Traditional Makefile approaches force you to choose: either duplicate targets for consistency (brittle and hard to maintain), or write complex shell scripts that hide logic from Make (losing discoverability), or create a web of dependencies that nobody understands.
+Traditional Makefile approaches force you to choose: either duplicate targets
+for consistency (brittle and hard to maintain), or write complex shell scripts
+that hide logic from Make (losing discoverability), or create a web of
+dependencies that nobody understands.
 
-Make's advanced features solve this dilemma by letting you **encode patterns without losing transparency**. Pattern rules say "here's how we deploy to *any* environment" while still letting you see exactly what `make deploy-prod` will do. Recursive Make coordinates multiple projects while keeping each project's Makefile simple and focused. Functions encapsulate complex sequences while keeping the invocation readable.
+Make's advanced features solve this dilemma by letting you **encode patterns
+without losing transparency**. Pattern rules say "here's how we deploy to *any*
+environment" while still letting you see exactly what `make deploy-prod` will
+do. Recursive Make coordinates multiple projects while keeping each project's
+Makefile simple and focused. Functions encapsulate complex sequences while
+keeping the invocation readable.
 
-The key insight: **these features let you scale automation without scaling complexity for users**. A new developer can still run `make help` and understand what's possible. They can run `make -n deploy-staging` and see exactly what will happen. But behind that simplicity, you've eliminated hundreds of lines of duplication.
+The key insight: **these features let you scale automation without scaling
+complexity for users**. A new developer can still run `make help` and understand
+what's possible. They can run `make -n deploy-staging` and see exactly what will
+happen. But behind that simplicity, you've eliminated hundreds of lines of
+duplication.
 
 ## When Multiplicity Demands Abstraction
 
 Look for these signals that you need advanced features:
 
-**Copy-paste proliferation**: You have `deploy-dev`, `deploy-staging`, `deploy-prod` that are identical except for one word. Or five services with identical build targets.
+**Copy-paste proliferation**: You have `deploy-dev`, `deploy-staging`,
+`deploy-prod` that are identical except for one word. Or five services with
+identical build targets.
 
-**Change amplification**: When you improve your deployment process, you need to update it in twelve places. Miss one and environments diverge.
+**Change amplification**: When you improve your deployment process, you need to
+update it in twelve places. Miss one and environments diverge.
 
-**Implicit knowledge**: Team members say "we deploy to staging the same way as prod, but..." and the "but" is only in their heads, not in the Makefile.
+**Implicit knowledge**: Team members say "we deploy to staging the same way as
+prod, but..." and the "but" is only in their heads, not in the Makefile.
 
-**Multi-project coordination**: You're running make commands in five different directories in a specific order, and that order isn't documented anywhere.
+**Multi-project coordination**: You're running make commands in five different
+directories in a specific order, and that order isn't documented anywhere.
 
-These patterns indicate that your workflow has inherent structure that isn't captured in your Makefile. The advanced features in this chapter give you tools to make that implicit structure explicit and automatic.
+These patterns indicate that your workflow has inherent structure that isn't
+captured in your Makefile. The advanced features in this chapter give you tools
+to make that implicit structure explicit and automatic.
 
 ## Applying Advanced Features to Your Workflows
 
-You understand the tools. Now here's how to recognize when to use them in your actual DevOps work.
+You understand the tools. Now here's how to recognize when to use them in your
+actual DevOps work.
 
 ### Start with Your Pain Points
 
 Look at your current Makefile. What makes you groan?
 
-- **"I just added a fifth environment and had to update 20 targets"** → Pattern rules
-- **"I keep forgetting to run the pre-deploy checks"** → Functions that bundle checks with deployment
+- **"I just added a fifth environment and had to update 20 targets"** → Pattern
+  rules
+- **"I keep forgetting to run the pre-deploy checks"** → Functions that bundle
+  checks with deployment
 - **"I have to coordinate three repos in the right order"** → Recursive Make
-- **"Production needs different validation than staging"** → Conditional execution
-- **"Every team reinvents deployment slightly differently"** → Extensible frameworks
+- **"Production needs different validation than staging"** → Conditional
+  execution
+- **"Every team reinvents deployment slightly differently"** → Extensible
+  frameworks
 
 ### The Incremental Adoption Pattern
 
-Don't rewrite your Makefile. Add one advanced feature to solve one specific pain point:
+Don't rewrite your Makefile. Add one advanced feature to solve one specific pain
+point:
 
 1. **Pick the most annoying duplication** - The targets you copy-paste most often
 2. **Convert just that set** - Leave everything else alone
@@ -62,29 +106,36 @@ Don't rewrite your Makefile. Add one advanced feature to solve one specific pain
 
 ### Example Progression
 
-**Week 1**: You have `deploy-dev`, `deploy-staging`, `deploy-prod` that are 90% identical. Convert to `deploy-%` pattern rule. Three targets become one rule.
+**Week 1**: You have `deploy-dev`, `deploy-staging`, `deploy-prod` that are 90%
+identical. Convert to `deploy-%` pattern rule. Three targets become one rule.
 
-**Week 3**: You realize every deployment should notify Slack but you keep forgetting. Create a `deploy_with_notification` function. Now it's automatic.
+**Week 3**: You realize every deployment should notify Slack but you keep
+forgetting. Create a `deploy_with_notification` function. Now it's automatic.
 
-**Week 5**: You're coordinating API, frontend, and worker deployments manually. Add recursive Make to orchestrate them. The sequence is now encoded, not team lore.
+**Week 5**: You're coordinating API, frontend, and worker deployments manually.
+Add recursive Make to orchestrate them. The sequence is now encoded, not team
+lore.
 
 ### Warning Signs You're Over-Engineering
 
 - You're using pattern rules for two targets (just write two targets)
 - Your functions have functions calling functions (flatten it)
-- New team members can't figure out what `make deploy-prod` does (too much indirection)
+- New team members can't figure out what `make deploy-prod` does (too much
+  indirection)
 - You're writing advanced features "because we might need this later" (YAGNI)
 
 ### The Test
 
-After adding an advanced feature, run `make -n <target>` and read the output. If you can't easily understand what will happen, you've gone too far. Revert to something simpler.
+After adding an advanced feature, run `make -n <target>` and read the output. If
+you can't easily understand what will happen, you've gone too far. Revert to
+something simpler.
 
-\begin{calloutbox}[The Glide Path: Evolving to Advanced Features]
-Don't jump straight to advanced features—evolve into them naturally as your needs grow:
+\begin{calloutbox}[The Glide Path: Evolving to Advanced Features] Don't jump
+straight to advanced features—evolve into them naturally as your needs grow:
 
-\textbf{Stage 1: Start with Repetition}
-\begin{itemize}
-\item Write \texttt{deploy-dev}, \texttt{deploy-staging}, \texttt{deploy-prod} as separate targets
+\textbf{Stage 1: Start with Repetition} \begin{itemize} \item Write
+\texttt{deploy-dev}, \texttt{deploy-staging}, \texttt{deploy-prod} as separate
+targets
 \item Copy-paste is fine when learning what each environment needs
 \item Focus on making each target work reliably first
 \end{itemize}
@@ -103,8 +154,8 @@ Don't jump straight to advanced features—evolve into them naturally as your ne
 \item Don't force everything into patterns if it doesn't fit
 \end{itemize}
 
-The key is solving today's problems with today's complexity level, not building for imaginary future requirements.
-\end{calloutbox}
+The key is solving today's problems with today's complexity level, not building
+for imaginary future requirements. \end{calloutbox}
 
 \newpage
 ## Pattern Rules for Handling Multiple Environments
@@ -130,7 +181,8 @@ deploy-%: validate-% ## Deploy to specified environment
 # Now: make deploy-dev, make deploy-staging, make deploy-prod
 ```
 
-The `%` matches any string, and `$*` contains the matched portion. One rule creates multiple targets.
+The `%` matches any string, and `$*` contains the matched portion. One rule
+creates multiple targets.
 
 \newpage
 ### Environment-Specific Validation
@@ -156,7 +208,8 @@ deploy-%: validate-%
 	@./scripts/deploy.sh $*
 ```
 
-Pattern rules work with prerequisites. Each environment gets appropriate validation automatically.
+Pattern rules work with prerequisites. Each environment gets appropriate
+validation automatically.
 
 \newpage
 ### Service-Specific Pattern Rules
@@ -805,6 +858,510 @@ check-git-clean: ## Ensure clean working directory
 ```
 
 Git state influences workflow decisions.
+\newpage
+
+## Hidden Gems: Lesser-Known Make Features
+
+Make's documentation spans decades of development. Buried in that history are
+features that solve specific problems elegantly but remain unknown to most
+users. These aren't academic curiosities—they're practical tools that can
+simplify complex DevOps workflows once you understand when to apply them.
+
+This section covers Make's lesser-known capabilities: features that didn't make
+it into introductory tutorials but prove invaluable when you hit their specific
+use cases. You won't need all of these immediately. But when you encounter the
+problems they solve, you'll be glad you know they exist.
+
+### Secondary Expansion: Dynamic Prerequisites
+
+Prerequisites are evaluated when Make reads the Makefile. This creates a
+problem: how do you create prerequisites that depend on the target's name or
+other computed values?
+
+Secondary expansion solves this by evaluating prerequisites twice—once during
+initial parsing, and again when the target is about to execute. Enable it with
+`.SECONDEXPANSION:` and use `$$` to delay evaluation:
+
+```makefile
+.SECONDEXPANSION:
+
+# Deploy to environment using environment-specific config
+deploy-%: test build-% config/$$(ENV_$$*).yaml
+	@echo "Deploying $* with config: config/$(ENV_$*).yaml"
+	./scripts/deploy.sh $* config/$(ENV_$*)
+
+# Define environment-specific configs
+ENV_dev = dev-config
+ENV_staging = staging-config
+ENV_prod = prod-config
+
+build-%:
+	@echo "Building for $* environment"
+	docker build -t myapp:$* .
+```
+
+The `$$` delays evaluation until Make processes the specific target. When you
+run `make deploy-prod`, Make expands `$$(ENV_$$*)` to `$(ENV_prod)`, which then
+expands to `prod-config`. The prerequisite becomes `config/prod-config.yaml`.
+
+Without secondary expansion, you'd need separate targets for each environment or
+complex pattern matching logic. Secondary expansion lets you write the pattern
+once and have it work for all environments.
+
+**When to use it**: Dynamic prerequisites based on target names, especially with
+pattern rules where the matched portion (`$*`) determines what files are needed.
+
+**Gotcha**: The double-dollar syntax is easy to get wrong. Test thoroughly and
+use `make -n` to verify prerequisites expand correctly.
+
+\newpage ### Target-Specific and Pattern-Specific Variables
+
+Different targets need different configurations. Production builds need
+optimization flags. Debug builds need symbols and verbose output.
+Target-specific variables override global settings for specific targets:
+
+```makefile
+# Global defaults
+DOCKER_BUILD_FLAGS = --no-cache
+DEPLOY_FLAGS = --wait
+
+# Production needs extra safety
+deploy-prod: DEPLOY_FLAGS += --timeout=300s --verify
+deploy-prod: DOCKER_BUILD_FLAGS += --build-arg ENV=production
+deploy-prod: test build
+	./scripts/deploy.sh $(DEPLOY_FLAGS)
+
+# Development can be fast and loose
+deploy-dev: DOCKER_BUILD_FLAGS = --cache-from=myapp:dev
+deploy-dev: DEPLOY_FLAGS = --no-wait
+deploy-dev: build
+	./scripts/deploy.sh $(DEPLOY_FLAGS)
+
+build:
+	docker build $(DOCKER_BUILD_FLAGS) -t myapp:$(ENV) .
+```
+
+Pattern-specific variables apply to all targets matching a pattern:
+
+```makefile
+# All test targets get debug flags
+test-%: DEBUG_FLAGS = -v --log-level=DEBUG
+test-%: COVERAGE_FLAGS = --cov --cov-report=html
+
+test-%:
+	pytest $(DEBUG_FLAGS) $(COVERAGE_FLAGS) tests/$*/
+
+# All production targets get strict validation
+deploy-prod-%: VALIDATION_LEVEL = strict
+deploy-prod-%: APPROVAL_REQUIRED = true
+
+deploy-prod-%: validate-% test-%
+	@if [ "$(APPROVAL_REQUIRED)" = "true" ]; then \
+		./scripts/require-approval.sh; \
+	fi
+	./scripts/deploy.sh $* --validation=$(VALIDATION_LEVEL)
+```
+
+This eliminates conditional logic in recipes. The variable values automatically
+adjust based on which target is executing.
+
+**When to use it**: Different environments need different settings, or you have
+groups of targets (test-*, deploy-prod-*) that share configuration.
+
+**Benefit**: Configuration lives with the target that uses it, not scattered
+through conditionals. The target name determines the behavior.
+
+\newpage ### Grouped Targets: Multiple Outputs from Single Commands
+
+Traditional Make treats multiple targets as separate rules that each run
+independently:
+
+```makefile
+# WRONG: This runs the command twice!
+deployment.yaml service.yaml: templates/app.j2
+	./scripts/generate-k8s.sh  # Generates both files
+```
+
+If both files are out of date, Make runs the command twice—once for each target.
+Grouped targets (`&:`) tell Make that one command generates all the outputs:
+
+```makefile
+# Correct: Command runs once, generates both files
+deployment.yaml service.yaml &: templates/app.j2 values.yaml
+	./scripts/generate-k8s.sh templates/app.j2 values.yaml
+
+# Another example: Terraform generates multiple files
+.terraform/terraform.tfstate .terraform/terraform.tfstate.backup &: *.tf
+	terraform init
+	terraform plan
+
+deploy: .terraform/terraform.tfstate
+	terraform apply
+```
+
+The `&:` syntax (available in Make 4.3+) declares that the recipe generates all
+listed targets in a single invocation. Make tracks all of them and only re-runs
+if any are missing or any prerequisite is newer.
+
+**When to use it**: Any command that generates multiple output files—template
+engines, code generators, Terraform, CloudFormation, or any script that writes
+multiple artifacts.
+
+**Gotcha**: Requires Make 4.3 or later (released 2020). Check your version with
+`make --version`. If you're stuck on an older version, use a marker file pattern
+instead:
+
+```makefile
+# Fallback for Make < 4.3
+.k8s-generated: templates/app.j2 values.yaml
+	./scripts/generate-k8s.sh
+	touch .k8s-generated
+
+deployment.yaml service.yaml: .k8s-generated
+```
+
+\newpage
+### .RECIPEPREFIX: Escaping Tab Hell
+
+Make's tab requirement causes problems: editors insert spaces, copying from
+documentation breaks formatting, and Python developers' muscle memory fights it
+constantly. `.RECIPEPREFIX` lets you change the recipe indicator:
+
+```makefile
+.RECIPEPREFIX = >
+
+deploy:
+> @echo "No tabs needed!"
+> kubectl apply -f k8s/
+> @echo "Deployment complete"
+
+test:
+> pytest tests/
+> coverage report
+```
+
+Now recipes use `>` instead of tabs. Your editor's space settings don't break
+the Makefile.
+
+**When to use it**: Teams that constantly fight tab issues, or Makefiles
+embedded in documentation where preserving tabs is difficult.
+
+**Major caveat**: This is non-standard. Anyone using your Makefile needs to
+understand the custom prefix. For shared Makefiles, stick with tabs and
+configure editors properly. For personal or team-internal Makefiles where
+everyone agrees on the convention, `.RECIPEPREFIX` can reduce friction.
+
+**Best practice**: If you use this, document it prominently at the top of the
+Makefile:
+
+```makefile
+# This Makefile uses > as recipe prefix instead of tabs
+# Requires Make 3.82 or later
+.RECIPEPREFIX = >
+```
+
+\newpage
+### Advanced Automatic Variable Modifiers
+
+You know `$@` (target name) and `$<` (first prerequisite). Make provides
+modifiers that extract directory and filename components:
+
+```makefile
+# Automatic variables and their modifiers:
+# $@   - target name              (e.g., "build/app.bin")
+# $(@D) - directory of target     (e.g., "build")
+# $(@F) - filename of target      (e.g., "app.bin")
+# $<   - first prerequisite       (e.g., "src/main.c")
+# $(<D) - directory of first req  (e.g., "src")
+# $(<F) - filename of first req   (e.g., "main.c")
+
+# Useful for organizing build outputs
+build/%.yaml: templates/%.j2
+	@mkdir -p $(@D)  # Create output directory
+	j2 $< > $@
+	@echo "Generated $(@F) in $(@D)"
+
+# Deploy based on environment structure
+deploy-%: configs/%.yaml
+	@echo "Deploying $(@F) using config from $(<D)"
+	kubectl apply -f $< --namespace=$*
+
+# Process files maintaining directory structure
+dist/%.min.js: src/%.js
+	@mkdir -p $(@D)
+	uglifyjs $< --output $@ --source-map $(@D)/$(<F).map
+```
+
+These modifiers eliminate manual string manipulation with `basename`, `dirname`,
+or `subst`. Make handles the path parsing.
+
+**When to use it**: File-based targets where you need to create output
+directories, reference source locations, or maintain directory structures in
+build outputs.
+
+**Example use case**: Compiling source files from nested directories into a flat
+build directory while maintaining logical organization.
+
+\newpage
+### Intermediate File Handling
+
+Make can automatically clean up temporary files it generates during builds. The
+`.INTERMEDIATE`, `.SECONDARY`, and `.NOTINTERMEDIATE` directives control this
+behavior:
+
+```makefile
+# Mark files as intermediate - Make will delete them after use
+.INTERMEDIATE: %.compiled config.tmp
+
+# Build process: source → compiled → optimized
+%.optimized: %.compiled
+	./scripts/optimize.sh $< $@
+
+%.compiled: %.source
+	./scripts/compile.sh $< $@
+
+# config.tmp is generated and used, then deleted
+deploy: app.optimized config.tmp
+	./scripts/deploy.sh app.optimized config.tmp
+	# After successful deploy, Make deletes *.compiled and config.tmp
+```
+
+`.SECONDARY` marks files that shouldn't be deleted but also shouldn't trigger
+rebuilds of targets that depend on them:
+
+```makefile
+# Keep these generated files around
+.SECONDARY: api-schema.json terraform.tfstate
+
+# Don't rebuild app just because schema timestamp changed
+app: api-schema.json code.compiled
+	./scripts/link.sh code.compiled $@
+
+api-schema.json: api.yaml
+	./scripts/generate-schema.sh $< $@
+```
+
+`.NOTINTERMEDIATE` (Make 4.4+) explicitly prevents intermediate deletion:
+
+```makefile
+# Keep debug symbols even though they're intermediate
+.NOTINTERMEDIATE: %.debug
+
+production: app.stripped
+
+app.stripped: app.debug
+	strip -o $@ $<
+
+app.debug: app.o
+	gcc -g app.o -o $@
+```
+
+**When to use it**: Build processes with multi-stage transformations where
+temporary files clutter your workspace. Or when you need fine-grained control
+over which generated files persist.
+
+**Gotcha**: Intermediate files are only deleted if the build succeeds. Failed
+builds leave them around for debugging, which is usually what you want.
+
+\newpage
+### Parallel Build Output Synchronization
+
+Parallel builds with `make -j` improve speed but create unreadable output when
+multiple targets print simultaneously:
+
+```bash
+# Without output-sync: chaos
+$ make -j4 build-all
+Buil[Testding iapiBuil...
+ng ding woruser-kser...
+ervic]ice...
+Test pPass[edWorkering tes d!
+eployed!
+```
+
+The `--output-sync` flag groups output by target:
+
+```bash
+# With output-sync=target: clean output
+$ make -j4 --output-sync=target build-all
+Building api...
+Tests passed!
+Deployed api!
+
+Building user-service...
+Tests passed!
+Deployed user-service!
+
+Building worker...
+Tests passed!
+Deployed worker!
+```
+
+Available modes:
+
+- `--output-sync=none` - No synchronization (default, fastest)
+- `--output-sync=line` - Synchronize per line (minimal buffering)
+- `--output-sync=target` - Buffer entire target output (most readable)
+- `--output-sync=recurse` - Synchronize recursive make calls
+
+For DevOps workflows, `target` mode works best—you see complete output for each
+service/component without interleaving:
+
+```makefile
+# Enable synchronized parallel builds
+MAKEFLAGS += --output-sync=target
+
+.PHONY: build-all
+
+SERVICES = api frontend worker notification
+
+build-all: $(SERVICES:%=build-%)
+
+build-%:
+	@echo "=== Building $* ==="
+	docker build -t $*:latest services/$*
+	docker push $*:latest
+	@echo "=== $* complete ==="
+
+# Run with: make -j4 build-all
+# Output remains grouped by service
+```
+
+**When to use it**: Any parallel build or deployment workflow where you need
+readable logs. Essential for CI/CD where you're reviewing build output after the
+fact.
+
+**Tradeoff**: Output appears in chunks rather than streaming. For long-running
+targets, you won't see progress until the target completes. Use `line` mode if
+you need streaming output.
+
+\newpage
+### Combining Hidden Features for Power Workflows
+
+These features combine to solve complex problems:
+
+```makefile
+.SECONDEXPANSION:
+.RECIPEPREFIX = >
+
+# Pattern-specific variables for environment groups
+deploy-prod-%: VALIDATION = strict
+deploy-prod-%: REPLICAS = 5
+deploy-dev-%: VALIDATION = basic
+deploy-dev-%: REPLICAS = 1
+
+# Grouped targets with secondary expansion
+k8s/%-deployment.yaml k8s/%-service.yaml &: \
+    templates/k8s.j2 configs/$$(ENV_$$*).yaml
+> @mkdir -p $(@D)
+> ./scripts/generate-k8s.sh $* $(VALIDATION) $(REPLICAS)
+
+# Deploy with automatic config resolution
+deploy-prod-api: k8s/api-deployment.yaml k8s/api-service.yaml
+> kubectl apply -f k8s/api-deployment.yaml
+> kubectl apply -f k8s/api-service.yaml
+> kubectl wait --for=condition=ready pod -l app=api
+
+# Parallel deployment with clean output
+MAKEFLAGS += --output-sync=target
+
+deploy-all: deploy-prod-api deploy-prod-frontend deploy-prod-worker
+```
+
+This combines:
+- Secondary expansion for dynamic config prerequisites
+- Pattern-specific variables for environment settings
+- Grouped targets for multi-file generation
+- `.RECIPEPREFIX` for readability
+- Output synchronization for parallel execution
+
+Each feature solves a specific problem. Together, they create powerful,
+maintainable workflows.
+
+\newpage
+### When to Use Hidden Features
+
+These features add complexity. Use them when they solve real problems:
+
+**Use secondary expansion when:**
+- Pattern rules need prerequisites based on the matched pattern
+- Target names determine which files are needed
+- You're duplicating rules that differ only in prerequisite lists
+
+**Use target-specific variables when:**
+- Different targets need different flag values
+- Conditionals inside recipes are getting complex
+- Configuration naturally groups with specific targets
+
+**Use grouped targets when:**
+- One command generates multiple files
+- You're getting duplicate builds of multi-output targets
+- Templates or code generators create multiple artifacts
+
+**Use .RECIPEPREFIX when:**
+- Your team constantly fights tab issues
+- The Makefile is personal/internal only
+- Editor configuration isn't solving the problem
+
+**Use automatic variable modifiers when:**
+- Working with file paths in recipes
+- Maintaining directory structure in outputs
+- Manual path manipulation clutters recipes
+
+**Use intermediate file handling when:**
+- Multi-stage builds create temporary files
+- Disk space matters and cleanup is needed
+- You want automatic cleanup without manual rm commands
+
+**Use output synchronization when:**
+- Parallel builds produce unreadable output
+- Reviewing CI logs requires detective work
+- You need grouped output by target
+
+\newpage
+### Version Requirements and Portability
+
+These features have different Make version requirements:
+
+- **Secondary expansion**: Make 3.81+ (2006)
+- **Target-specific variables**: Make 3.76+ (1997)
+- **Grouped targets**: Make 4.3+ (2020)
+- **.RECIPEPREFIX**: Make 3.82+ (2010)
+- **Automatic variable modifiers**: Make 3.0+ (ancient)
+- **Intermediate files**: Make 3.76+ (1997)
+- **--output-sync**: Make 4.0+ (2013)
+
+Most systems have Make 4.x by now, but CI environments or older servers might
+have Make 3.81. Check versions if you're using newer features:
+
+```makefile
+# Check Make version and fail early
+MAKE_VERSION := $(shell make --version | head -1 | cut -d' ' -f3)
+REQUIRED_VERSION := 4.3
+
+ifeq ($(shell printf '%s\n' "$(REQUIRED_VERSION)" "$(MAKE_VERSION)" | \
+              sort -V | head -1),$(REQUIRED_VERSION))
+    $(info Make $(MAKE_VERSION) detected, version OK)
+else
+    $(error Make $(REQUIRED_VERSION)+ required, found $(MAKE_VERSION))
+endif
+```
+
+For maximum portability, stick to features from Make 3.81 or provide fallback
+patterns for older versions.
+
+These features represent Make's depth—capabilities that solve specific problems
+elegantly once you encounter them. You won't need all of them immediately, and
+you shouldn't reach for them preemptively. But when you hit the problem they
+solve—dynamic prerequisites that depend on target names, commands that generate
+multiple files, or parallel builds with unreadable output—you'll have the right
+tool ready.
+
+The discipline remains the same: simple Makefiles beat clever ones unless the
+cleverness eliminates real pain. These hidden features are in your toolkit now.
+Use them when the problem appears, not before.
+
+
 
 \newpage
 ## Creating Extensible Frameworks
@@ -872,9 +1429,14 @@ Configuration determines workflow without changing the Makefile.
 \newpage
 ### Reusable Components with Functions
 
-Functions encapsulate repetitive command sequences into reusable blocks. When you find yourself copying the same multi-line command pattern across targets, functions eliminate the duplication while keeping the logic in one maintainable location.
+Functions encapsulate repetitive command sequences into reusable blocks. When
+you find yourself copying the same multi-line command pattern across targets,
+functions eliminate the duplication while keeping the logic in one maintainable
+location.
 
-Make functions use `define` and `endef` to wrap commands, accept parameters through `$(1)`, `$(2)`, etc., and get invoked with `$(call function_name,arg1,arg2)`.
+Make functions use `define` and `endef` to wrap commands, accept parameters
+through `$(1)`, `$(2)`, etc., and get invoked with `$(call
+function_name,arg1,arg2)`.
 
 Start with a simple example:
 
@@ -890,12 +1452,15 @@ deploy-api:
 	$(call log_message,API deployment complete)
 ```
 
-The `$(1)` represents the first argument passed to the function. Simple functions like this standardize output formatting across all targets without repeating date formatting logic.
+The `$(1)` represents the first argument passed to the function. Simple
+functions like this standardize output formatting across all targets without
+repeating date formatting logic.
 
 \newpage
 #### Standardizing Repetitive Notifications
 
-DevOps workflows need consistent notifications. Functions centralize the notification logic:
+DevOps workflows need consistent notifications. Functions centralize the
+notification logic:
 
 ```makefile
 # Function for cleanup reminders
@@ -920,7 +1485,8 @@ cleanup-cache:
 	@./scripts/cleanup-test-cache.sh
 ```
 
-Before functions, each target repeated the notification text. Functions ensure consistent messaging and make updates happen in one place.
+Before functions, each target repeated the notification text. Functions ensure
+consistent messaging and make updates happen in one place.
 
 \newpage
 #### Environment Configuration Pattern
@@ -956,7 +1522,9 @@ deploy-api-staging:
 	$(call deploy_service,api,staging)
 ```
 
-The function handles environment file validation and service deployment with two parameters: service name `$(1)` and environment `$(2)`. Changes to deployment logic happen once, not in every target.
+The function handles environment file validation and service deployment with two
+parameters: service name `$(1)` and environment `$(2)`. Changes to deployment
+logic happen once, not in every target.
 
 \newpage
 #### Multi-Step Operations with Error Handling
@@ -983,7 +1551,9 @@ deploy-frontend-prod:
 	$(call safe_deploy,frontend,prod)
 ```
 
-Health checks, deployment, rollback logic, and verification exist in one function. Every service gets the same safety guarantees without duplicating the error handling code.
+Health checks, deployment, rollback logic, and verification exist in one
+function. Every service gets the same safety guarantees without duplicating the
+error handling code.
 
 \newpage
 #### Framework Integration with Functions
@@ -1012,7 +1582,9 @@ deploy-order-service:
 # Teams don't change individual targets
 ```
 
-Framework functions let you evolve deployment patterns without touching every target. Add monitoring, change health check logic, or enhance error handling in one place.
+Framework functions let you evolve deployment patterns without touching every
+target. Add monitoring, change health check logic, or enhance error handling in
+one place.
 
 \newpage
 #### When to Use Functions
@@ -1031,9 +1603,13 @@ Avoid functions when:
 - **Only used once** (inline the commands directly)
 - **Team unfamiliar with Make functions** (simpler approaches exist)
 
-Functions add a layer of indirection. Teams need to understand `$(call ...)` syntax and find function definitions to understand what targets do. Use functions when duplication pain exceeds learning curve pain.
+Functions add a layer of indirection. Teams need to understand `$(call ...)`
+syntax and find function definitions to understand what targets do. Use
+functions when duplication pain exceeds learning curve pain.
 
-The right balance: functions for framework code that many teams use, simple targets for team-specific workflows. Functions become infrastructure—stable, well-tested, and trusted by everyone.
+The right balance: functions for framework code that many teams use, simple
+targets for team-specific workflows. Functions become infrastructure—stable,
+well-tested, and trusted by everyone.
 
 \newpage
 ## Key Takeaways
@@ -1059,15 +1635,17 @@ Use these features when they solve real problems:
 - Frameworks when standardizing across teams
 - Functions when command sequences repeat across targets
 
-Don't use advanced features for their own sake. Simple, clear Makefiles beat clever, complex ones unless complexity solves a real problem.
+Don't use advanced features for their own sake. Simple, clear Makefiles beat
+clever, complex ones unless complexity solves a real problem.
 
 \newpage
 ### The Payoff:
 Advanced features turn duplication into abstraction without sacrificing
 visibility. Pattern rules let you write `deploy-%` once instead of copying
-`deploy-dev`, `deploy-staging`, and `deploy-prod`. Functions encapsulate your standard
-health-check-deploy-verify sequence so improvements propagate automatically.
-Recursive Make coordinates five microservices without a 200-line orchestration
+`deploy-dev`, `deploy-staging`, and `deploy-prod`. Functions encapsulate your
+standard health-check-deploy-verify sequence so improvements propagate
+automatically. Recursive Make coordinates five microservices without a 200-line
+orchestration
 script.
 
 The real power: these features compress your Makefile's *size* while expanding its
