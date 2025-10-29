@@ -451,18 +451,11 @@ Using \texttt{.IGNORE} is almost always wrong—it hides real problems. If you'r
 tempted to use it, you probably need better error handling in your scripts.
 
 Default to failing fast and loud. Your future self will thank you when errors
-are caught immediately rather than silently ignored. \end{calloutbox}
+are caught immediately rather than silently ignored.
 
-\begin{calloutbox}[Advanced Shell Configuration: Chapter 8]
-The error handling patterns shown here—using \texttt{set -e}, \texttt{-} prefix, and \texttt{||} operators—work well for individual targets. But for complex DevOps workflows where failures have serious consequences, Make offers powerful shell configuration directives that provide systematic error handling.
-Chapter 8's "Robust Shell Configuration and Error Handling" section covers:
-\begin{itemize}
-\item \texttt{.ONESHELL}: Running all target commands in a single shell (so \texttt{cd} and environment variables persist)
-\item \texttt{.SHELLFLAGS}: Strict error handling modes (\texttt{-euo pipefail}) that catch failures you'd otherwise miss
-\item \texttt{DEBUG} flags for troubleshooting failed deployments
-\item Handling commands with expected non-zero exit codes (like \texttt{grep})
-\end{itemize}
-For now, the patterns in this chapter handle most needs. But when you're writing production deployment workflows where silent failures could cause incidents, the advanced configurations in Chapter 8 provide a safety net that catches errors before they reach production.
+For production-critical workflows, see Chapter 8's "Robust Shell Configuration
+and Error Handling" for advanced shell directives (.ONESHELL, .SHELLFLAGS) that
+provide systematic safety guarantees.
 \end{calloutbox}
 
 \newpage
