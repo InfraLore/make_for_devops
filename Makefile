@@ -43,6 +43,10 @@ TOC = --toc --toc-depth 2
 METADATA_ARGS = --metadata-file $(METADATA) --metadata-file $(TMP_METADATA)
 IMAGES = $(shell find images -type f)
 TEMPLATES = $(shell find templates/ -type f)
+
+# Mermaid diagram files
+MMD_FILES = $(shell find images -name "*.mmd" -type f)
+PNG_FILES = $(MMD_FILES:.mmd=.png)
 COVER_IMAGE = images/cover.png
 MATH_FORMULAS = --webtex
 
@@ -124,7 +128,7 @@ endef
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs
+.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs diagrams
 
 all:	book ## Build all formats (epub, html, pdf, docx)
 
@@ -225,7 +229,20 @@ find_blank_pages: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Find blank pages in the
 blank_pages_report: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Generate a report of blank pages in the PDF
 	@bin/pdf_blank_scanner.py $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf --create-report
 
-find_bullets: ## Find bullet points that may be incorrectly formatted
+diagrams: $(PNG_FILES) ## Generate PNG diagrams from all .mmd files
+
+# Pa		ern rule to convert .mmd files to .png files
+images/%.png: images/%.mmd
+	@echo "Generating diagram: $@..."
+	@if command -v mmdc >/dev/null 2>&1; then \
+		mmdc -i $< -o $@; \
+	else \
+		echo "❌ mmdc (mermaid-cli) not found!"; \
+		echo "Install it with: npm install -g @mermaid-js/mermaid-cli"; \
+		exit 1; \
+	fi
+	@echo "✅ Generated: $@"
+find_bullets: ## Find bullet points that may be incorrectly forma		ed
 	@awk 'prev ~ /:$$/ && $$0 ~ /^[[:space:]]*[-*+][[:space:]]/ {print FILENAME ":" FNR ":" prev "\n" $$0} {prev=$$0}' chapters/*.md
 
 stats: ## Show book statistics
