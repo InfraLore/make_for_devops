@@ -581,7 +581,7 @@ with `-e` enabled.
 \newpage
 ### Adding a DEBUG Flag
 
-DevOps workflows need visibility during development and troubleshooting. A DEBUG
+DevOps workflows need visibility during development and troubleshooting. A `DEBUG`
 flag adds shell tracing without modifying target code:
 
 ```makefile
@@ -621,6 +621,21 @@ Verifying deployment...
 
 This visibility helps debug CI failures where you can't easily add `echo`
 statements. You see exactly which command failed and what preceded it.
+
+The `DEBUG` flag approach complements other debugging techniques covered
+elsewhere in this book. Chapter 3 covers Make's built-in debugging with `make -n`
+(dry run) and `make -d` (debug output), which show you what Make is thinking about
+dependencies and execution order. Chapter 4 explores validation and testing
+strategies for Makefiles themselves. Chapter 19 dives deep into troubleshooting
+production Make workflows with comprehensive debugging strategies.
+
+The `DEBUG` flag's advantage: surgical precision. Unlike `make -d` which shows
+everything Make does, this `DEBUG=1` pattern traces only the shell commands in
+your targets. You can even combine approaches: `make -n DEBUG=1 deploy-api` shows
+what would run with tracing enabled, without actually executing anything. This
+is invaluable when debugging a specific target in a complex Makefile with dozens
+of targets—you get detailed shell execution traces without wading through Make's
+internal dependency resolution.
 
 \newpage
 ### Conditional Debug Configuration
