@@ -467,6 +467,14 @@ $endif$
       \vskip 0.5em
       {\LatoFont\footnotesize \textcolor{gray}{Git date: $git_date$}\par}
     $endif$
+    $if(rights)$
+      \vskip 2em
+      {\LatoFont\footnotesize \textcolor{gray}{$rights$}\par}
+    $endif$
+    $if(covercredit)$
+      \vskip 0.5em
+      {\LatoFont\footnotesize \textcolor{gray}{$covercredit$}\par}
+    $endif$
     $if(logo)$
       \vskip 1em
       \includegraphics{$logo$} % logo

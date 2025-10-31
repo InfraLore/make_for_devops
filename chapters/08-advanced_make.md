@@ -11,110 +11,75 @@ features that can transform complex, repetitive operational tasks into elegant,
 maintainable automation.
 
 This chapter explores Make's sophisticated features: pattern rules that
-eliminate repetitive target definitions, recursive Make for coordinating
-multiple projects, external tool integration patterns, and conditional execution
-based on system state.
+eliminate repetitive target definitions, robust shell configuration for
+production workflows, lesser-known features that solve specific problems
+elegantly, configuration-driven workflows for team autonomy, and functions that
+encapsulate complex sequences.
 
-## The DevOps Automation Dilemma
+## Recognizing When You Need Advanced Features
 
-DevOps work inherently involves managing **multiplicity at scale**: multiple
-environments (dev, staging, prod), multiple services (api, frontend, worker),
-multiple deployment strategies (rolling, canary, blue-green), and multiple cloud
-providers or regions. This multiplicity creates a tension between three
-competing needs:
+Look at your current Makefile. What makes you groan when you work with it?
 
-**Consistency**: Every environment should deploy the same way. Every service
-should follow the same standards. When you fix a bug in one workflow, that fix
-should apply everywhere automatically.
+**Copy-paste proliferation**: You have `deploy-dev`, `deploy-staging`,
+`deploy-prod` that are identical except for one word. Or five services with
+identical build targets. Every new environment means copying another target.
 
-**Flexibility**: Production needs extra safety checks that dev doesn't. The
-payment service needs PCI compliance steps that other services don't. Some teams
-use Docker, others use native builds.
+**Change amplification**: When you improve your deployment process, you need to
+update it in twelve places. Miss one and environments diverge. A bug fix becomes
+an archaeological dig to find all the variants.
 
-**Maintainability**: When deployment requirements change, you shouldn't need to
-update fifty similar targets. When a new team member reads your Makefile, they
-should understand the pattern, not memorize individual cases.
+**Implicit knowledge**: Team members say "we deploy to staging the same way as
+prod, but..." and the "but" is only in their heads, not in the Makefile. The
+team lore grows while the documentation stays static.
 
-Traditional Makefile approaches force you to choose: either duplicate targets
-for consistency (brittle and hard to maintain), or write complex shell scripts
-that hide logic from Make (losing discoverability), or create a web of
-dependencies that nobody understands.
+**Silent failures in production**: A command in the middle of a deployment
+script fails quietly. Environment variables don't persist between commands. A
+script that worked on your laptop breaks in CI because of different shell
+behavior.
 
-Make's advanced features solve this dilemma by letting you **encode patterns
-without losing transparency**. Pattern rules say "here's how we deploy to *any*
-environment" while still letting you see exactly what `make deploy-prod` will
-do. Recursive Make coordinates multiple projects while keeping each project's
-Makefile simple and focused. Functions encapsulate complex sequences while
-keeping the invocation readable.
+**Over-engineering signals**: You're using pattern rules for two targets. Your
+functions have functions calling functions. New team members can't figure out
+what `make deploy-prod` does. You're writing features "because we might need
+this later."
+
+These patterns indicate that your workflow has structure that isn't captured in
+your Makefile, or that you're fighting Make's defaults, or that you've added
+abstraction without solving real problems.
+
+## The Incremental Adoption Pattern
+
+Don't rewrite your Makefile. Add one advanced feature to solve one specific pain
+point:
+
+**Week 1**: You have `deploy-dev`, `deploy-staging`, `deploy-prod` that are 90%
+identical. Convert to `deploy-%` pattern rule. Three targets become one rule.
+
+**Week 3**: You realize every deployment should check health but you keep
+forgetting. The checks run in separate shells and context gets lost. Add
+`.ONESHELL` and strict error handling. Now failures stop immediately.
+
+**Week 5**: You're writing the same health-check-deploy-verify sequence in eight
+targets. Create a `safe_deploy` function. Changes propagate automatically.
+
+**Week 7**: Three teams need different deployment strategies but you're
+maintaining one giant Makefile full of conditionals. Extract to configuration
+files. Teams own their config, you own the execution engine.
+
+Live with each change for a week. Does it actually help? Is it clear to others?
+If it's not obviously better, revert to simple targets. Only after one change
+proves valuable, move to the next pain point.
+
+### The Test
+
+After adding an advanced feature, run `make -n <target>` and read the output. If
+you can't easily understand what will happen, you've gone too far. Revert to
+something simpler.
 
 The key insight: **these features let you scale automation without scaling
 complexity for users**. A new developer can still run `make help` and understand
 what's possible. They can run `make -n deploy-staging` and see exactly what will
 happen. But behind that simplicity, you've eliminated hundreds of lines of
 duplication.
-
-## When Multiplicity Demands Abstraction
-
-Look for these signals that you need advanced features:
-
-**Copy-paste proliferation**: You have `deploy-dev`, `deploy-staging`,
-`deploy-prod` that are identical except for one word. Or five services with
-identical build targets.
-
-**Change amplification**: When you improve your deployment process, you need to
-update it in twelve places. Miss one and environments diverge.
-
-**Implicit knowledge**: Team members say "we deploy to staging the same way as
-prod, but..." and the "but" is only in their heads, not in the Makefile.
-
-**Multi-project coordination**: You're running make commands in five different
-directories in a specific order, and that order isn't documented anywhere.
-
-These patterns indicate that your workflow has inherent structure that isn't
-captured in your Makefile. The advanced features in this chapter give you tools
-to make that implicit structure explicit and automatic.
-
-## Applying Advanced Features to Your Workflows
-
-You understand the tools. Now here's how to recognize when to use them in your
-actual DevOps work.
-
-### Start with Your Pain Points
-
-Look at your current Makefile. What makes you groan?
-
-- **"I just added a fifth environment and had to update 20 targets"** → Pattern
-  rules
-- **"I keep forgetting to run the pre-deploy checks"** → Functions that bundle
-  checks with deployment
-- **"I have to coordinate three repos in the right order"** → Recursive Make
-- **"Production needs different validation than staging"** → Conditional
-  execution
-- **"Every team reinvents deployment slightly differently"** → Extensible
-  frameworks
-
-### The Incremental Adoption Pattern
-
-Don't rewrite your Makefile. Add one advanced feature to solve one specific pain
-point:
-
-1. **Pick the most annoying duplication** - The targets you copy-paste most often
-2. **Convert just that set** - Leave everything else alone
-3. **Live with it for a week** - Does it actually help? Is it clear to others?
-4. **Refine or revert** - If it's not clearly better, go back to simple targets
-5. **Move to the next pain point** - Only after the first one proves valuable
-
-### Example Progression
-
-**Week 1**: You have `deploy-dev`, `deploy-staging`, `deploy-prod` that are 90%
-identical. Convert to `deploy-%` pattern rule. Three targets become one rule.
-
-**Week 3**: You realize every deployment should notify Slack but you keep
-forgetting. Create a `deploy_with_notification` function. Now it's automatic.
-
-**Week 5**: You're coordinating API, frontend, and worker deployments manually.
-Add recursive Make to orchestrate them. The sequence is now encoded, not team
-lore.
 
 ### Warning Signs You're Over-Engineering
 
@@ -123,39 +88,10 @@ lore.
 - New team members can't figure out what `make deploy-prod` does (too much
   indirection)
 - You're writing advanced features "because we might need this later" (YAGNI)
+- Your Makefile feels clever rather than clear
 
-### The Test
-
-After adding an advanced feature, run `make -n <target>` and read the output. If
-you can't easily understand what will happen, you've gone too far. Revert to
-something simpler.
-
-\begin{calloutbox}[The Glide Path: Evolving to Advanced Features] Don't jump
-straight to advanced features—evolve into them naturally as your needs grow:
-
-\textbf{Stage 1: Start with Repetition} \begin{itemize} \item Write
-\texttt{deploy-dev}, \texttt{deploy-staging}, \texttt{deploy-prod} as separate
-targets
-\item Copy-paste is fine when learning what each environment needs
-\item Focus on making each target work reliably first
-\end{itemize}
-
-\textbf{Stage 2: Notice the Patterns}
-\begin{itemize}
-\item After 3-4 similar targets, you'll see the repetition
-\item This is when pattern rules (\texttt{deploy-\%}) start making sense
-\item Convert one set of repetitive targets at a time
-\end{itemize}
-
-\textbf{Stage 3: Handle Exceptions}
-\begin{itemize}
-\item Some environments need special handling
-\item Use pattern rules for common cases, specific targets for exceptions
-\item Don't force everything into patterns if it doesn't fit
-\end{itemize}
-
-The key is solving today's problems with today's complexity level, not building
-for imaginary future requirements. \end{calloutbox}
+Advanced features solve real problems. Use them when duplication pain or failure
+risk exceeds the cost of indirection. Not before.
 
 \newpage
 ## Pattern Rules for Handling Multiple Environments
@@ -234,139 +170,6 @@ deploy-all-services: $(SERVICES:%=deploy-%-service)
 ```
 
 One pattern handles all services. Add new services without changing the Makefile.
-
-\newpage
-## Recursive Make for Multi-Project Orchestration
-
-Coordinate multiple related projects:
-
-```makefile
-# Project structure:
-# /
-# ├── services/api/Makefile
-# ├── services/frontend/Makefile
-# └── infrastructure/Makefile
-
-# Coordinate builds across projects
-build-all: ## Build all projects
-	@$(MAKE) -C services/api build
-	@$(MAKE) -C services/frontend build
-	@$(MAKE) -C infrastructure plan
-
-# Test all projects
-test-all: ## Test all projects
-	@$(MAKE) -C services/api test
-	@$(MAKE) -C services/frontend test
-
-# Deploy in correct order
-deploy-all: ## Deploy all projects
-	@$(MAKE) -C infrastructure apply
-	@sleep 10  # Wait for infrastructure
-	@$(MAKE) -C services/api deploy
-	@$(MAKE) -C services/frontend deploy
-```
-
-Simple orchestration across projects. Each project has its own Makefile.
-
-\newpage
-### Parallel Execution
-
-Execute independent projects in parallel:
-
-```makefile
-SERVICES := services/api services/frontend services/worker
-
-# Build services in parallel
-build-services: ## Build all services in parallel
-	@$(MAKE) -j3 $(SERVICES:%=build-%)
-
-# Pattern for individual services
-build-%:
-	@$(MAKE) -C $* build
-
-# Sequential deployment (infrastructure first)
-deploy-orchestrated: ## Deploy with sequencing
-	@$(MAKE) -C infrastructure apply
-	@sleep 30
-	@$(MAKE) -j3 $(SERVICES:%=deploy-%)
-```
-
-Use `-j` flag for parallel execution where safe.
-
-\newpage
-## Integration with External Tools
-
-Integrate with APIs and external services:
-
-```makefile
-# Notify deployment via API
-notify-start: ## Notify deployment start
-	@curl -X POST $(WEBHOOK_URL)/deployment/start \
-		-d '{"app":"$(APP_NAME)","version":"$(VERSION)"}' \
-		|| echo "Failed to notify"
-
-notify-complete: ## Notify deployment complete
-	@curl -X POST $(WEBHOOK_URL)/deployment/complete \
-		-d '{"app":"$(APP_NAME)","version":"$(VERSION)"}' \
-		|| echo "Failed to notify"
-
-# Deploy with notifications
-deploy-with-api: notify-start deploy notify-complete
-```
-
-Integration adds observability without complicating core workflows.
-
-\newpage
-### Cloud Provider Integration
-
-Fetch configuration from cloud services:
-
-```makefile
-# Fetch secrets from AWS
-fetch-aws-secrets: ## Fetch secrets from AWS
-	@aws secretsmanager get-secret-value \
-		--secret-id $(APP_NAME)-secrets \
-		--query SecretString --output text > .secrets
-
-# Fetch secrets from GCP
-fetch-gcp-secrets: ## Fetch secrets from GCP
-	@gcloud secrets versions access latest \
-		--secret=$(APP_NAME)-secrets > .secrets
-
-# Deploy with cloud secrets
-deploy-cloud: fetch-$(CLOUD)-secrets deploy
-```
-
-Abstract cloud provider differences behind consistent interfaces.
-
-\newpage
-## Conditional Execution Based on System State
-
-Execute different workflows based on current state:
-
-```makefile
-# Detect deployment state
-detect-state: ## Detect current deployment state
-	@./scripts/detect-deployment-state.sh
-
-# Deploy based on state
-deploy-smart: ## Deploy based on current state
-	@STATE=$$($(MAKE) -s detect-state); \
-	case $$STATE in \
-		fresh) $(MAKE) deploy-fresh ;; \
-		scaled-down) $(MAKE) deploy-scale-up ;; \
-		unhealthy) $(MAKE) deploy-heal ;; \
-		healthy) $(MAKE) deploy-update ;; \
-	esac
-
-deploy-fresh:
-	@./scripts/deploy-fresh.sh
-
-deploy-update:
-	@./scripts/deploy-update.sh
-```
-
-Workflows adapt to system state automatically.
 
 \newpage
 ## Robust Shell Configuration and Error Handling
@@ -849,28 +652,6 @@ handling.
 The result: workflows that fail fast with clear error messages rather than
 continuing with corrupt state. That's the difference between an incident you
 catch in staging and one that wakes you up at 3 AM.
-\newpage
-### Git-Based Conditional Execution
-
-Different actions for different branches:
-
-```makefile
-# Deploy based on branch
-deploy-by-branch: ## Deploy based on Git branch
-	@BRANCH=$$(git rev-parse --abbrev-ref HEAD); \
-	case $$BRANCH in \
-		main) $(MAKE) deploy-prod ;; \
-		develop) $(MAKE) deploy-staging ;; \
-		feature/*) $(MAKE) deploy-dev ;; \
-	esac
-
-# Ensure working directory is clean
-check-git-clean: ## Ensure clean working directory
-	@git diff --quiet || \
-		(echo "Uncommitted changes" && exit 1)
-```
-
-Git state influences workflow decisions.
 \newpage
 
 ## Hidden Gems: Lesser-Known Make Features
@@ -1750,20 +1531,21 @@ logic in opaque scripts.
 
 ### The Tools:
 1. **Pattern Rules**: Eliminate repetition with `%` wildcards
-2. **Recursive Make**: Coordinate multiple projects
-3. **External Integration**: Connect to APIs and cloud services
-4. **Conditional Execution**: Adapt to system state
-5. **Extensible Frameworks**: Build customizable systems
-6. **Functions**: Encapsulate multi-line sequences with `define/endef` and `$(call)`
+2. **Shell Configuration**: Robust error handling for production workflows
+3. **Secondary Expansion**: Dynamic prerequisites based on target names
+4. **Target-Specific Variables**: Configuration that lives with targets
+5. **Grouped Targets**: Multiple outputs from single commands
+6. **Extensible Frameworks**: Build customizable systems
+7. **Functions**: Encapsulate multi-line sequences with `define/endef` and `$(call)`
 
 ### The Discipline:
-Use these features when they solve real problems:
+Use these features sparingly—only when they solve real problems:
 
-- Pattern rules when you have 3+ similar targets
-- Recursive Make when coordinating multiple projects
-- Conditionals when workflows need to adapt
-- Frameworks when standardizing across teams
-- Functions when command sequences repeat across targets
+- Duplication pain (pattern rules, functions)
+- Silent failure risk (shell configuration)
+- Dynamic dependencies (secondary expansion)
+- Environment differences (target-specific variables, configuration files)
+- Multi-output commands (grouped targets)
 
 Don't use advanced features for their own sake. Simple, clear Makefiles beat
 clever, complex ones unless complexity solves a real problem.
