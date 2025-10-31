@@ -1,7 +1,7 @@
 # Book Proposal: Make for DevOps: Discovering and Documenting Your Workflow with Make
 
-**Proposed Length:** 500 pages
-**Target Release:** Q1 2026
+- **Proposed Length:** 500 pages
+- **Target Release:** Q1 2026
 
 ## 1. The Book Idea & Problem/Solution Statement
 
