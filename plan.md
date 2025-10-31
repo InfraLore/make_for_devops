@@ -2,6 +2,10 @@ convo:
 
 https://claude.ai/chat/0b0cbf74-9c89-4541-8eac-21ecf5fef5e7
 
+NOTE: that conversation was the start... but it took multiple conversations to get to the point of completing the project.
+
+What follows are scattered notes from the early stages of the project.
+
 It looks like Claude 3.5 really wants to make quick reference guides, not write books. That's OK. We can get Claude 4 to do this, two chapters at at time.
 
 - [x] let Claude 4 know that we've added a new chapter 4 (hand it the revised TOC)
