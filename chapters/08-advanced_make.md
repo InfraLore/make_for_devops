@@ -358,7 +358,7 @@ check-errors:
 	grep "ERROR" app.log || echo "No errors found"
 	# The || operator handles the expected failure
 ```
-
+\newpage
 Common patterns for expected failures:
 
 ```makefile
@@ -734,7 +734,7 @@ deploy-dev: build
 build:
 	docker build $(DOCKER_BUILD_FLAGS) -t myapp:$(ENV) .
 ```
-
+\newpage
 Pattern-specific variables apply to all targets matching a pattern:
 
 ```makefile
@@ -853,7 +853,7 @@ Makefile:
 # Requires Make 3.82 or later
 .RECIPEPREFIX = >
 ```
-
+\newpage
 ### Advanced Automatic Variable Modifiers
 
 You know `$@` (target name) and `$<` (first prerequisite). Make provides
