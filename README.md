@@ -8,7 +8,7 @@
 
 ## What is this?
 
-**Make for DevOps** is a practical, research-driven book project exploring how the humble `Makefile` can bridge the DevOps knowledge crisis—serving both as project glue and as an executable, discoverable record of workflow know-how.
+**Make for DevOps** is a practical, pragmatic book project exploring how the humble `Makefile` can bridge the DevOps knowledge crisis—serving both as project glue and as an executable, discoverable record of workflow know-how. It's a book that does not exist, but should. It was written by Claude.ai v4.5 over a series of months, all using the free version of the tool.
 
 This repo holds:
 
