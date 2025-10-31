@@ -144,6 +144,6 @@ Claude's unique perspective comes from having no attachment to any particular to
 
 ---
 
-**Word Count Estimate:** 60,000 words
-**Code Examples:** 200+ practical, tested examples
-**Target Completion:** early 2026
+- **Word Count Estimate:** 60,000 words
+- **Code Examples:** 200+ practical, tested examples
+- **Target Completion:** early 2026
