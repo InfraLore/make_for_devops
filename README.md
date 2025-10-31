@@ -2,6 +2,8 @@
 
 > _Format and tooling derived from the [wikiti/pandoc-book-template](https://github.com/wikiti/pandoc-book-template) with content authored for "Make for DevOps"._
 
+[![Cover](images/cover.png)](#)
+
 ---
 
 ## What is this?
@@ -58,7 +60,7 @@ Originally forked from [wikiti/pandoc-book-template](https://github.com/wikiti/p
 
 If you use [Devbox](https://www.jetpack.io/devbox):
 
-1. Install Devbox:  
+1. Install Devbox:
    [https://www.jetpack.io/devbox/docs/install/](https://www.jetpack.io/devbox/docs/install/)
 2. In this project directory, run:
    ```sh
@@ -66,17 +68,17 @@ If you use [Devbox](https://www.jetpack.io/devbox):
    ```
 3. That’s it! All necessary tools for building (Pandoc, Make, XeLaTeX, etc) are automatically installed and available in your shell.
 
-No need to install dependencies one-by-one or pollute your global environment.  
+No need to install dependencies one-by-one or pollute your global environment.
 If you don’t use Devbox, see below for manual setup instructions.
 
 ---
 
 ## Usage & Build
 
-**Requirements:**  
+**Requirements:**
 - [Pandoc](http://pandoc.org/)
 - [GNU Make](https://www.gnu.org/software/make/)
-- [XeLaTeX](https://tug.org/xetex/) for PDF output  
+- [XeLaTeX](https://tug.org/xetex/) for PDF output
 - (Recommended) [pandoc-crossref](https://github.com/lierdakil/pandoc-crossref) for cross-referencing
 
 **Basic build:**
@@ -127,7 +129,8 @@ ack "[a-z] make" # we should always capitalize the proper noun Make, find outlie
 ## Acknowledgments
 
 - Original template © Daniel Herzog, [wikiti/pandoc-book-template](https://github.com/wikiti/pandoc-book-template), MIT License
-- Significant updates, research, and content © Contributors to "Make for DevOps" (see [plan.md](plan.md) for author info and project direction)
+- Book is Licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
+- [Cover image](images/cover.png) by ChatGPT (GPT-5), OpenAI, 2025.
 
 ---
 
