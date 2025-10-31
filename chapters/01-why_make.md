@@ -78,9 +78,9 @@ command to rotate the database credentials?" This "ask an expert" pattern scales
 poorly and creates single points of failure in your team's operational
 capability.
 
-**Fear of Change**: When operational procedures exist only as team lore—passed 
-down through observation and oral tradition—engineers become conservative 
-about making changes. Infrastructure improvements stall because nobody wants 
+**Fear of Change**: When operational procedures exist only as team lore—passed
+down through observation and oral tradition—engineers become conservative
+about making changes. Infrastructure improvements stall because nobody wants
 to be the one who breaks the undocumented deployment process.
 
 ### The Knowledge Transfer Problem
@@ -193,8 +193,8 @@ most valuable knowledge is often the knowledge you don't know you need.
 
 ### 5. The Team Lore Trap
 
-Even in organizations with excellent documentation practices, a shadow 
-knowledge base emerges: team lore. This is the collection of unwritten rules, 
+Even in organizations with excellent documentation practices, a shadow
+knowledge base emerges: team lore. This is the collection of unwritten rules,
 workarounds, and accumulated wisdom that experienced engineers carry:
 
 - "Always run that command twice—the first time fails but initializes something"
@@ -202,8 +202,8 @@ workarounds, and accumulated wisdom that experienced engineers carry:
 - "If you see error X, just ignore it and continue"
 - "The staging database needs manual cleanup every few days"
 
-This team lore is invisible to new engineers, untested in automation, and 
-lost when people leave. It represents the gap between how systems are supposed 
+This team lore is invisible to new engineers, untested in automation, and
+lost when people leave. It represents the gap between how systems are supposed
 to work and how they actually work.
 
 ## Make as the "Universal Interface" for Project Workflows
@@ -279,12 +279,12 @@ sequences:
 ```markdown
 To deploy to staging:
 1. Run `docker build -t myapp:$(git rev-parse --short HEAD) .`
-2. Run `docker tag myapp:$(git rev-parse --short HEAD) 
+2. Run `docker tag myapp:$(git rev-parse --short HEAD)
    registry.company.com/myapp:staging-$(git rev-parse --short HEAD)`
-3. Run `docker push registry.company.com/myapp:staging-$(git rev-parse 
+3. Run `docker push registry.company.com/myapp:staging-$(git rev-parse
    --short HEAD)`
-4. Run `kubectl set image deployment/myapp 
-   myapp=registry.company.com/myapp:staging-$(git rev-parse --short HEAD) 
+4. Run `kubectl set image deployment/myapp
+   myapp=registry.company.com/myapp:staging-$(git rev-parse --short HEAD)
    -n staging`
 5. Run `kubectl rollout status deployment/myapp -n staging`
 ```
@@ -308,6 +308,14 @@ becomes both documentation and automation.
 Let's examine a transformation at a fictional mid-sized SaaS company, which
 we'll call DataFlow Inc. They operate a microservices architecture with 23
 services across three environments, managed by a DevOps team of 8 engineers.
+
+\begin{calloutbox}[DataFlow Inc. Does Not Exist] To be absolutely clear, what
+follows is a fictional case study. DataFlow Inc. *does not exist*. None of the
+numbers are real, they are included for illustrative purposes. It would not be
+fair to call this section a "hallucination." It's what AIs do a lot: generate
+convincing narratives in order to make a point. Please bear with us. It's a good
+story.
+\end{calloutbox}
 
 ### Before: The Documentation Swamp
 
