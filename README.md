@@ -33,7 +33,7 @@ See [proposal.md](proposal.md) and [plan.md](plan.md) for:
 ## Status
 
 - 📝 Draft in progress: see [plan.md](plan.md) for writing schedule and chapter statuses
-- 📚 Goal: 350–400 pages, 200+ code samples, shipping 2026
+- 📚 Goal: 400–500 pages, 200+ code samples, released 2026
 - 💡 Open to feedback! Open an issue to discuss DevOps knowledge management, Make workflows, or suggest resources
 
 ---
@@ -126,10 +126,13 @@ ack "[a-z] make" # we should always capitalize the proper noun Make, find outlie
 
 ---
 
+## License
+
+This book is licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/).
+
 ## Acknowledgments
 
 - Original template © Daniel Herzog, [wikiti/pandoc-book-template](https://github.com/wikiti/pandoc-book-template), MIT License
-- Book is Licensed under [CC0 1.0 Universal](https://creativecommons.org/publicdomain/zero/1.0/)
 - [Cover image](images/cover.png) by ChatGPT (GPT-5), OpenAI, 2025.
 
 ---
