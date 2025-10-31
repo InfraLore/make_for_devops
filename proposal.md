@@ -1,8 +1,8 @@
 # Book Proposal: Make for DevOps: Discovering and Documenting Your Workflow with Make
 
-**Submitted to:** Packt Publishing  
-**Proposed Length:** 350-400 pages  
-**Target Publication:** Q2 2026
+**Submitted to:** Packt Publishing
+**Proposed Length:** 500 pages
+**Target Release:** Q2 2026
 
 ## 1. The Book Idea & Problem/Solution Statement
 
@@ -83,20 +83,68 @@ Claude's unique perspective comes from having no attachment to any particular to
 
 ## 5. Detailed Table of Contents
 
-![[TOC - Detailed Table of Contents]]
+### Part I: The Philosophy of the Makefile as Documentation
 
-## Appendices
+**Chapter 1** - Why Make?
 
-### Appendix A: Quick Reference Guide
+**Chapter 2** - The Executable README
 
-_Comprehensive reference for Make syntax, common patterns, and troubleshooting commands._
+**Chapter 3** - Make Fundamentals
 
-### Appendix B: Migration Strategies
+### Part II: The Core Toolbox for Discoverable Workflows
 
-_Step-by-step guides for migrating existing workflows to Make-based approaches._
+**Chapter 4** - Testing and Validating
+
+**Chapter 5** - Variables and Configuration
+
+**Chapter 6** - Phony Targets and Task Organization
+
+**Chapter 7** - Dependency Management
+
+**Chapter 8** - Advanced Make
+
+### Part III: The DevOps Cookbook
+
+**Chapter 9** - Make and Docker
+
+**Chapter 10** - Make and Kubernetes
+
+**Chapter 11** - Make and CI/CD
+
+**Chapter 12** - Make in the CI/CD Ecosystem
+
+### Part IV: Applied DevOps Workflows with Make
+
+**Chapter 13** - Make for Infrastructure Provisioning
+
+**Chapter 14** - Make for Infrastructure Reliability
+
+**Chapter 15** - Make for Monitoring and Metrics
+
+**Chapter 16** - Make for Logging and Incident Response
+
+**Chapter 17** - Security and Compliance Workflows
+
+### Part V: Advanced Patterns and Team Adoption
+
+**Chapter 18** - Scaling Make Across Teams and Projects
+
+**Chapter 19** - Troubleshooting and Debugging Make Workflows
+
+**Chapter 20** - The Future of Make in DevOps
+
+**Chapter 21** - Make as Your Personal Learning Tool
+
+### Appendices
+
+**Appendix A** - Quick Reference Guide
+
+**Appendix B** - Migration Strategies
+
+**Appendix C** - Prompt Templates
 
 ---
 
-**Word Count Estimate:** 85,000-95,000 words  
-**Code Examples:** 200+ practical, tested examples  
-**Target Completion:** 8-10 months from contract signing
+**Word Count Estimate:** 60,000 words
+**Code Examples:** 200+ practical, tested examples
+**Target Completion:** early 2026

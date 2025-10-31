@@ -7,30 +7,7 @@ It looks like Claude 3.5 really wants to make quick reference guides, not write 
 - [x] let Claude 4 know that we've added a new chapter 4 (hand it the revised TOC)
 
 Build plan: 2-3 chapters a day:
-- [ ] Chapter 10 (Kubernetes)
-- [ ] Chapter 11 (CI/CD)
-- [ ] Chapter 12 (Infrastructure as Code)
-- [ ] Chapter 13 (Monitoring)
-- [ ] Chapter 14 (Security)
-- [ ] Chapter 15 (Scaling)
-- [ ] Chapter 17 (Future)
-- [ ] Appendix B (Tool integration)
-- [ ] Appendix C (Migration)
-- [ ] Chapter 1 (Why make)
-- [ ] Review existing chapters (3,16,A in context of more recent chapters)
-- [x] Chapter 9 (Docker)   2025-09-18
-- [x] Chapter 8 (Advanced Make)   2025-09-18
-- [x] Chapter 8 (Advanced Features)   2025-09-18
-- [x] Chapter 3
-- [x] Chapter 16
-- [x] Appendix A (can use Claude 3.5, it's a reference)
-- [x] Chapter 2 (executable readme)
-- [x] Chapter 5 (variables and configuration)
-- [x] Chapter 4 (testing)
-- [x] Chapter 6 (Phony Targets)
-- [x] Chapter 7 (Dependency Management)   2025-09-18
-
-In addition to Appendix A, I think we need a really nice cheat sheet reference, ask for it after chapter 17, and definitely ask Claude 4 to write it, not Versa)
+- all chapters complete
 
 ## Chapter 1 - Why Make? - Research plan
 
@@ -93,22 +70,22 @@ Sources to Consider:
 - Reddit r/devops
 - LinkedIn DevOps groups
 
-1. Original Make Paper:  
-    S. I. Feldman, “Make — A Program for Maintaining Computer Programs,” Software: Practice and Experience, vol. 9, pp. 255-265, 1979.  
+1. Original Make Paper:
+    S. I. Feldman, “Make — A Program for Maintaining Computer Programs,” Software: Practice and Experience, vol. 9, pp. 255-265, 1979.
     DOI: [https://doi.org/10.1002/spe.4380090402](https://doi.org/10.1002/spe.4380090402)
     https://pages.cs.wisc.edu/~horwitz/make/make.pdf
 
 Some key quotes from this paper that would be relevant for Chapter 1:
 
-1. On Make’s purpose (still relevant today):  
+1. On Make’s purpose (still relevant today):
     “Make allows a programmer to maintain a collection of programs by describing their interdependencies.”
-    
-2. On automation and reproducibility:  
+
+2. On automation and reproducibility:
     “Make uses the recorded dependencies to determine automatically which pieces need to be redone…”
-    
-3. On Make’s universality (prescient for DevOps):  
+
+3. On Make’s universality (prescient for DevOps):
     “Make is most useful for programs that need to be modified frequently and whose compilations are complex…”
-    
+
 
 We could use these historical points to show how Make’s original principles align perfectly with modern DevOps needs:
 
@@ -121,7 +98,7 @@ We could use these historical points to show how Make’s original principles al
 
 papers that cite Feldman's paper:
 
-“Build Systems à la Carte” by A. Mokhov, et al. (2018)  
+“Build Systems à la Carte” by A. Mokhov, et al. (2018)
 Proceedings of the ACM on Programming Languages, Vol. 2, No. ICFP, Article 79
 [https://doi.org/10.1145/3236774](https://doi.org/10.1145/3236774)
 https://dl.acm.org/doi/pdf/10.1145/3236774
@@ -130,17 +107,17 @@ https://dl.acm.org/doi/pdf/10.1145/3236774
 *I* can find papers that cite other papers, no reason to make Claude work that hard, it's sort of bad at it.
 
 
-    
-2. Historical Context/Evolution:  
-    V. Henson and D. Garzik, “BitKeeper for kernel developers,” in Proceedings of the Linux Symposium, Ottawa, 2002.  
-    [Shows how Make evolved in Linux kernel development]  
+
+2. Historical Context/Evolution:
+    V. Henson and D. Garzik, “BitKeeper for kernel developers,” in Proceedings of the Linux Symposium, Ottawa, 2002.
+    [Shows how Make evolved in Linux kernel development]
     Available: [https://www.kernel.org/doc/ols/2002/ols2002-pages-83-90.pdf](https://www.kernel.org/doc/ols/2002/ols2002-pages-83-90.pdf)
-    
-3. Modern Make Usage:  
-    P. Miller, “Recursive Make Considered Harmful,” AUUGN Journal of AUUG Inc., 1997.  
-    Available: [http://aegis.sourceforge.net/auug97.pdf](http://aegis.sourceforge.net/auug97.pdf)  
+
+3. Modern Make Usage:
+    P. Miller, “Recursive Make Considered Harmful,” AUUGN Journal of AUUG Inc., 1997.
+    Available: [http://aegis.sourceforge.net/auug97.pdf](http://aegis.sourceforge.net/auug97.pdf)
     [This paper is frequently cited in discussions about Make best practices]
-    
+
 
 Oooh, cool, Julia Evans wrote about Make:
 https://jvns.ca/blog/2025/06/10/how-to-compile-a-c-program/
@@ -194,8 +171,6 @@ Based on the search results, I can provide some additional context about blog po
 - Works across multiple programming languages
 - Particularly useful for scientific computing and reproducible research
 
-Would you like me to elaborate on any of these blog posts or help you find more specific Make resources?
-
 
 ---
 # presentations about Make in a DevOps context
@@ -221,7 +196,7 @@ https://chatgpt.com/c/68cca4c7-0678-8326-b19f-ef0dc971a127
 ^^ skip to the end, there's a gap in research (maybe)
 
 
-Honestly, it's the theme of this book... And a big role of DevOps is to automate builds... so... gosh, maybe build automation is *causing* a perceived institutional knowledge crisis? It's kinda a complex thing... I really want to talk to Cat about this.
+Honestly, it's the theme of this book... And a big role of DevOps is to automate builds... so... gosh, maybe build automation is *causing* a perceived institutional knowledge crisis? It's kinda a complex thing...
 
 
 ### The Overlooked Role of Build Automation in the DevOps Knowledge Crisis
@@ -231,65 +206,64 @@ Most discussions of the “institutional knowledge crisis” in DevOps focus on 
 What’s missing in this conversation is the role of **build and workflow automation tools**, especially **GNU Make** and its modern successors (Taskfile, Just, Mage, etc.).
 
 - **Makefiles capture tacit knowledge.** They encode the exact commands, dependencies, and environment assumptions required to build, test, and deploy software.
-    
+
 - **They are living artifacts.** Unlike a wiki, a `Makefile` breaks if it’s wrong—forcing it to stay closer to reality than static documentation.
-    
+
 - **They bridge gaps for newcomers.** Running `make deploy` provides immediate access to otherwise undocumented, fragile sequences of commands.
-    
+
 - **But they risk becoming opaque.** Without annotation or context, a Makefile can function as a black box: runnable, but not explainable. The _reasoning_ behind steps is still at risk of loss.
-    
+
 
 This creates a gap in both research and practice: **automation files are simultaneously one of the most durable carriers of institutional knowledge, and one of the least studied or discussed in the DevOps knowledge-management literature.**
 
 A promising area for future work is to treat Makefiles not just as automation artifacts, but as **sites of knowledge capture**. For example:
 
 - Embedding self-documentation (`make help` targets, annotated recipes).
-    
+
 - Linking Makefile tasks to architectural decision records or incident logs.
-    
+
 - Studying how teams actually use and maintain Makefiles as part of their knowledge ecosystem.
-    
+
 
 Exploring this angle could surface new strategies for mitigating the knowledge crisis in DevOps, bridging the gap between _automation_ and _institutional memory_.
 
-- [ ] mention this to Cat Hicks, maybe she knows of a relevant-ish study that ChatGPT misssed?
 
 ---
 ### DevOps as Both Cure and Cause of the Knowledge Crisis
 
-- **DevOps as automation-first culture.**  
+- **DevOps as automation-first culture.**
     At its heart, DevOps emphasizes _automating everything_: builds, tests, deployments, rollbacks, monitoring. It’s the pursuit of **build automation at organizational scale**.
-    
-- **The promise.**  
+
+- **The promise.**
     By automating, we reduce error, make workflows repeatable, and encode steps that once lived only in people’s heads. In theory, that _preserves_ institutional knowledge.
-    
-- **The paradox.**  
+
+- **The paradox.**
     But the very success of automation can _hollow out human knowledge_:
-    
+
     - Engineers stop learning the underlying commands because the pipeline handles it.
-        
+
     - “Why” something happens gets obscured — the automation encodes _what to do_, but rarely _why it was designed that way_.
-        
+
     - When automation fails, teams discover they’ve lost the _experiential knowledge_ needed to debug it.
-        
-- **The crisis.**  
+
+- **The crisis.**
     DevOps culture may unintentionally accelerate the institutional knowledge crisis by:
-    
+
     1. Encouraging teams to **skip documentation** (“the pipeline is the documentation”).
-        
+
     2. **Shifting knowledge into scripts and YAML** that only a few specialists understand.
-        
+
     3. **Masking fragile processes** under a veneer of automation, until turnover or incidents reveal the gap.
-        
-- **The opportunity.**  
+
+- **The opportunity.**
     If DevOps is both cure and cause, the real question is: _How do we design automation that also preserves context, rationale, and human understanding?_
-    
+
     - Pipelines and Makefiles could embed explanatory notes, decision records, and links to design docs.
-        
+
     - CI/CD tooling could enforce not just builds, but also “knowledge artifacts” (runbooks, ADRs) as part of the process.
-        
+
     - Teams could treat automation as **knowledge infrastructure**, not just execution infrastructure.
-        
+
 
 ---
 
@@ -317,15 +291,15 @@ These works touch on pieces of the paradox — automation vs human understanding
 Here are aspects of the paradox you want that seem under-explored:
 
 - **Explicit framing**: No paper I found places “automation causing institutional knowledge loss” as a primary research question.
-    
+
 - **Case studies**: Lacking detailed empirical studies of teams where automation has led to knowledge gaps, e.g. when key people leave or when weird failures happen, and tracing how much automation played a role.
-    
+
 - **Build tool focused**: I couldn’t find anything that discusses Makefiles / build / workflow automation tools specifically in the knowledge retention context.
-    
+
 - **Context + rationale preservation**: The “why” behind automation choices (why pipelines are built the way they are, why certain commands exist) is rarely studied; most focus is on _how_ to or _how well_ automation is done.
-    
+
 - **Longitudinal perspectives**: How knowledge accumulates or erodes over time with automation.
-    
+
 
 ---
 
@@ -334,9 +308,7 @@ Here are aspects of the paradox you want that seem under-explored:
 Even though the exact match isn’t found, there are adjacent ideas that could be linked or used in a paper or article:
 
 - **Polanyi’s paradox** (implicit knowledge can’t always be made explicit) — useful to tie to how certain automation hides or abstracts away parts of the system that were once well‐understood. [Wikipedia](https://en.wikipedia.org/wiki/Polanyi%27s_paradox?utm_source=chatgpt.com)
-    
+
 - **Ironies of Automation** (from human factors) — when automation removes tasks, humans lose practice, get less ready/prepared for exceptional cases. [Wikipedia](https://en.wikipedia.org/wiki/Ironies_of_Automation?utm_source=chatgpt.com)
-    
+
 - **Socio-technical theory of CI / automation tools** — what ADEPT shows.
-
-
