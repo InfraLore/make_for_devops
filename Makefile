@@ -315,6 +315,40 @@ help:  ## Show this help message
 	@echo "  PUBLISH_PATH=$(PUBLISH_PATH)"
 	@echo ""
 
+toc: ## Generate the Table of Contents from source files
+	@echo "## 5. Detailed Table of Contents"
+	@# Process each part
+	@for part_num in 1 2 3 4 5; do \
+		part_file="parts/part-$$part_num.md"; \
+		if [ -f "$$part_file" ]; then \
+			part_title=$$(grep '\\part{' "$$part_file" | sed 's/\\part{\(.*\)}/\1/'); \
+			echo
+			echo "### $$part_title"; \
+		fi; \
+		\
+		case $$part_num in \
+			1) chapters="$(PART_1)";; \
+			2) chapters="$(PART_2)";; \
+			3) chapters="$(PART_3)";; \
+			4) chapters="$(PART_4)";; \
+			5) chapters="$(PART_5)";; \
+		esac; \
+		\
+		for chapter_file in $$chapters; do \
+			if [[ "$$chapter_file" == chapters/*.md ]]; then \
+				chapter_title=$$(head -1 "$$chapter_file" | sed 's/^# //'); \
+				echo "- **$$chapter_title**"; \
+			fi; \
+		done; \
+	done; \
+	\
+	echo ""; \
+	echo "### Appendices"; \
+	for appendix in $(APPENDICES); do \
+		appendix_title=$$(head -1 "$$appendix" | sed 's/^# //'); \
+		echo "- **$$appendix_title**"; \
+	done
+
 ####################################################################################################
 # File builders
 ####################################################################################################
