@@ -81,16 +81,11 @@ what's possible. They can run `make -n deploy-staging` and see exactly what will
 happen. But behind that simplicity, you've eliminated hundreds of lines of
 duplication.
 
-### Warning Signs You're Over-Engineering
-
-- You're using pattern rules for two targets (just write two targets)
-- Your functions have functions calling functions (flatten it)
-- New team members can't figure out what `make deploy-prod` does (too much
-  indirection)
-- You're writing advanced features "because we might need this later" (YAGNI)
-- Your Makefile feels clever rather than clear
-
-Advanced features solve real problems, but only use them when duplication pain or failure risk exceeds the overhead of adding these features. That overhead is real: pattern rules make targets harder to trace, functions hide logic behind calls that require jumping to definitions, and secondary expansion adds a second evaluation pass that can confuse debugging.
+Advanced features solve real problems, but only use them when duplication pain
+or failure risk exceeds the overhead of adding these features. That overhead is
+real: pattern rules make targets harder to trace, functions hide logic behind
+calls that require jumping to definitions, and secondary expansion adds a second
+evaluation pass that can confuse debugging.
 
 \newpage
 ## Pattern Rules for Handling Multiple Environments
@@ -119,7 +114,8 @@ deploy-%: validate-% ## Deploy to specified environment
 The `%` matches any string, and `$*` contains the matched portion. One rule
 creates multiple targets.
 
-Pattern rules become even more powerful with pattern-specific variables (covered later in this chapter).
+Pattern rules become even more powerful with pattern-specific variables (covered
+later in this chapter).
 
 \newpage
 ### Environment-Specific Validation
@@ -287,7 +283,9 @@ deploy-safe:
 	terraform plan
 	terraform apply
 ```
-**This combination is known as "Bash strict mode",a set of flags that transforms the shell from permissive to rigorous, catching errors that would otherwise fail silently.**
+**This combination is known as "Bash strict mode", a set of flags that
+transforms the shell from permissive to rigorous, catching errors that would
+otherwise fail silently.**
 
 Each flag provides specific protection:
 
