@@ -69,13 +69,13 @@ Live with each change for a week. Does it actually help? Is it clear to others?
 If it's not obviously better, revert to simple targets. Only after one change
 proves valuable, move to the next pain point.
 
-### The Test
+### The Test: with an Advanced Feature in place, can you still understand what's going on?
 
 After adding an advanced feature, run `make -n <target>` and read the output. If
 you can't easily understand what will happen, you've gone too far. Revert to
 something simpler.
 
-The key insight: **these features let you scale automation without scaling
+The key insight: **these features should let you scale automation without scaling
 complexity for users**. A new developer can still run `make help` and understand
 what's possible. They can run `make -n deploy-staging` and see exactly what will
 happen. But behind that simplicity, you've eliminated hundreds of lines of
@@ -90,8 +90,7 @@ duplication.
 - You're writing advanced features "because we might need this later" (YAGNI)
 - Your Makefile feels clever rather than clear
 
-Advanced features solve real problems. Use them when duplication pain or failure
-risk exceeds the cost of indirection. Not before.
+Advanced features solve real problems, but only use them when duplication pain or failure risk exceeds the overhead of adding these features. That overhead is real: pattern rules make targets harder to trace, functions hide logic behind calls that require jumping to definitions, and secondary expansion adds a second evaluation pass that can confuse debugging.
 
 \newpage
 ## Pattern Rules for Handling Multiple Environments
@@ -119,6 +118,8 @@ deploy-%: validate-% ## Deploy to specified environment
 
 The `%` matches any string, and `$*` contains the matched portion. One rule
 creates multiple targets.
+
+Pattern rules become even more powerful with pattern-specific variables (covered later in this chapter).
 
 \newpage
 ### Environment-Specific Validation
@@ -286,6 +287,7 @@ deploy-safe:
 	terraform plan
 	terraform apply
 ```
+**This combination is known as "Bash strict mode",a set of flags that transforms the shell from permissive to rigorous, catching errors that would otherwise fail silently.**
 
 Each flag provides specific protection:
 
@@ -494,6 +496,8 @@ What this configuration guarantees:
 Without these configurations, any step could fail silently, and you'd migrate
 production with no valid backup.
 
+These guarantees are safety nets, not primary defenses. You should validate required variables explicitly (as shown in the multi-environment example that follows, and described in-depth in Chapter 4), use Make's built-in checks, or fail fast at the target's start. Strict mode's real value is during development: it catches mistakes as you write. Then it stays in place as a backstop, catching the unexpected: a refactoring that removes a variable definition, a copy-paste error, or an edge case you didn't anticipate. Think of -u as insurance, not your security system.
+
 \newpage
 ### Real-World Example: Multi-Environment Deploy
 
@@ -518,7 +522,7 @@ deploy-%: ## Deploy to specified environment
 		 ./scripts/rollback.sh $* && exit 1)
 ```
 
-The strict flags ensure:
+Strict mode ensures:
 
 - All required variables must be set before deployment starts
 - Configuration must succeed before deploy runs
@@ -577,7 +581,7 @@ check-config-drift:
 	fi
 ```
 
-### When to Use Strict Shell Configuration
+### When to Use Strict Mode
 
 Use `.ONESHELL` and strict `.SHELLFLAGS` when:
 
@@ -590,7 +594,7 @@ environment-specific deployments
 - **Pipeline failures matter**: Log analysis, data processing, backup
 verification
 
-**Don't use strict configuration for**:
+**Don't use strict mode for**:
 
 - **Simple, independent commands**: Building artifacts, running tests, basic
 checks
@@ -601,10 +605,10 @@ different shells
 
 ### Configuration Scope
 
-Apply strict configurations selectively:
+Apply strict mode selectively:
 
 ```makefile
-# Strict configuration for production targets
+# Strict mode for production targets
 .ONESHELL:
 .SHELLFLAGS := -euo pipefail -c
 
@@ -634,7 +638,7 @@ cause production incidents.
 **Key techniques**:
 
 - **`.ONESHELL`**: Runs target commands in one shell, preserving context
-- **`.SHELLFLAGS := -euo pipefail -c`**: Strict error handling that catches
+- **`.SHELLFLAGS := -euo pipefail -c`**: Strict mode that catches
 failures early
   - `-e`: Stop on any error
   - `-u`: Treat undefined variables as errors
@@ -664,7 +668,9 @@ simplify complex DevOps workflows once you understand when to apply them.
 This section covers Make's lesser-known capabilities: features that didn't make
 it into introductory tutorials but prove invaluable when you hit their specific
 use cases. You won't need all of these immediately. But when you encounter the
-problems they solve, you'll be glad you know they exist.
+problems they solve, you'll be glad you know they exist. Where to start? Grouped
+targets and output-sync. Explore secondary expansion later, when you think you
+might need it.
 
 ### Secondary Expansion: Dynamic Prerequisites
 
@@ -1035,6 +1041,8 @@ These features combine to solve complex problems:
 
 ```makefile
 .SECONDEXPANSION:
+# This Makefile uses > as recipe prefix instead of tabs
+# Requires Make 3.82 or later
 .RECIPEPREFIX = >
 
 # Pattern-specific variables for environment groups
@@ -1065,7 +1073,7 @@ This combines:
 - Secondary expansion for dynamic config prerequisites
 - Pattern-specific variables for environment settings
 - Grouped targets for multi-file generation
-- `.RECIPEPREFIX` for readability
+- `.RECIPEPREFIX` for readability and team comfort (remember this is non-standard, it's used here just as an example of combining all advanced features)
 - Output synchronization for parallel execution
 
 Each feature solves a specific problem. Together, they create powerful,
@@ -1398,6 +1406,39 @@ cleanup-cache:
 
 Before functions, each target repeated the notification text. Functions ensure
 consistent messaging and make updates happen in one place.
+
+\begin{calloutbox}[GOTCHA: Functions Don't Validate Arguments]
+Make functions use positional parameters (\texttt{\$(1)}, \texttt{\$(2)}, etc.) but provide no argument validation. Pass too few arguments and you get empty strings. Pass too many and extras are silently ignored:
+
+\begin{verbatim}
+define deploy_service
+	@./scripts/deploy-$(1).sh $(2)
+endef
+
+deploy-api:
+	$(call deploy_service,api)  # Missing $(2) - becomes empty string!
+	# Expands to: ./scripts/deploy-api.sh
+	# Your script might assume "dev" or fail cryptically
+
+deploy-worker:
+	$(call deploy_service,worker,prod,extra)  # "extra" silently ignored
+\end{verbatim}
+
+Even with strict mode's \texttt{-u} flag, \texttt{\$(2)} is Make syntax, not shell, so unset parameter detection doesn't help.
+
+\textbf{For missing arguments} (the dangerous case), add explicit validation if wrong arguments could cause damage:
+
+\begin{verbatim}
+define deploy_service
+	@test -n "$(1)" || (echo "Error: service name required" && exit 1)
+	@test -n "$(2)" || (echo "Error: environment required" && exit 1)
+	@./scripts/deploy-$(1).sh $(2)
+endef
+\end{verbatim}
+
+\textbf{For extra arguments}, document expected parameters clearly. Trying to detect extras adds complexity for minimal benefit---they're harmlessly ignored.
+\end{calloutbox}
+
 
 \newpage
 #### Environment Configuration Pattern
