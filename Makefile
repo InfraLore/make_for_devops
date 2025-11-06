@@ -242,7 +242,7 @@ images/%.png: images/%.mmd
 		exit 1; \
 	fi
 	@echo "✅ Generated: $@"
-find_bullets: ## Find bullet points that may be incorrectly forma		ed
+find_bullets: ## Find bullet points that may be incorrectly formatted
 	@awk 'prev ~ /:$$/ && $$0 ~ /^[[:space:]]*[-*+][[:space:]]/ {print FILENAME ":" FNR ":" prev "\n" $$0} {prev=$$0}' chapters/*.md
 
 stats: ## Show book statistics
