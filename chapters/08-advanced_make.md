@@ -1084,6 +1084,7 @@ deploy-all: deploy-prod-api deploy-prod-frontend deploy-prod-worker
 ```
 
 This combines:
+
 - Secondary expansion for dynamic config prerequisites
 - Pattern-specific variables for environment settings
 - Grouped targets for multi-file generation
@@ -1100,36 +1101,43 @@ maintainable workflows.
 These features add complexity. Use them when they solve real problems:
 
 **Use secondary expansion when:**
+
 - Pattern rules need prerequisites based on the matched pattern
 - Target names determine which files are needed
 - You're duplicating rules that differ only in prerequisite lists
 
 **Use target-specific variables when:**
+
 - Different targets need different flag values
 - Conditionals inside recipes are getting complex
 - Configuration naturally groups with specific targets
 
 **Use grouped targets when:**
+
 - One command generates multiple files
 - You're getting duplicate builds of multi-output targets
 - Templates or code generators create multiple artifacts
 
 **Use .RECIPEPREFIX when:**
+
 - Your team constantly fights tab issues
 - The Makefile is personal/internal only
 - Editor configuration isn't solving the problem
 
 **Use automatic variable modifiers when:**
+
 - Working with file paths in recipes
 - Maintaining directory structure in outputs
 - Manual path manipulation clutters recipes
 
 **Use intermediate file handling when:**
+
 - Multi-stage builds create temporary files
 - Disk space matters and cleanup is needed
 - You want automatic cleanup without manual rm commands
 
 **Use output synchronization when:**
+
 - Parallel builds produce unreadable output
 - Reviewing CI logs requires detective work
 - You need grouped output by target
@@ -1248,6 +1256,7 @@ health_check_retries: 5
 auto_rollback: true
 ```
 \newpage
+
 **Makefile:**
 ```makefile
 # Load configuration
