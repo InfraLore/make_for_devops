@@ -2,3 +2,4 @@ click
 pdf2image
 Pillow
 numpy
+pymarkdownlnt

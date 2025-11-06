@@ -128,7 +128,7 @@ endef
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs diagrams
+.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs diagrams lint lint-markdown lint-markdown-strict lint-fix
 
 all:	book ## Build all formats (epub, html, pdf, docx)
 
@@ -348,6 +348,26 @@ toc: ## Generate the Table of Contents from source files
 		appendix_title=$$(head -1 "$$appendix" | sed 's/^# //'); \
 		echo "- **$$appendix_title**"; \
 	done
+
+lint-markdown: ## Lint all markdown files with PyMarkdown
+	@echo "📝 Linting markdown files with PyMarkdown..."
+	@pymarkdown scan chapters/*.md parts/*.md || true
+
+lint-markdown-strict: ## Lint markdown files with PyMarkdown (fail on errors)
+	@echo "📝 Strict markdown linting..."
+	@pymarkdown scan chapters/*.md parts/*.md *.md
+
+lint-fix: ## Auto-fix markdown issues where possible
+	@echo "🔧 Auto-fixing markdown issues..."
+	@for file in chapters/*.md parts/*.md *.md; do \
+		if [ -f "$$file" ]; then \
+			echo "Checking $$file..."; \
+			pymarkdown scan "$$file" --fix || true; \
+		fi; \
+	done
+
+lint: lint-markdown check-overflow check-long-lines ## Run all linting checks
+	@echo "✅ All linting completed"
 
 ####################################################################################################
 # File builders

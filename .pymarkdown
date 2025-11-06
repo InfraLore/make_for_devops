@@ -1,0 +1,29 @@
+{
+    "extensions": {
+        "front-matter": {
+            "enabled": false
+        }
+    },
+    "plugins": {
+        "md010": {
+            "enabled": false,
+        },
+        "md013": {
+            "enabled": true,
+            "line_length": 88,
+            "code_blocks": false,
+            "tables": false,
+            "headings": false
+        },
+        "md033": {
+            "enabled": false
+        },
+        "md041": {
+            "enabled": false
+        },
+        "md046": {
+            "enabled": true,
+            "style": "fenced"
+        }
+    }
+}

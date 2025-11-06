@@ -1,23 +1,31 @@
-We're working on "Make for DevOps: Discovering and Documenting Your Workflow with Make", a 350-400 page book for Packt Publishing targeting Q2 2026. You've already completed chapters 1-15.
+We're working on "Make for DevOps: Discovering and Documenting Your Workflow
+with Make", a 350-400 page book for Packt Publishing targeting Q2 2026. You've
+already completed chapters 1-15.
 
-# Core Concept
-The book positions Make as a universal workflow orchestration and documentation layer for DevOps teams. The key innovation is treating Makefiles as "executable READMEs" that solve the institutional knowledge problem—where critical workflows exist only in senior engineers' minds or scattered documentation.
+# Core Concept The book positions Make as a universal workflow orchestration and
+documentation layer for DevOps teams. The key innovation is treating Makefiles
+as "executable READMEs" that solve the institutional knowledge problem—where
+critical workflows exist only in senior engineers' minds or scattered
+documentation.
 
-# Target Reader
-DevOps/SRE/Platform Engineers with 2-5 years experience who:
+# Target Reader DevOps/SRE/Platform Engineers with 2-5 years experience who:
 
 - Know Docker, cloud platforms, CI/CD concepts, and scripting
 - Have basic/limited Make exposure (mostly from C/C++ contexts)
-- Face pain points: onboarding nightmares, inconsistent execution, knowledge silos, tool proliferation, and workflow discoverability crises
+- Face pain points: onboarding nightmares, inconsistent execution, knowledge
+  silos, tool proliferation, and workflow discoverability crises
 
-# Unique Position
-Unlike traditional Make books (focused on compilation) or DevOps books (focused on specialized tools), this book uniquely addresses Make as a workflow documentation and discovery tool that bridges complex infrastructure code with human understanding.
+# Unique Position Unlike traditional Make books (focused on compilation) or
+DevOps books (focused on specialized tools), this book uniquely addresses Make
+as a workflow documentation and discovery tool that bridges complex
+infrastructure code with human understanding.
 
 # Writing Approach
 
 - Practical, tested examples throughout
 - Focus on reducing cognitive load and improving team productivity
-- Emphasize patterns that make workflows transparent, maintainable, and accessible
+- Emphasize patterns that make workflows transparent, maintainable, and
+  accessible
 - Balance between teaching Make fundamentals and modern DevOps integration
 - Clear, conversational tone for intermediate technical audience
 
@@ -29,35 +37,37 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
 - Reducing onboarding friction
 
 # RULES
-- We will always capitalize Make when we are referring to the software, like we do with all proper nouns.
+- We will always capitalize Make when we are referring to the software, like we
+  do with all proper nouns.
 - We will NOT use the word "tribal" -- Use "team lore" instead.
 - We will keep Makefile line width to 75 characters max.
-- We will use "# implementation" for targets in Makefiles that are about the structure of a Makefile, and not specific to an actual task relevant to the current discussion.
-- WE will use `\chaptersubtitle{Bridging local and remote workflows with consistent, discoverable automation.}` as the markup for chapter subtitles
+- We will use "# implementation" for targets in Makefiles that are about the
+  structure of a Makefile, and not specific to an actual task relevant to the
+  current discussion.
+- WE will use `\chaptersubtitle{Bridging local and remote workflows with
+  consistent, discoverable automation.}` as the markup for chapter subtitles
 
-# Table of Contents
-## Part I: The Philosophy of the Makefile as Documentation
+# Table of Contents ## Part I: The Philosophy of the Makefile as Documentation
 ### Chapter 1: Why Make for DevOps?
 - The institutional knowledge crisis in modern DevOps teams
 - The challenge of preserving team expertise
 - Why traditional documentation fails in fast-moving environments
 - Make as the "universal interface" for project workflows
 - Case study: Before and after implementing make-based workflows
-- The ROI of discoverable workflows: measuring onboarding time and operational efficiency
-### Chapter 2: The Executable README Concept
+- The ROI of discoverable workflows: measuring onboarding time and operational
+  efficiency ### Chapter 2: The Executable README Concept
 - Moving beyond static documentation
 - Designing Make targets as self-describing interfaces
 - The anatomy of a discoverable Makefile
 - Creating help systems and target categorization
-- Best practices for naming conventions and target organization
-### Chapter 3: Make Fundamentals for the Modern DevOps Engineer
+- Best practices for naming conventions and target organization ### Chapter 3:
+  Make Fundamentals for the Modern DevOps Engineer
 - Essential make syntax for DevOps use cases
 - Variables, functions, and conditional logic
 - Understanding dependencies in the context of deployment workflows
 - File-based vs. phony targets for operational tasks
-- Debugging and troubleshooting Makefile execution
-## Part II: The Core Toolbox for Discoverable Workflows
-### Chapter 4: Testing and Validating Makefiles
+- Debugging and troubleshooting Makefile execution ## Part II: The Core Toolbox
+  for Discoverable Workflows ### Chapter 4: Testing and Validating Makefiles
 - Static analysis and linting with Checkmake
 - Using Make’s dry run (`-n` flag) for execution validation
 - Common testing patterns and strategies:
@@ -74,45 +84,45 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
     - Mocking external dependencies
     - Testing environment variables
     - Testing file-based dependencies
-    - Performance testing for large Makefiles
-### Chapter 5: Variables and Configuration Management
+    - Performance testing for large Makefiles ### Chapter 5: Variables and
+      Configuration Management
 - Environment-specific configuration patterns
 - Managing secrets and sensitive data in make workflows
 - Creating reusable variable libraries
-- Integration with external configuration sources (environment files, cloud parameter stores)
-- Validation and error handling for configuration values
-### Chapter 6: Phony Targets and Task Organization
+- Integration with external configuration sources (environment files, cloud
+  parameter stores)
+- Validation and error handling for configuration values ### Chapter 6: Phony
+  Targets and Task Organization
 - Designing intuitive target naming schemes
 - Organizing targets into logical categories (build, test, deploy, maintenance)
 - Creating composite targets for complex workflows
 - Target dependencies for enforcing operational prerequisites
-- Documentation patterns for self-describing targets
-### Chapter 7: Dependency Management for DevOps Workflows
+- Documentation patterns for self-describing targets ### Chapter 7: Dependency
+  Management for DevOps Workflows
 - Modeling deployment dependencies and prerequisites
 - File-based dependencies for infrastructure and configuration
 - Dynamic dependencies based on environment state
 - Parallel execution strategies for improved performance
-- Handling failures and partial completions in complex dependency chains
-### Chapter 8: Advanced Make Features for Workflow Automation
+- Handling failures and partial completions in complex dependency chains ###
+  Chapter 8: Advanced Make Features for Workflow Automation
 - Pattern rules for handling multiple environments
 - Recursive make for multi-project orchestration
 - Integration with external tools and APIs
 - Conditional execution based on system state
-- Creating extensible workflow frameworks
-## Part III: The DevOps Cookbook
-### Chapter 9: Make and Docker - Containerization Made Discoverable
+- Creating extensible workflow frameworks ## Part III: The DevOps Cookbook ###
+  Chapter 9: Make and Docker - Containerization Made Discoverable
 - Dockerized development environment setup
 - Multi-stage build orchestration through make
 - Container registry management and versioning
 - Local development with docker-compose integration
-- Container security scanning and compliance checks
-### Chapter 10: Make and Kubernetes - Orchestrating Cloud-Native Deployments
+- Container security scanning and compliance checks ### Chapter 10: Make and
+  Kubernetes - Orchestrating Cloud-Native Deployments
 - Kubernetes manifest generation and validation
 - Environment-specific deployment strategies
 - Helm chart management and customization
 - Service mesh configuration and monitoring setup
-- Database migrations and state management in Kubernetes
-### Chapter 11: Make and CI/CD Foundations
+- Database migrations and state management in Kubernetes ### Chapter 11: Make
+  and CI/CD Foundations
 - **The problem**: “works on my machine” → “fails in pipeline”
 - **Why Make helps**: consistency, discoverability, onboarding
 - **Core design patterns**:
@@ -122,43 +132,45 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
     4. Fast feedback loops
     5. Integrated security scanning
 - **Practical walkthrough**: pipeline-friendly `build`, `test`, `deploy` targets
-### Chapter 12: Make in the CI/CD Ecosystem
-- **Optimization strategies**: quick checks vs. full validation, parallelization, caching   
+  ### Chapter 12: Make in the CI/CD Ecosystem
+- **Optimization strategies**: quick checks vs. full validation,
+  parallelization, caching
 - **Platform integrations**: GitHub Actions, GitLab CI, and helpers
-- **Caching & artifacts**: dependency caching, Docker cache layers, artifact packaging, deployment from artifacts
-- **GitOps integration**: preparing manifests, committing to GitOps repos, triggering ArgoCD/Flux
-- **Key takeaways**: consistency + performance + platform-agnosticism
-## Part IV: Applied DevOps Workflows with Make
-### Chapter 13: Make for Infrastructure Provisioning
+- **Caching & artifacts**: dependency caching, Docker cache layers, artifact
+  packaging, deployment from artifacts
+- **GitOps integration**: preparing manifests, committing to GitOps repos,
+  triggering ArgoCD/Flux
+- **Key takeaways**: consistency + performance + platform-agnosticism ## Part
+  IV: Applied DevOps Workflows with Make ### Chapter 13: Make for Infrastructure
+  Provisioning
 - Terraform workflow orchestration
 - Cloud resource lifecycle management
-- Shared infra patterns across teams
-### Chapter 14: Make for Infrastructure Reliability
+- Shared infra patterns across teams ### Chapter 14: Make for Infrastructure
+  Reliability
 - Infrastructure testing and validation
 - Disaster recovery and backup procedures
-- Cost optimization and resource cleanup
-### Chapter 15: Make for Monitoring and Metrics
+- Cost optimization and resource cleanup ### Chapter 15: Make for Monitoring and
+  Metrics
 - Monitoring stack deployment and configuration
 - Performance testing and benchmarking
-- Alerting configuration and testing
-### Chapter 16: Make for Logging and Incident Response
+- Alerting configuration and testing ### Chapter 16: Make for Logging and
+  Incident Response
 - Log aggregation and analysis workflows
 - Incident response runbooks as make targets
-- Integrating alerts with response automation
-### Chapter 17: Security and Compliance Workflows
+- Integrating alerts with response automation ### Chapter 17: Security and
+  Compliance Workflows
 - Security scanning integration (SAST, DAST, container scanning)
-- Compliance validation and reporting    
+- Compliance validation and reporting
 - Secret rotation and management
 - Audit trail generation and maintenance
-- Incident response and forensics workflows
-## Part V: Advanced Patterns and Team Adoption
-### Chapter 18: Scaling Make Across Teams and Projects
+- Incident response and forensics workflows ## Part V: Advanced Patterns and
+  Team Adoption ### Chapter 18: Scaling Make Across Teams and Projects
 - Creating organization-wide make standards
 - Shared libraries and common patterns
 - Template projects and scaffolding tools
 - Training and adoption strategies
-- Measuring and improving workflow effectiveness
-### Chapter 19: Troubleshooting and Debugging Make Workflows
+- Measuring and improving workflow effectiveness ### Chapter 19: Troubleshooting
+  and Debugging Make Workflows
 - Common pitfalls and debugging techniques
 - Performance optimization for large workflows
 - Handling edge cases and error conditions
@@ -177,7 +189,8 @@ Unlike traditional Make books (focused on compilation) or DevOps books (focused 
 
 ### Appendix A: Quick Reference Guide
 
-_Comprehensive reference for make syntax, common patterns, and troubleshooting commands._
+_Comprehensive reference for make syntax, common patterns, and troubleshooting
+commands._
 
 ### Appendix B: Migration Strategies
 
@@ -189,8 +202,8 @@ _Step-by-step guides for migrating existing workflows to make-based approaches._
 
 # Chapter 2 - The Executable README
 
-\chaptersubtitle{Transforming the traditional README from static documentation into an
-interactive, always-current guide to your project's capabilities.}
+\chaptersubtitle{Transforming the traditional README from static documentation
+into an interactive, always-current guide to your project's capabilities.}
 
 Every developer has experienced the frustration: you clone a promising
 repository, eager to try it out, only to find a README that's either woefully
@@ -215,8 +228,7 @@ documentation could run itself?**
 Traditional project documentation follows a predictable pattern. A well-meaning
 developer creates a comprehensive README with detailed setup instructions:
 
-```markdown
-# MyApp Setup
+```markdown # MyApp Setup
 
 ## Prerequisites
 - Node.js 14.x
@@ -231,13 +243,10 @@ developer creates a comprehensive README with detailed setup instructions:
 4. Start the development server: `npm start`
 5. In another terminal, start the worker: `python worker.py`
 
-## Testing
-Run the test suite with `pytest tests/` and `npm test`.
+## Testing Run the test suite with `pytest tests/` and `npm test`.
 
-## Deployment
-Deploy to staging with `kubectl apply -f k8s/staging/` then update the image with
-`kubectl set image deployment/myapp app=myapp:latest`.
-```
+## Deployment Deploy to staging with `kubectl apply -f k8s/staging/` then update
+the image with `kubectl set image deployment/myapp app=myapp:latest`. ```
 
 This looks comprehensive and helpful. The problem emerges over time:
 
@@ -250,8 +259,8 @@ This looks comprehensive and helpful. The problem emerges over time:
 
 Six months later, this helpful README has become a liability. New developers
 waste hours trying to follow outdated instructions, and experienced team members
-bypass the README entirely, relying on institutional knowledge that's never written
-down.
+bypass the README entirely, relying on institutional knowledge that's never
+written down.
 
 ## The Philosophy of the Executable README
 
@@ -260,25 +269,18 @@ what to do, you create executable targets that **do the things directly**. Your
 README becomes a menu of available actions rather than a set of instructions to
 follow manually.
 
-\pagebreak
-Here's how the same project might look with an Executable README approach:
+\pagebreak Here's how the same project might look with an Executable README
+approach:
 
-### README.md
-````markdown
-# MyApp
+### README.md ````markdown # MyApp
 
 A modern web application with automated workflows.
 
 ## Quick Start
 
-```bash
-make setup    # Set up development environment
-make dev      # Start development servers
-make test     # Run all tests
-make deploy   # Deploy to staging
-```
-Run `make help` to see all available commands.
-````
+```bash make setup # Set up development environment make dev # Start development
+servers make test # Run all tests make deploy # Deploy to staging ``` Run `make
+help` to see all available commands. ````
 
 Notice what's happened here. The README is now incredibly simple—it doesn't try
 to document complex processes, it just points to executable commands. The
@@ -287,49 +289,36 @@ validation, error handling, and helpful output. On the next page, I'll show you
 the Makefile to which this README refers. It's not a working Makefile, you'll
 have to read on for working examples.
 
-```makefile
-.DEFAULT_GOAL := help
+```makefile .DEFAULT_GOAL := help
 
-# Configuration
-NODE_VERSION := 16
-PYTHON_VERSION := 3.9
-DB_IMAGE := postgres:13
+# Configuration NODE_VERSION := 16 PYTHON_VERSION := 3.9 DB_IMAGE := postgres:13
 KUBE_NAMESPACE := myapp-staging
 
 .PHONY: help setup dev test deploy clean
 
-help: ## Show this help message
-	@echo "Available commands:"
-	@awk 'BEGIN {FS=":.*##"} /^[a-zA-Z_-]+:.*?##/ \
-	{ printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+help: ## Show this help message @echo "Available commands:" @awk 'BEGIN
+{FS=":.*##"} /^[a-zA-Z_-]+:.*?##/ \ { printf " \033[36m%-15s\033[0m %s\n", $$1,
+$$2 }' $(MAKEFILE_LIST)
 
-setup: ## Set up development environment
-	@echo "Setting up MyApp development environment..."
+setup: ## Set up development environment @echo "Setting up MyApp development
+environment..."
 	# ... implementation
 
-db-setup: ## Initialize database
-	@echo "Starting database..."
+db-setup: ## Initialize database @echo "Starting database..."
 	# ... implementation
 	@echo "Database ready!"
 
-dev: ## Start development servers
-	@echo "Starting MyApp in development mode..."
+dev: ## Start development servers @echo "Starting MyApp in development mode..."
 	# ... implementation
 
-test: ## Run all tests
-	@echo "Running test suite..."
-	pytest tests/ -v
-	npm test
+test: ## Run all tests @echo "Running test suite..." pytest tests/ -v npm test
 
-check-kubectl: ## Verify kubectl is configured
-	@kubectl cluster-info >/dev/null || \
-		(echo "kubectl not configured properly" && exit 1)
+check-kubectl: ## Verify kubectl is configured @kubectl cluster-info >/dev/null
+|| \ (echo "kubectl not configured properly" && exit 1)
 
-clean: ## Clean up development environment
-	@echo "Cleaning up..."
+clean: ## Clean up development environment @echo "Cleaning up..."
 	# ... implementation
-	@echo "Cleanup complete!"
-```
+	@echo "Cleanup complete!" ```
 
 ## Designing Make Targets as Self-Describing Interfaces
 
@@ -342,108 +331,69 @@ capabilities.
 
 Every target name should clearly communicate what it does:
 
-```makefile
-# Good: Intent is immediately clear
-setup         # Set up the project
-test          # Run tests
-deploy        # Deploy the application
-clean         # Clean up resources
+```makefile # Good: Intent is immediately clear setup # Set up the project test
+# Run tests deploy # Deploy the application clean # Clean up resources
 
-# Bad: Requires domain knowledge to understand
-init          # Initialize what?
-run           # Run what?
-push          # Push where?
-sync          # Sync what with what?
-```
-\pagebreak
-### The Principle of Safe Defaults
+# Bad: Requires domain knowledge to understand init # Initialize what? run # Run
+what? push # Push where? sync # Sync what with what? ``` \pagebreak ### The
+Principle of Safe Defaults
 
 Targets should be safe to run without parameters and should validate their
 prerequisites:
 
-```makefile
-# Good: Safe with clear validation
-deploy: check-environment check-tests
-	@echo "Deploying $(APP_NAME) version $(VERSION) to $(ENVIRONMENT)"
-	@echo "Continue? [y/N]" && read ans && [ $$ans = y ]
-	kubectl apply -f k8s/$(ENVIRONMENT)/
-	@echo "Deployment complete!"
+```makefile # Good: Safe with clear validation deploy: check-environment
+check-tests @echo "Deploying $(APP_NAME) version $(VERSION) to $(ENVIRONMENT)"
+@echo "Continue? [y/N]" && read ans && [ $$ans = y ] kubectl apply -f
+k8s/$(ENVIRONMENT)/ @echo "Deployment complete!"
 
-check-environment:
-	@test -n "$(ENVIRONMENT)" || (echo "ENVIRONMENT not set" && exit 1)
+check-environment: @test -n "$(ENVIRONMENT)" || (echo "ENVIRONMENT not set" &&
+exit 1)
 
-check-tests:
-	@$(MAKE) test >/dev/null || (echo "Tests must pass before deployment" && exit 1)
+check-tests: @$(MAKE) test >/dev/null || (echo "Tests must pass before
+deployment" && exit 1)
 
-# Bad: Dangerous and assumes too much
-deploy:
-	kubectl delete -f k8s/production/  # Deletes production without warning!
-	kubectl apply -f k8s/production/
-```
-\pagebreak
-### The Principle of Helpful Output
+# Bad: Dangerous and assumes too much deploy: kubectl delete -f k8s/production/
+# Deletes production without warning! kubectl apply -f k8s/production/ ```
+\pagebreak ### The Principle of Helpful Output
 
 Make targets should provide clear, actionable feedback:
 
-```makefile
-# Good: Informative and helpful
-setup:
-	@echo " Setting up MyApp development environment"
-	@echo "Checking prerequisites..."
-	@command -v node >/dev/null && \
-		echo " Node.js found" || \
-		(echo " Node.js required" && exit 1)
-	@command -v docker >/dev/null && \
-		echo " Docker found" || \
-		(echo " Docker required" && exit 1)
-	@echo "Installing dependencies..."
-	npm install --silent
-	@echo " Setup complete! Try 'make dev' to start development."
+```makefile # Good: Informative and helpful setup: @echo " Setting up MyApp
+development environment" @echo "Checking prerequisites..." @command -v node
+>/dev/null && \ echo " Node.js found" || \ (echo " Node.js required" && exit 1)
+@command -v docker >/dev/null && \ echo " Docker found" || \ (echo " Docker
+required" && exit 1) @echo "Installing dependencies..." npm install --silent
+@echo " Setup complete! Try 'make dev' to start development."
 
-# Bad: Silent or confusing
-setup:
-	node --version
-	npm install
-	echo "done"
-```
-\pagebreak
-## The Anatomy of a Discoverable Makefile
-A well-designed Executable README Makefile follows a predictable structure that
-makes it easy for newcomers to understand and use:
-```makefile
-#################### MyApp Development Workflow ###########################
-# Configuration - all customizable values in one place
-APP_NAME := myapp
-VERSION := $(shell git describe --tags --always --dirty)
-DOCKER_REGISTRY ?= localhost:5000
-.DEFAULT_GOAL := help
+# Bad: Silent or confusing setup: node --version npm install echo "done" ```
+\pagebreak ## The Anatomy of a Discoverable Makefile A well-designed Executable
+README Makefile follows a predictable structure that makes it easy for newcomers
+to understand and use: ```makefile #################### MyApp Development
+Workflow ########################### # Configuration - all customizable values
+in one place APP_NAME := myapp VERSION := $(shell git describe --tags --always
+--dirty) DOCKER_REGISTRY ?= localhost:5000 .DEFAULT_GOAL := help
 
 ######## Primary Workflows - The most common developer actions ############
 .PHONY: help setup dev test build deploy clean
 
-help: ##   Show available commands
-	@echo "$(APP_NAME) Development Commands"
-	@echo "================================"
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ \
-	{ printf "  \033[36m%-12s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
-setup: ##   Set up development environment
-	@echo "Setting up $(APP_NAME)..."
-	@$(MAKE) check-prerequisites
-	@$(MAKE) install-dependencies
-	@$(MAKE) start-database
-	@echo " Setup complete! Run 'make dev' to start."
+help: ## Show available commands @echo "$(APP_NAME) Development Commands" @echo
+"================================" @awk 'BEGIN {FS = ":.*##"}
+/^[a-zA-Z_-]+:.*?##/ \ { printf " \033[36m%-12s\033[0m %s\n", $$1, $$2 }'
+$(MAKEFILE_LIST) setup: ## Set up development environment @echo "Setting up
+$(APP_NAME)..." @$(MAKE) check-prerequisites @$(MAKE) install-dependencies
+@$(MAKE) start-database @echo " Setup complete! Run 'make dev' to start."
 
-dev: ##  Start development environment
+dev: ## Start development environment
 	# ... implementation
 
-test: ##   Run all tests
+test: ## Run all tests
 	# ... implementation
 ####################### Build and Deployment ##############################
-build: ##   Build Docker image
+build: ## Build Docker image
 	# ... implementation
-deploy: build test ##   Deploy to staging
+deploy: build test ## Deploy to staging
 	# ... implementation
-clean: ##   Clean up development environment
+clean: ## Clean up development environment
 	# ... implementation
 ################# Utility Targets - Supporting functionality ##############
 check-prerequisites: ## Check required tools
@@ -467,28 +417,14 @@ ensuring that the help text stays synchronized with the actual targets.
 
 You can create sophisticated help systems that organize targets by category:
 
-```makefile
-help: ##   Show available commands
-	@echo "MyApp Development Commands"
-	@echo "========================="
-	@echo
-	@echo " Getting Started:"
-		@awk '/^##@ Getting Started/,/^##@ / { \
-			if(/^[a-zA-Z_-]+:.*##/) \
-				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
-		}' $(MAKEFILE_LIST)
-		@echo
-		@echo " Development:"
-		@awk '/^##@ Development/,/^##@ / { \
-			if(/^[a-zA-Z_-]+:.*##/) \
-				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
-		}' $(MAKEFILE_LIST)
-		@echo
-		@echo " Deployment:"
-		@awk '/^##@ Deployment/,/^##@ / { \
-			if(/^[a-zA-Z_-]+:.*##/) \
-				printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 \
-		}' $(MAKEFILE_LIST)
+```makefile help: ## Show available commands @echo "MyApp Development Commands"
+@echo "=========================" @echo @echo " Getting Started:" @awk '/^##@
+Getting Started/,/^##@ / { \ if(/^[a-zA-Z_-]+:.*##/) \ printf "
+\033[36m%-15s\033[0m %s\n", $$1, $$2 \ }' $(MAKEFILE_LIST) @echo @echo "
+Development:" @awk '/^##@ Development/,/^##@ / { \ if(/^[a-zA-Z_-]+:.*##/) \
+printf " \033[36m%-15s\033[0m %s\n", $$1, $$2 \ }' $(MAKEFILE_LIST) @echo @echo
+" Deployment:" @awk '/^##@ Deployment/,/^##@ / { \ if(/^[a-zA-Z_-]+:.*##/) \
+printf " \033[36m%-15s\033[0m %s\n", $$1, $$2 \ }' $(MAKEFILE_LIST)
 
 ##@ Getting Started
 
@@ -516,38 +452,20 @@ deploy: ## Deploy to staging
 
 You can create help systems that go beyond simple command listing:
 
-```makefile
-help-interactive: ##   Interactive help system
-	@echo "What would you like to do?"
-	@echo "1) Set up the project for the first time"
-	@echo "2) Start development"
-	@echo "3) Run tests"
-	@echo "4) Deploy to staging"
-	@echo "5) View logs"
-	@echo "6) Clean up"
-	@echo -n "Choose [1-6]: "
-	@read choice; \
-	case $$choice in \
-		1) echo "Run: make setup" ;; \
-		2) echo "Run: make dev" ;; \
-		3) echo "Run: make test" ;; \
-		4) echo "Run: make deploy ENVIRONMENT=staging" ;; \
-		5) echo "Run: make logs" ;; \
-		6) echo "Run: make clean" ;; \
-		*) echo "Invalid choice" ;; \
-	esac
+```makefile help-interactive: ## Interactive help system @echo "What would you
+like to do?" @echo "1) Set up the project for the first time" @echo "2) Start
+development" @echo "3) Run tests" @echo "4) Deploy to staging" @echo "5) View
+logs" @echo "6) Clean up" @echo -n "Choose [1-6]: " @read choice; \ case
+$$choice in \ 1) echo "Run: make setup" ;; \ 2) echo "Run: make dev" ;; \ 3)
+echo "Run: make test" ;; \ 4) echo "Run: make deploy ENVIRONMENT=staging" ;; \
+5) echo "Run: make logs" ;; \ 6) echo "Run: make clean" ;; \ *) echo "Invalid
+choice" ;; \ esac
 
-what-can-i-do: ##   Suggest what to do based on current state
-	@if [ ! -f package.json ]; then \
-		echo "You probably want to run: make setup"; \
-	elif [ ! -d node_modules ]; then \
-		echo "Dependencies not installed. Run: make setup"; \
-	elif ! docker ps | grep -q myapp-db; then \
-		echo "Database not running. Run: make dev"; \
-	else \
-		echo "Everything looks ready! Try: make test"; \
-	fi
-```
+what-can-i-do: ## Suggest what to do based on current state @if [ ! -f
+package.json ]; then \ echo "You probably want to run: make setup"; \ elif [ !
+-d node_modules ]; then \ echo "Dependencies not installed. Run: make setup"; \
+elif ! docker ps | grep -q myapp-db; then \ echo "Database not running. Run:
+make dev"; \ else \ echo "Everything looks ready! Try: make test"; \ fi ```
 
 ## Best Practices for Naming Conventions and Target Organization
 
@@ -579,43 +497,28 @@ what-can-i-do: ##   Suggest what to do based on current state
 
 **By Lifecycle Phase**:
 
-```makefile
-# Setup and initialization
-setup: setup-env setup-deps setup-db
-setup-env: check-prerequisites install-tools
-setup-deps: install-dependencies
+```makefile # Setup and initialization setup: setup-env setup-deps setup-db
+setup-env: check-prerequisites install-tools setup-deps: install-dependencies
 setup-db: start-database run-migrations
 
-# Development workflow
-dev: start-services watch-files
-test: test-lint test-unit test-integration
-build: build-assets build-docker
+# Development workflow dev: start-services watch-files test: test-lint test-unit
+test-integration build: build-assets build-docker
 
-# Deployment workflow
-deploy: deploy-staging
-deploy-staging: build test push-image update-staging
-deploy-production: validate-production deploy-to-production
-```
+# Deployment workflow deploy: deploy-staging deploy-staging: build test
+push-image update-staging deploy-production: validate-production
+deploy-to-production ```
 
 **By System Component**:
 
-```makefile
-# Database operations
-db-start: start-database
-db-stop: stop-database
-db-reset: stop-database clean-database start-database run-migrations
-db-backup: backup-database
+```makefile # Database operations db-start: start-database db-stop:
+stop-database db-reset: stop-database clean-database start-database
+run-migrations db-backup: backup-database
 
-# Frontend operations
-frontend-dev: start-webpack-dev-server
-frontend-build: build-assets optimize-assets
-frontend-test: test-javascript test-css
+# Frontend operations frontend-dev: start-webpack-dev-server frontend-build:
+build-assets optimize-assets frontend-test: test-javascript test-css
 
-# Backend operations
-backend-dev: start-api-server
-backend-build: build-docker-image
-backend-test: test-python test-api
-```
+# Backend operations backend-dev: start-api-server backend-build:
+build-docker-image backend-test: test-python test-api ```
 
 ## Real-World Example: Transforming a Legacy Project
 
@@ -624,8 +527,7 @@ into an Executable README approach.
 
 ### Before: Traditional README**
 
-```markdown
-# LegacyApp
+```markdown # LegacyApp
 
 ## Setup
 1. Install Node 14
@@ -652,26 +554,19 @@ into an Executable README approach.
 - Build: `docker build -t legacyapp .`
 - Push: `docker push registry.company.com/legacyapp`
 - Deploy: `kubectl apply -f k8s/`
-- Update image:  
-	`kubectl set image deployment/legacyapp app=registry.company.com/legacyapp:latest`
-```
-\pagebreak
-### After: Executable README
+- Update image: `kubectl set image deployment/legacyapp
+  app=registry.company.com/legacyapp:latest` ``` \pagebreak ### After:
+  Executable README
 
-````markdown
-# LegacyApp
+````markdown # LegacyApp
 
 Modern web application with automated development workflows.
 
 ## Quick Start
 
-```bash
-make setup    # One-time setup (installs everything)
-make dev      # Start development (API + frontend + worker)
-make test     # Run all tests
-make deploy   # Deploy to staging
-```
-Run `make help` for all available commands.
+```bash make setup # One-time setup (installs everything) make dev # Start
+development (API + frontend + worker) make test # Run all tests make deploy #
+Deploy to staging ``` Run `make help` for all available commands.
 
 ## Requirements
 
@@ -691,172 +586,119 @@ Run `make config-help` for configuration details.
 
 ````
 
-**Makefile:**
-```makefile
-# LegacyApp Development Workflow
-APP_NAME := legacyapp
-VERSION := $(shell git describe --tags --always --dirty)
-REGISTRY := registry.company.com
-IMAGE_NAME := $(REGISTRY)/$(APP_NAME)
-DATABASE_URL ?= postgresql://legacyapp:dev@localhost:5432/legacyapp
+**Makefile:** ```makefile # LegacyApp Development Workflow APP_NAME := legacyapp
+VERSION := $(shell git describe --tags --always --dirty) REGISTRY :=
+registry.company.com IMAGE_NAME := $(REGISTRY)/$(APP_NAME) DATABASE_URL ?=
+postgresql://legacyapp:dev@localhost:5432/legacyapp
 
-.DEFAULT_GOAL := help
-.PHONY: help setup dev test build deploy clean
+.DEFAULT_GOAL := help .PHONY: help setup dev test build deploy clean
 
-help: ## Show available commands
-	@echo "LegacyApp Development Commands"
-	@echo "============================="
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { \
-		printf "  \033[36m%-15s\033[0m %s\n", $$1, \
-		(substr($$2, 1, 65) (length($$2)>65?"...":"")) \
-	}' $(MAKEFILE_LIST)
+help: ## Show available commands @echo "LegacyApp Development Commands" @echo
+"=============================" @awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/
+{ \ printf " \033[36m%-15s\033[0m %s\n", $$1, \ (substr($$2, 1, 65)
+(length($$2)>65?"...":"")) \ }' $(MAKEFILE_LIST)
 
 ##@ Getting Started
 
-setup: ##   Complete project setup
-	@echo "Setting up LegacyApp development environment..."
-	@$(MAKE) check-system-requirements
-	@$(MAKE) create-env-file
-	@$(MAKE) install-dependencies
-	@$(MAKE) setup-database
-	@echo " Setup complete! Run 'make dev' to start development."
+setup: ## Complete project setup @echo "Setting up LegacyApp development
+environment..." @$(MAKE) check-system-requirements @$(MAKE) create-env-file
+@$(MAKE) install-dependencies @$(MAKE) setup-database @echo " Setup complete!
+Run 'make dev' to start development."
 
-setup-system: ##   Install system requirements (Node.js, Python)
-	@echo "Installing system requirements..."
-	@command -v brew >/dev/null && $(MAKE) setup-macos || $(MAKE) setup-linux
+setup-system: ## Install system requirements (Node.js, Python) @echo "Installing
+system requirements..." @command -v brew >/dev/null && $(MAKE) setup-macos ||
+$(MAKE) setup-linux
 
-setup-macos:
-	brew install node@14 python@3.8 postgresql
+setup-macos: brew install node@14 python@3.8 postgresql
 
-setup-linux:
-	sudo apt-get update
-	sudo apt-get install nodejs npm python3.8 python3-pip postgresql
+setup-linux: sudo apt-get update sudo apt-get install nodejs npm python3.8
+python3-pip postgresql
 
 ##@ Development
 
-dev: ##  Start development environment
-	@echo "Starting LegacyApp development environment..."
-	@$(MAKE) ensure-database-running
-	@trap 'echo "Shutting down..."; kill %1 %2 %3; exit' INT; \
-	python app.py & \
-	npm start & \
-	python worker.py & \
-	echo " All services started. Press Ctrl+C to stop."; \
-	wait
+dev: ## Start development environment @echo "Starting LegacyApp development
+environment..." @$(MAKE) ensure-database-running @trap 'echo "Shutting down...";
+kill %1 %2 %3; exit' INT; \ python app.py & \ npm start & \ python worker.py & \
+echo " All services started. Press Ctrl+C to stop."; \ wait
 
-test: ##   Run all tests
-	@echo "Running LegacyApp test suite..."
-	@$(MAKE) test-backend
-	@$(MAKE) test-frontend
-	@echo " All tests passed!"
+test: ## Run all tests @echo "Running LegacyApp test suite..." @$(MAKE)
+test-backend @$(MAKE) test-frontend @echo " All tests passed!"
 
-test-backend: ##  Run Python tests
-	pytest -v
+test-backend: ## Run Python tests pytest -v
 
-test-frontend: ##   Run JavaScript tests
-	npm test
+test-frontend: ## Run JavaScript tests npm test
 
 ##@ Build & Deploy
 
-build: ##   Build Docker image
-	@echo "Building $(IMAGE_NAME):$(VERSION)..."
-	docker build -t $(IMAGE_NAME):$(VERSION) .
-	docker tag $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo " Build complete"
+build: ## Build Docker image @echo "Building $(IMAGE_NAME):$(VERSION)..." docker
+build -t $(IMAGE_NAME):$(VERSION) . docker tag $(IMAGE_NAME):$(VERSION)
+$(IMAGE_NAME):latest @echo " Build complete"
 
-deploy: build test ##   Deploy to staging
-	@echo "Deploying $(APP_NAME) version $(VERSION)..."
-	docker push $(IMAGE_NAME):$(VERSION)
-	kubectl apply -f k8s/
-	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_NAME):$(VERSION)
-	kubectl rollout status deployment/$(APP_NAME)
-	@echo " Deployment complete!"
+deploy: build test ## Deploy to staging @echo "Deploying $(APP_NAME) version
+$(VERSION)..." docker push $(IMAGE_NAME):$(VERSION) kubectl apply -f k8s/
+kubectl set image deployment/$(APP_NAME) app=$(IMAGE_NAME):$(VERSION) kubectl
+rollout status deployment/$(APP_NAME) @echo " Deployment complete!"
 
 ##@ Utilities
 
-check-system-requirements: ##   Verify system requirements
-	@echo "Checking system requirements..."
-	@command -v node >/dev/null || \
-		(echo " Node.js required. Run 'make setup-system'" && exit 1)
-	@command -v python3 >/dev/null || \
-		(echo " Python 3 required. Run 'make setup-system'" && exit 1)
-	@command -v docker >/dev/null || \
-		(echo " Docker required. Please install Docker." && exit 1)
-	@echo " All system requirements met"
+check-system-requirements: ## Verify system requirements @echo "Checking system
+requirements..." @command -v node >/dev/null || \ (echo " Node.js required. Run
+'make setup-system'" && exit 1) @command -v python3 >/dev/null || \ (echo "
+Python 3 required. Run 'make setup-system'" && exit 1) @command -v docker
+>/dev/null || \ (echo " Docker required. Please install Docker." && exit 1)
+@echo " All system requirements met"
 
-create-env-file: ##  Create .env configuration file
-	@if [ ! -f .env ]; then \
-		echo "Creating .env file..."; \
-		echo "DATABASE_URL=$(DATABASE_URL)" > .env; \
-		echo "SECRET_KEY=$$(python3 -c 'import secrets; print(secrets.token_urlsafe(32))')" >> .env; \
-		echo "API_KEY=your-api-key-here" >> .env; \
-		echo " Please edit .env and set your API_KEY"; \
-	else \
-		echo ".env file already exists"; \
-	fi
+create-env-file: ## Create .env configuration file @if [ ! -f .env ]; then \
+echo "Creating .env file..."; \ echo "DATABASE_URL=$(DATABASE_URL)" > .env; \
+echo "SECRET_KEY=$$(python3 -c 'import secrets;
+print(secrets.token_urlsafe(32))')" >> .env; \ echo "API_KEY=your-api-key-here"
+>> .env; \ echo " Please edit .env and set your API_KEY"; \ else \ echo ".env
+file already exists"; \ fi
 
-install-dependencies: ##   Install all dependencies
-	@echo "Installing dependencies..."
-	npm install --silent
-	pip install -r requirements.txt --quiet
-	@echo " Dependencies installed"
+install-dependencies: ## Install all dependencies @echo "Installing
+dependencies..." npm install --silent pip install -r requirements.txt --quiet
+@echo " Dependencies installed"
 
-setup-database: ##    Set up development database
-	@echo "Setting up database..."
-	@$(MAKE) start-database
-	@echo "Waiting for database to be ready..."
-	@timeout 30 bash -c 'until docker exec legacyapp-db pg_isready -U legacyapp; do sleep 1; done'
-	python manage.py migrate
-	@echo " Database ready"
+setup-database: ## Set up development database @echo "Setting up database..."
+@$(MAKE) start-database @echo "Waiting for database to be ready..." @timeout 30
+bash -c 'until docker exec legacyapp-db pg_isready -U legacyapp; do sleep 1;
+done' python manage.py migrate @echo " Database ready"
 
-start-database: ## ▶  Start PostgreSQL database
-	@docker run -d --name legacyapp-db \
-		-e POSTGRES_DB=legacyapp \
-		-e POSTGRES_USER=legacyapp \
-		-e POSTGRES_PASSWORD=dev \
-		-p 5432:5432 \
-		postgres:13 >/dev/null 2>&1 || echo "Database already running"
+start-database: ## ▶ Start PostgreSQL database @docker run -d --name
+legacyapp-db \ -e POSTGRES_DB=legacyapp \ -e POSTGRES_USER=legacyapp \ -e
+POSTGRES_PASSWORD=dev \ -p 5432:5432 \ postgres:13 >/dev/null 2>&1 || echo
+"Database already running"
 
-ensure-database-running: ##   Ensure database is running
-	@docker ps | grep -q legacyapp-db || $(MAKE) start-database
+ensure-database-running: ## Ensure database is running @docker ps | grep -q
+legacyapp-db || $(MAKE) start-database
 
-config-help: ##   Show configuration help
-	@echo "LegacyApp Configuration"
-	@echo "====================="
-	@echo "Environment variables (set in .env file):"
-	@echo " DATABASE_URL  - PostgreSQL connection string"
-	@echo " SECRET_KEY    - Application secret (auto-generated)"
-	@echo " API_KEY       - External service API key (required)"
-	@echo ""
-	@echo "Current configuration:"
-	@echo " DATABASE_URL: $(DATABASE_URL)"
-	@echo " SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | \
-sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
-	@echo " API_KEY: $$(test -f .env && grep API_KEY .env | cut -d= -f2 | \
-sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')"
+config-help: ## Show configuration help @echo "LegacyApp Configuration" @echo
+"=====================" @echo "Environment variables (set in .env file):" @echo
+" DATABASE_URL - PostgreSQL connection string" @echo " SECRET_KEY - Application
+secret (auto-generated)" @echo " API_KEY - External service API key (required)"
+@echo "" @echo "Current configuration:" @echo " DATABASE_URL: $(DATABASE_URL)"
+@echo " SECRET_KEY: $$(test -f .env && grep SECRET_KEY .env | cut -d= -f2 | \
+sed 's/^\(.\{0,20\}\).*/\1.../' || echo 'Not set')" @echo " API_KEY: $$(test -f
+.env && grep API_KEY .env | cut -d= -f2 | \ sed 's/^\(.\{0,20\}\).*/\1.../' ||
+echo 'Not set')"
 
-clean: ##   Clean up development environment
-	@echo "Cleaning up..."
-	-docker stop legacyapp-db
-	-docker rm legacyapp-db
-	-docker rmi $(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):latest
-	@echo " Cleanup complete"
+clean: ## Clean up development environment @echo "Cleaning up..." -docker stop
+legacyapp-db -docker rm legacyapp-db -docker rmi $(IMAGE_NAME):$(VERSION)
+$(IMAGE_NAME):latest @echo " Cleanup complete"
 
-logs: ##   Show application logs (in Kubernetes)
-	kubectl logs -f deployment/$(APP_NAME)
+logs: ## Show application logs (in Kubernetes) kubectl logs -f
+deployment/$(APP_NAME)
 
-shell: ##   Get shell in running container
-	kubectl exec -it deployment/$(APP_NAME) -- /bin/bash
-````
+shell: ## Get shell in running container kubectl exec -it deployment/$(APP_NAME)
+-- /bin/bash ````
 
 The transformation is dramatic. What was once a multi-step, error-prone setup
 process becomes:
 
 1. `make setup` - Installs everything, creates configuration, sets up database
 2. `make dev` - Starts all services with proper coordination and shutdown
-   handling
-3. `make test` - Runs comprehensive test suite
-4. `make deploy` - Builds, tests, and deploys safely
+handling 3. `make test` - Runs comprehensive test suite 4. `make deploy` -
+Builds, tests, and deploys safely
 
 New team members can be productive in minutes rather than hours, and the
 Makefile serves as both documentation and implementation of the project's
@@ -927,7 +769,7 @@ foundation of discoverability and executable documentation.
 ## Remember:
 - The book is about discovering and documenting workflows.
 - Examples should show how Make makes workflows discoverable, not how to build
-production-grade infrastructure automation from scratch.
+  production-grade infrastructure automation from scratch.
 - We're teaching patterns, not providing templates.
 - We will always capitalize Make when we are referring to the software.
 - We will NOT use the word "tribal" -- Use "team lore" instead.
