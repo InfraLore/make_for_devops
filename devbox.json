@@ -19,11 +19,11 @@
       "if [ ! -d \"$VENV_DIR\" ]; then",
       "  python -m venv \"$VENV_DIR\";",
       "  . \"$VENV_DIR/bin/activate\";",
-      "  pip install --upgrade pip;",
-      "  pip install -r requirements.txt || true;",
+      "  pip install -qqq --upgrade pip;",
+      "  pip install -qqq -r requirements.txt || true;",
       "else",
       "  . \"$VENV_DIR/bin/activate\";",
-      "  pip install -r requirements.txt || true;",
+      "  pip install -qqq -r requirements.txt || true;",
       "fi"
     ],
     "scripts": {
