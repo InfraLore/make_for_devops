@@ -27,17 +27,10 @@
       "fi"
     ],
     "scripts": {
-      "test": [
-        "echo \"Error: no test specified\" && exit 1"
-      ],
-      "pdf": [
-        "make clean",
-        "make pdf"
-      ],
-      "final": [
-        "make clean",
-        "make final"
-      ]
+      "test": ["echo \"Error: no test specified\" && exit 1"],
+      "pdf": ["make clean", "make pdf"],
+      "final": ["make clean", "make final"],
+      "publish": ["make clean", "make publish"]
     }
   }
 }
