@@ -104,7 +104,7 @@ Create consistency through conventions, not mandates:
 
 # Development
 setup:      ## Set up development environment
-dev:        ## Start development environment  
+dev:        ## Start development environment
 test:       ## Run tests
 build:      ## Build artifacts
 
@@ -131,6 +131,7 @@ ENVIRONMENT     # Target environment
 IMAGE_NAME      # Full Docker image name
 ```
 \pagebreak
+
 ### Help System Conventions
 
 ```makefile
@@ -145,6 +146,7 @@ help: ## Show available commands
 		{printf "  %-20s %s\n", $$1, $$2}'
 ```
 \pagebreak
+
 ## Creating Template Projects
 
 Templates help teams start with good patterns:

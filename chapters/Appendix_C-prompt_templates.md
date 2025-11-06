@@ -128,7 +128,7 @@ CORE PRINCIPLES TO APPLY:
    - Keep the Makefile focused on orchestration
 
 SPECIFIC ISSUES TO ADDRESS:
-[List any specific problems: unclear target names, missing documentation, 
+[List any specific problems: unclear target names, missing documentation,
 repetitive code, unsafe operations, etc.]
 
 CONSTRAINTS:
@@ -239,7 +239,7 @@ DOCKER ORCHESTRATION CONTEXT:
 - Services: [database, cache, app, etc.]
 - Environments: [dev, test, production]
 
-KEY PRINCIPLE: Make doesn't replace Docker tools, it provides the discoverable 
+KEY PRINCIPLE: Make doesn't replace Docker tools, it provides the discoverable
 interface to them. Make should:
 
 - Show what Docker operations are available (make docker or make help)

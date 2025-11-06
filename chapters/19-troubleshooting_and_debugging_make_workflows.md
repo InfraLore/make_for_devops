@@ -15,12 +15,15 @@ This chapter equips you with the techniques, tools, and mental models for troubl
 Most Make debugging starts with understanding what Make is actually doing. Make's execution model has several layers:
 
 ### 1. Parsing Phase
+
 Make reads the Makefile, expands variables, evaluates conditions, and builds a dependency graph.
 
 ### 2. Dependency Resolution Phase
+
 Make determines which targets need to run based on file timestamps or phony declarations.
 
 ### 3. Execution Phase
+
 Make runs the shell commands for each required target.
 
 Problems can occur in any of these phases, and the symptoms differ:

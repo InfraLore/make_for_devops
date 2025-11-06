@@ -88,6 +88,7 @@ calls that require jumping to definitions, and secondary expansion adds a second
 evaluation pass that can confuse debugging.
 
 \newpage
+
 ## Pattern Rules for Handling Multiple Environments
 
 Pattern rules eliminate repetitive target definitions:
@@ -118,6 +119,7 @@ Pattern rules become even more powerful with pattern-specific variables (covered
 later in this chapter).
 
 \newpage
+
 ### Environment-Specific Validation
 
 Different environments need different safety levels:
@@ -145,6 +147,7 @@ Pattern rules work with prerequisites. Each environment gets appropriate
 validation automatically.
 
 \newpage
+
 ### Service-Specific Pattern Rules
 
 Handle multiple services consistently:
@@ -169,6 +172,7 @@ deploy-all-services: $(SERVICES:%=deploy-%-service)
 One pattern handles all services. Add new services without changing the Makefile.
 
 \newpage
+
 ## Robust Shell Configuration and Error Handling
 
 DevOps workflows fail in production for predictable reasons: a command in the
@@ -211,6 +215,7 @@ targets execute. The key is knowing when the default behavior helps you and
 when it hurts you.
 
 \newpage
+
 ### Understanding Make's Default Shell Behavior
 
 Make's default shell execution has specific characteristics that affect
@@ -240,6 +245,7 @@ For simple targets, this behavior is fine. For complex DevOps workflows, it
 causes subtle failures.
 
 \newpage
+
 ### The .ONESHELL Directive
 
 `.ONESHELL` runs all lines of a target in a single shell session:
@@ -268,6 +274,7 @@ The tradeoff: if one line fails, Make might not stop the target immediately
 unless you configure error handling explicitly.
 
 \newpage
+
 ### Advanced .SHELLFLAGS Configuration
 
 `.SHELLFLAGS` controls which flags Make passes to the shell. The default is
@@ -297,6 +304,7 @@ The `-c` at the end tells the shell to execute what follows as a command (this
 is Make's requirement).
 
 \newpage
+
 #### Why Each Flag Matters
 
 **`-e` (errexit)**: Without this, commands continue after failures:
@@ -382,6 +390,7 @@ The `-` prefix tells Make to ignore the exit code for that specific line, even
 with `-e` enabled.
 
 \newpage
+
 ### Adding a DEBUG Flag
 
 DevOps workflows need visibility during development and troubleshooting. A `DEBUG`
@@ -463,6 +472,7 @@ prints commands as executed (after expansion). Use `-v` for build debugging,
 `-x` for runtime debugging.
 
 \newpage
+
 ### Real-World Example: Database Migration
 
 Here's how these configurations solve a common DevOps scenario:
@@ -497,6 +507,7 @@ production with no valid backup.
 These guarantees are safety nets, not primary defenses. You should validate required variables explicitly (as shown in the multi-environment example that follows, and described in-depth in Chapter 4), use Make's built-in checks, or fail fast at the target's start. Strict mode's real value is during development: it catches mistakes as you write. Then it stays in place as a backstop, catching the unexpected: a refactoring that removes a variable definition, a copy-paste error, or an edge case you didn't anticipate. Think of -u as insurance, not your security system.
 
 \newpage
+
 ### Real-World Example: Multi-Environment Deploy
 
 Configuration management across environments benefits from strict shell
@@ -528,6 +539,7 @@ Strict mode ensures:
 - Any unexpected error stops the deployment immediately
 
 \newpage
+
 ### Pitfalls and Workarounds
 
 Strict shell configuration changes behavior that some commands rely on:
@@ -626,6 +638,7 @@ This pattern gives you safety where it matters and flexibility where you need
 it.
 
 \newpage
+
 ### Summary: Building Reliability Into Your Workflows
 
 Shell configuration directives transform Make from a simple task runner into a
@@ -858,6 +871,7 @@ Makefile:
 .RECIPEPREFIX = >
 ```
 \newpage
+
 ### Advanced Automatic Variable Modifiers
 
 You know `$@` (target name) and `$<` (first prerequisite). Make provides
@@ -900,6 +914,7 @@ build outputs.
 build directory while maintaining logical organization.
 
 \newpage
+
 ### Intermediate File Handling
 
 Make can automatically clean up temporary files it generates during builds. The
@@ -1033,6 +1048,7 @@ targets, you won't see progress until the target completes. Use `line` mode if
 you need streaming output.
 
 \newpage
+
 ### Combining Hidden Features for Power Workflows
 
 These features combine to solve complex problems:
@@ -1078,6 +1094,7 @@ Each feature solves a specific problem. Together, they create powerful,
 maintainable workflows.
 
 \newpage
+
 ### When to Use Hidden Features
 
 These features add complexity. Use them when they solve real problems:
@@ -1118,6 +1135,7 @@ These features add complexity. Use them when they solve real problems:
 - You need grouped output by target
 
 \newpage
+
 ### Version Requirements and Portability
 
 These features have different Make version requirements:
@@ -1195,6 +1213,7 @@ post-build-hooks:
 Framework provides structure, teams add customization through hooks.
 
 \newpage
+
 ### Configuration-Driven Workflows
 
 Configuration-driven workflows separate **what to execute** from **how to execute it**. Instead of hardcoding deployment strategies in your Makefile, you store them in configuration files that Make reads at runtime. The Makefile becomes an execution engine that interprets configuration, rather than a collection of hardcoded procedures.
@@ -1206,6 +1225,7 @@ The key insight: configuration files change frequently (every project, every tea
 ![Configuration-driven Workflows](images/chapter8.png)
 
 \newpage
+
 #### Basic Configuration Pattern
 
 Here's a practical example with a configuration file:
@@ -1257,6 +1277,7 @@ workflow-blue-green:
 The `load-config` target validates the configuration file and ensures required fields exist. The `execute-workflow` target reads the `workflow_type` field and dispatches to the appropriate implementation. Each workflow script receives the full configuration and extracts the parameters it needs.
 
 \newpage
+
 #### Multi-Environment Configuration
 
 Real deployments need environment-specific configurations:
@@ -1344,6 +1365,7 @@ The progression:
 Each step adds capability at the cost of indirection. Stop at the simplest solution that solves your problem. Configuration-driven workflows are powerful, but they're the solution to a specific scaling problem, not a universal best practice.
 
 \newpage
+
 ### Reusable Components with Functions
 
 Functions encapsulate repetitive command sequences into reusable blocks. When
@@ -1374,6 +1396,7 @@ functions like this standardize output formatting across all targets without
 repeating date formatting logic.
 
 \newpage
+
 #### Standardizing Repetitive Notifications
 
 DevOps workflows need consistent notifications. Functions centralize the
@@ -1439,6 +1462,7 @@ endef
 
 
 \newpage
+
 #### Environment Configuration Pattern
 
 Setting up environment context involves repetitive checks and configuration:
@@ -1477,6 +1501,7 @@ parameters: service name `$(1)` and environment `$(2)`. Changes to deployment
 logic happen once, not in every target.
 
 \newpage
+
 #### Multi-Step Operations with Error Handling
 
 Complex operations benefit from centralized error handling:
@@ -1506,6 +1531,7 @@ function. Every service gets the same safety guarantees without duplicating the
 error handling code.
 
 \newpage
+
 #### Framework Integration with Functions
 
 Functions shine in extensible frameworks where teams need consistent patterns:
@@ -1537,6 +1563,7 @@ target. Add monitoring, change health check logic, or enhance error handling in
 one place.
 
 \newpage
+
 #### When to Use Functions
 
 Use functions when you have:
@@ -1562,6 +1589,7 @@ targets for team-specific workflows. Functions become infrastructure—stable,
 well-tested, and trusted by everyone.
 
 \newpage
+
 ## Key Takeaways
 
 Make's advanced features solve the DevOps multiplicity problem—managing many
@@ -1569,6 +1597,7 @@ environments, services, and strategies without drowning in duplication or hiding
 logic in opaque scripts.
 
 ### The Tools:
+
 1. **Pattern Rules**: Eliminate repetition with `%` wildcards
 2. **Shell Configuration**: Robust error handling for production workflows
 3. **Secondary Expansion**: Dynamic prerequisites based on target names
@@ -1578,6 +1607,7 @@ logic in opaque scripts.
 7. **Functions**: Encapsulate multi-line sequences with `define/endef` and `$(call)`
 
 ### The Discipline:
+
 Use these features sparingly—only when they solve real problems:
 
 - Duplication pain (pattern rules, functions)
@@ -1590,7 +1620,9 @@ Don't use advanced features for their own sake. Simple, clear Makefiles beat
 clever, complex ones unless complexity solves a real problem.
 
 \newpage
+
 ### The Payoff:
+
 Advanced features turn duplication into abstraction without sacrificing
 visibility. Pattern rules let you write `deploy-%` once instead of copying
 `deploy-dev`, `deploy-staging`, and `deploy-prod`. Functions encapsulate your

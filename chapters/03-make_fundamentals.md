@@ -17,6 +17,7 @@ domain-specific languages or complex configuration formats, Make leverages
 concepts you already understand: commands, dependencies, and variables.
 
 \newpage
+
 ## Essential Make Syntax for DevOps Use Cases
 
 ### The Fundamental Structure: Targets, Prerequisites, and Recipes
@@ -49,6 +50,7 @@ needing to remember `pytest tests/`, they just run `make test`. This might seem
 trivial, but it's the foundation of discoverability.
 
 \newpage
+
 ### Building Workflows with Prerequisites
 
 The real power of Make emerges when you start defining **prerequisites**—targets that must run before other targets:
@@ -85,6 +87,7 @@ command itself, showing only the output. This makes the workflow output cleaner
 and more readable.
 
 \newpage
+
 ### Dependency Graphs and Execution Order
 
 Prerequisites can have their own prerequisites, creating dependency graphs:
@@ -187,6 +190,7 @@ build:
 The `:=` operator evaluates the shell command once when the Makefile is parsed, while `=` evaluates it every time the variable is used. For expensive operations like git commands, use `:=`.
 
 \newpage
+
 ### Conditional Logic for Environment-Aware Workflows
 
 Make supports conditional logic for adapting behavior:
@@ -226,6 +230,7 @@ Separate targets are self-documenting and easier to understand. Each target clea
 \end{calloutbox}
 
 \newpage
+
 ### Built-in Functions
 
 Make includes useful built-in functions:
@@ -258,6 +263,7 @@ dependencies, and failure handling, see Chapter 7: Dependency Management for
 DevOps Workflows. \end{calloutbox}
 
 \newpage
+
 ### Phony Targets: The DevOps Default
 
 Most DevOps tasks should use **phony targets**—targets that don't correspond to
@@ -296,6 +302,7 @@ that name exists. This is critical for DevOps workflows where targets represent
 actions, not build artifacts.
 
 \newpage
+
 ### File-Based Dependencies: When They Make Sense
 
 File targets are useful when you want to avoid unnecessary work:
@@ -459,6 +466,7 @@ provide systematic safety guarantees.
 \end{calloutbox}
 
 \newpage
+
 ### Validation Checks
 
 Build validation directly into your workflows:
@@ -483,6 +491,7 @@ check-cluster:
 These validation targets catch problems early with clear error messages.
 
 \newpage
+
 ## Pattern: The Self-Documenting Help System
 
 A well-designed Makefile teaches itself. The help system pattern is essential:
@@ -518,6 +527,7 @@ This pattern makes every Makefile self-documenting. New engineers run `make` and
 immediately see what's available.
 
 \newpage
+
 ### Enhanced Help with Categories
 
 For larger Makefiles, organize help into categories:
@@ -609,6 +619,7 @@ build. This dependency chain makes it impossible to accidentally deploy untested
 code. The workflow itself enforces good practices.
 
 \newpage
+
 ## Key Takeaways
 
 Make's syntax might seem intimidating at first, especially if you're coming from

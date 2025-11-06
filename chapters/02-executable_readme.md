@@ -22,6 +22,7 @@ The Executable README concept offers a radical solution: **what if your
 documentation could run itself?**
 
 \pagebreak
+
 ## Moving Beyond Static Documentation
 
 Traditional project documentation follows a predictable pattern. A well-meaning
@@ -74,6 +75,7 @@ follow manually.
 Here's how the same project might look with an Executable README approach:
 
 ### README.md
+
 ````markdown
 # MyApp
 
@@ -166,6 +168,7 @@ push          # Push where?
 sync          # Sync what with what?
 ```
 \pagebreak
+
 ### The Principle of Safe Defaults
 
 Targets should be safe to run without parameters and should validate their
@@ -191,6 +194,7 @@ deploy:
 	kubectl apply -f k8s/production/
 ```
 \pagebreak
+
 ### The Principle of Helpful Output
 
 Make targets should provide clear, actionable feedback:
@@ -216,7 +220,9 @@ setup:
 	npm install
 	echo "done"
 ```
+
 ## The Anatomy of a Discoverable Makefile
+
 A well-designed Executable README Makefile follows a predictable structure that
 makes it easy for newcomers to understand and use (see next page):
 ```makefile
@@ -462,10 +468,11 @@ into an Executable README approach.
 - Build: `docker build -t legacyapp .`
 - Push: `docker push registry.company.com/legacyapp`
 - Deploy: `kubectl apply -f k8s/`
-- Update image:  
+- Update image:
 	`kubectl set image deployment/legacyapp app=registry.company.com/legacyapp:latest`
 ```
 \pagebreak
+
 ### After: Executable README
 
 ````markdown

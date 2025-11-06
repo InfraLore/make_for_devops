@@ -131,6 +131,7 @@ make dev      # Start development
 For all available commands, run `make help`.
 
 ### Detailed Documentation
+
 See our [detailed setup guide](docs/setup.md) for manual setup instructions.
 ```
 
@@ -272,17 +273,17 @@ jobs:
     steps:
       - name: Build
         run: docker build -t myapp:${{ github.sha }} .
-      
+
       - name: Test
         run: |
           docker run myapp:${{ github.sha }} pytest
-      
+
       - name: Push
         run: |
           docker tag myapp:${{ github.sha }} myapp:latest
           docker push myapp:${{ github.sha }}
           docker push myapp:latest
-      
+
       - name: Deploy
         run: |
           kubectl set image deployment/myapp app=myapp:${{ github.sha }}
@@ -341,8 +342,8 @@ ifdef CI
   TEST_ARGS := --verbose
 else
   # Local development behavior
-  DOCKER_BUILD_ARGS := 
-  TEST_ARGS := 
+  DOCKER_BUILD_ARGS :=
+  TEST_ARGS :=
 endif
 
 build:
@@ -624,24 +625,28 @@ clean-logs: ## Clean old logs
 ## General Migration Timeline
 
 ### Week 1: Foundation
+
 - Add basic Makefile with `help` target
 - Create 3-5 high-value targets (`setup`, `test`, `build`)
 - Update README to mention Make
 - Announce to team
 
 ### Week 2-4: Expansion
+
 - Add targets as team requests them
 - Wrap existing scripts
 - Enhance with validation and safety checks
 - Gather feedback
 
 ### Month 2: Integration
+
 - Integrate with CI/CD
 - Add environment-specific targets
 - Create deployment workflows
 - Document patterns
 
 ### Month 3+: Advanced
+
 - Add incident runbooks
 - Create shared libraries
 - Establish conventions

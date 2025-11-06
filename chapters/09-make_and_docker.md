@@ -51,7 +51,7 @@ dev-compose: ## Start using Docker Compose
 	@docker-compose up -d
 	@$(MAKE) dev-ready
 
-dev-lando: ## Start using Lando  
+dev-lando: ## Start using Lando
 	@lando start
 	@$(MAKE) dev-ready
 
@@ -259,6 +259,7 @@ the complexity lives in scripts rather than being scattered across
 documentation.
 
 \newpage
+
 ## Discovering Development Environments
 
 Development with Docker involves multiple services and configuration. Make this
@@ -299,6 +300,7 @@ tells you what commands are available. Each operation is independently
 discoverable.
 
 \newpage
+
 ## Discovering Multi-Stage Builds
 
 Multi-stage Dockerfiles create different images for different purposes. Make the
@@ -331,6 +333,7 @@ Running `make build` shows available build targets. Each stage is independently
 buildable and the workflow is clear.
 
 \newpage
+
 ## Discovering Registry Operations
 
 Registry management involves tagging, pushing, and version control:
@@ -368,6 +371,7 @@ The registry workflow is discoverable through `make registry`. Authentication,
 versioning, and cleanup are all explicit operations.
 
 \newpage
+
 ## Discovering Security Scanning
 
 Security scanning should be built into the workflow:
@@ -399,6 +403,7 @@ Security becomes discoverable and repeatable. Developers can run the same scans
 locally that run in CI.
 
 \newpage
+
 ## Discovering Compose Orchestration
 
 Docker Compose involves multiple services and dependencies:
@@ -430,6 +435,7 @@ Compose operations are discoverable. Complex orchestration becomes simple
 commands.
 
 \newpage
+
 ## Discovering CI/CD Integration
 
 CI/CD pipelines need consistent, reliable Docker operations:
@@ -464,6 +470,7 @@ The CI pipeline is discoverable and can be run locally. No surprises in CI that
 didn't happen locally.
 
 \newpage
+
 ## Real-World Example
 
 ### Before: Scattered Scripts and Documentation
@@ -484,6 +491,7 @@ dev-setup.sh:
 Result: Confusion, inconsistency, broken builds
 ```
 \newpage
+
 ### After: Discoverable Workflow
 
 ```makefile
@@ -517,6 +525,7 @@ commands. New team members run `make help` and understand the workflow
 immediately.
 
 \newpage
+
 ## Key Patterns
 
 Make Docker workflows discoverable through:

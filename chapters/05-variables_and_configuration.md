@@ -47,7 +47,7 @@ The foundation of practical Make configuration is three simple patterns:
 1. **Defaults with overrides**: `VERSION ?= latest` provides a sensible default
    that's easy to override
 2. **Computed values**: `IMAGE_TAG = $(REGISTRY)/$(APP):$(VERSION)` builds
-   complex values from simple inputs  
+   complex values from simple inputs
 3. **Environment detection**: `VERSION = $(shell git describe --tags --always)`
    pulls values from your system
 
@@ -149,6 +149,7 @@ specific reason not to. \end{calloutbox}
 Here's how to handle different environments without over-engineering:
 
 \pagebreak
+
 ### Level 1: Simple Conditionals (Start Here)
 
 For 2-3 environments with a few different settings:
@@ -211,6 +212,7 @@ BACKUP_ENABLED = true
 The `-include` (with dash) means Make won't error if the file doesn't exist.
 
 \newpage
+
 ### Level 3: External Config Systems (For Large Organizations)
 
 Only reach for external systems when:
@@ -316,6 +318,7 @@ validate-secrets:
 	@echo "✓ Secrets validated"
 ```
 \newpage
+
 ## Validation: Only What Prevents Real Bugs
 
 Don't validate everything. Validate what has caused actual problems:
@@ -323,22 +326,22 @@ Don't validate everything. Validate what has caused actual problems:
 ```makefile
 validate-config: ## Validate configuration
 	@echo "Validating configuration..."
-	
+
 	# Has a missing VERSION broken deploys? Add this:
 	@test -n "$(VERSION)" || (echo "VERSION required" && exit 1)
-	
+
 	# Has wrong ENVIRONMENT caused issues? Add this:
 	@case "$(ENVIRONMENT)" in \
 		development|staging|production) ;; \
 		*) echo "Invalid ENVIRONMENT: $(ENVIRONMENT)" && exit 1 ;; \
 	esac
-	
+
 	# Has production deployed with 1 replica? Add this:
 	@if [ "$(ENVIRONMENT)" = "production" ]; then \
 		test "$(REPLICAS)" -gt 1 || \
 			(echo "Production needs REPLICAS > 1" && exit 1); \
 	fi
-	
+
 	@echo "✓ Configuration valid"
 
 # Run validation before critical targets
@@ -350,6 +353,7 @@ deploy: validate-config
 next time.
 
 \newpage
+
 ## A Practical Complete Example
 
 Here's what most teams actually need:
@@ -390,6 +394,7 @@ This shows variables, environment logic, validation, and computed values working
 together. Everything you need, nothing you don't.
 
 \newpage
+
 ## When to Use Reusable Variable Libraries
 
 **Short answer: probably never.**
@@ -421,6 +426,7 @@ GIT_COMMIT = $(shell git rev-parse --short HEAD)
 GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 ```
 \pagebreak
+
 ### Build Metadata
 
 ```makefile
@@ -444,6 +450,7 @@ CLEAN_BRANCH = $(shell git branch --show-current | \
 NAMESPACE = $(APP_NAME)-$(CLEAN_BRANCH)
 ```
 \newpage
+
 ## Configuration Help and Documentation
 
 Make your configuration discoverable:
@@ -472,6 +479,7 @@ config-help: ## Show configuration help
 ```
 
 \newpage
+
 ## Troubleshooting Configuration
 
 When things go wrong:

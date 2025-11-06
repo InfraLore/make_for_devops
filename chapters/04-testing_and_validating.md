@@ -22,7 +22,7 @@ how to build elaborate testing infrastructure.
 
 Before diving into any testing frameworks, remember that you can catch most
 Makefile issues with just a few simple checks:
- 
+
 1. **Dry run everything**: `make -n target` shows you exactly what would
    execute without actually doing it
 2. **Test your help**: `make help` should work and be useful to newcomers
@@ -71,6 +71,7 @@ actually adds value:
 - You haven't actually encountered bugs
 
 \newpage
+
 ## Quick Validation with Make's Dry Run
 
 Make's `--dry-run` (or `-n`) flag is the single most valuable testing tool you
@@ -103,6 +104,7 @@ test-build-deps:
 ```
 
 \newpage
+
 ## Static Analysis with Checkmake
 
 **Checkmake** (https://github.com/checkmake/checkmake) is a linting tool for
@@ -335,6 +337,7 @@ test-docs: ## Verify documentation is complete
 		echo "Warning: Help seems sparse"
 ```
 \newpage
+
 ### Performance Testing
 
 For very large Makefiles:
@@ -363,6 +366,7 @@ install-hooks:
 	@echo "Git hook installed"
 ```
 \newpage
+
 ## Troubleshooting Common Issues
 
 When tests fail, here's how to debug:

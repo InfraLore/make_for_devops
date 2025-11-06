@@ -504,18 +504,23 @@ Most of the advanced patterns in traditional Make books are overkill. Here's
 when they actually matter:
 
 ### Multiple Environments (Common)
+
 Use parameterized targets with shortcut targets.
 
 ### Large Codebase (20+ services)
+
 Group by component with prefixes (`frontend-`, `backend-`, `db-`).
 
 ### Complex Dependencies (Microservices)
+
 Use Make's dependency resolution to ensure correct ordering.
 
 ### Frequent Onboarding
+
 Invest in detailed help system with categories.
 
 ### Platform Team
+
 Create reusable target patterns that projects can include.
 
 **For most teams:** 5-10 well-named targets with simple dependencies is

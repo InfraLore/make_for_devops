@@ -36,7 +36,7 @@ Dependencies come in different forms:
 **Sequential Dependencies** - operations in order:
 ```makefile
 deploy: test
-test: build  
+test: build
 build: lint
 ```
 
@@ -52,6 +52,7 @@ security-scan: src
 deploy: validate-environment validate-secrets build test
 ```
 \newpage
+
 ### Real-World Pipeline Dependencies
 
 Model a complete deployment pipeline:
@@ -91,6 +92,7 @@ artifacts, parallel preparation, deployment only after prerequisites,
 verification after deployment.
 
 \newpage
+
 ### Multi-Service Dependencies
 
 Model inter-service dependencies:
@@ -117,6 +119,7 @@ deploy-frontend: deploy-api build-frontend
 ```
 
 \newpage
+
 ## File-Based Dependencies
 
 Track infrastructure state with files:
@@ -136,6 +139,7 @@ k8s/deployment.yaml: k8s/deployment.yaml.template config/$(ENV).env
 	@./scripts/generate-manifest.sh
 ```
 \newpage
+
 ### Docker Image Dependencies
 
 Track Docker builds efficiently:
@@ -162,6 +166,7 @@ deploy: .image-pushed k8s-manifests
 ```
 
 \newpage
+
 ## Parallel Execution
 
 One of Make's most powerful features is automatic parallel execution—the ability
@@ -230,7 +235,7 @@ deploy-all: deploy-backend deploy-frontend deploy-monitoring
 deploy-backend: build-backend test-backend
 	@./scripts/deploy-backend.sh
 
-deploy-frontend: build-frontend test-frontend  
+deploy-frontend: build-frontend test-frontend
 	@./scripts/deploy-frontend.sh
 
 # Monitoring depends on both
@@ -239,6 +244,7 @@ deploy-monitoring: deploy-backend deploy-frontend
 ```
 
 \newpage
+
 ### Controlling Parallelism
 
 Fine-tune parallel execution:
@@ -331,7 +337,7 @@ tasks simultaneously doesn't mean it's operationally wise.
 validate-all: lint security-scan type-check format-check
 	@echo "All validations complete"
 
-# Multiple builds from same source - safe to parallelize  
+# Multiple builds from same source - safe to parallelize
 build-all: build-api build-frontend build-worker
 	@echo "All services built"
 
@@ -352,7 +358,7 @@ test-all: test-unit test-integration test-e2e
 
 # DO: Test before pushing (sequential quality gate)
 deploy: push
-push: test  
+push: test
 test: build
 ```
 \newpage
@@ -385,6 +391,7 @@ push: build validate  # Skip some validations, parallel where safe
 validate: lint type-check  # Parallel validations only
 ```
 \newpage
+
 ### Team Communication
 
 Document parallelization decisions in your Makefile:

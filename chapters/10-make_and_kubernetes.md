@@ -21,6 +21,7 @@ workflows using Make. We'll explore patterns for manifest generation,
 environment-specific deployments, health checks, and Helm chart management.
 
 \newpage
+
 ## Discovering Kubernetes Operations
 
 The traditional approach to Kubernetes involves remembering complex commands:
@@ -81,6 +82,7 @@ Running `make help` shows available operations. The workflow reveals itself, and
 complexity lives in scripts rather than documentation.
 
 \newpage
+
 ## Discovering Environment-Specific Deployments
 
 Different environments need different deployment strategies. Make this discoverable:
@@ -115,6 +117,7 @@ Each environment has appropriate safety checks built in. The workflow is
 discoverable but implementations can differ.
 
 \newpage
+
 ## Discovering Manifest Generation
 
 Static YAML becomes maintenance nightmares. Make manifest generation discoverable:
@@ -145,6 +148,7 @@ manifests-diff: ## Show manifest differences
 The manifest workflow is discoverable. Developers can generate, validate, and compare before deploying.
 
 \newpage
+
 ## Discovering Rollout Management
 
 Deployments need careful monitoring and rollback capabilities:
@@ -179,6 +183,7 @@ rollback-to: ## Rollback to specific revision
 Rollback operations are discoverable and safe. Each command explains what it does.
 
 \newpage
+
 ## Discovering Helm Operations
 
 Helm adds another layer of complexity. Make it discoverable:
@@ -213,6 +218,7 @@ helm-status: ## Show Helm status
 Helm operations follow the same discovery pattern. Running `make helm` shows what's available.
 
 \newpage
+
 ## Discovering Troubleshooting Operations
 
 When things go wrong, troubleshooting needs to be discoverable:
@@ -247,6 +253,7 @@ Debugging operations are organized and discoverable. Engineers can find the
 right tool quickly.
 
 \newpage
+
 ## Discovering Resource Management
 
 Kubernetes resources need management:
@@ -281,6 +288,7 @@ port-forward: ## Port forward to application
 Resource management is discoverable. Each operation is independently runnable.
 
 \newpage
+
 ## Discovering Environment Management
 
 Creating and destroying environments should be explicit:
@@ -314,6 +322,7 @@ env-status: ## Show environment status
 Environment lifecycle is discoverable and protected.
 
 \newpage
+
 ## Real-World Example
 
 ### Before: Complex kubectl Commands
@@ -334,6 +343,7 @@ Result: Inconsistency, errors, confusion
 ```
 
 \newpage
+
 ### After: Discoverable Workflow
 
 ```makefile
@@ -363,6 +373,7 @@ One interface, works everywhere. CI and local use identical commands. New team
 members discover the workflow through `make help`.
 
 \newpage
+
 ## Key Patterns
 
 Make Kubernetes workflows discoverable through:

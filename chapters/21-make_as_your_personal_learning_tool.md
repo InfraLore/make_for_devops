@@ -238,6 +238,7 @@ look them up again.
 Your Makefile grows with your expertise:
 
 ### Week 1: Capturing Basic Commands
+
 ```makefile
 k8s-pods: ## List pods
 	kubectl get pods
@@ -249,6 +250,7 @@ docker-ps: ## List containers
 Simple commands, barely worth capturing. But you're building the habit.
 
 ### Month 1: Adding Complexity
+
 ```makefile
 k8s-debug-pod: ## Debug pod with logs and describe
 	@echo "Pod:"
@@ -263,6 +265,7 @@ docker-clean: ## Clean up Docker
 You're starting to combine commands, add interactivity, handle common workflows.
 
 ### Month 3: Sophisticated Operations
+
 ```makefile
 k8s-find-crashlooping: ## Find crashlooping pods
 	kubectl get pods -A | grep -E 'CrashLoopBackOff|Error'
@@ -280,6 +283,7 @@ You're writing commands you couldn't have written three months ago. Each one
 represents a problem you solved, a lesson learned.
 
 ### Month 6: Teaching Others
+
 ```makefile
 k8s-incident-checklist: ## Run through incident debugging checklist
 	@echo "=== Incident Debugging Checklist ==="

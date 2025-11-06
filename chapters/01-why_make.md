@@ -611,6 +611,7 @@ What you do need is a willingness to challenge your assumptions about how
 infrastructure should be documented and operated.
 
 \pagebreak
+
 ## Key Takeaways
 
 - **Institutional knowledge crisis**: Critical operational knowledge lives in
