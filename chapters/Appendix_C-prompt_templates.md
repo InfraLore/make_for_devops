@@ -139,6 +139,7 @@ CONSTRAINTS:
 - Keep changes incremental - don't rewrite everything at once
 
 Generate an improved version of this Makefile. Highlight:
+
 1. What you changed and why
 2. Any backward compatibility concerns
 3. Suggested follow-up improvements

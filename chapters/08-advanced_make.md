@@ -1366,6 +1366,7 @@ Start with explicit targets for each environment. When you have three environmen
 - A team comfortable maintaining the configuration interpretation layer
 
 The progression:
+
 1. **Explicit targets** (`deploy-dev`, `deploy-staging`, `deploy-prod`)
 2. **Variables** (`REPLICAS_DEV=1`, `REPLICAS_STAGING=2`, `REPLICAS_PROD=5`)
 3. **Pattern rules with variables** (`deploy-%` with `REPLICAS_$*`)

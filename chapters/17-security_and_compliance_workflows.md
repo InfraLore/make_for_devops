@@ -53,6 +53,7 @@ security-report-code: ## Detailed code security report
 ```
 
 Now when developers encounter a security failure, they can:
+
 1. Run `make security-check` locally to reproduce
 2. Run `make security-report-code` to see detailed findings
 3. Follow suggested remediation
@@ -256,7 +257,7 @@ Week 1: Compliance team requests evidence
 Week 2-3: Engineering scrambles to gather:
 
   - Screenshots of security scan results
-  - Manual exports of audit logs  
+  - Manual exports of audit logs
   - Written attestations about secret rotation
 
 Week 4: Submit evidence, hope it's sufficient

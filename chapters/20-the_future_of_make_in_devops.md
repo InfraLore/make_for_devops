@@ -429,6 +429,7 @@ interface.
 
 The engineer can say: "Add a new service that processes uploaded images" and the
 AI agent can:
+
 1. Run `make help` to understand the project structure
 2. Look at existing service targets to understand patterns
 3. Generate new Make targets following the same patterns

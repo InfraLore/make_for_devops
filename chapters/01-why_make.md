@@ -172,6 +172,7 @@ document a process that's completely broken, and you won't discover the problem
 until someone tries to follow the instructions and fails.
 
 This creates a vicious cycle:
+
 1. Documentation becomes outdated
 2. Engineers stop trusting the documentation
 3. Engineers stop consulting the documentation

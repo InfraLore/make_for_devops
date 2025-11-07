@@ -388,13 +388,11 @@ sections like:
 # Database Recovery Procedure
 
 Prerequisites:
-
 - Access to AWS console
 - Database backup location documented
 - Recovery time objective: 4 hours
 
 Steps:
-
 1. Identify the backup to restore...
    [detailed steps]
 2. Stop the application servers...
