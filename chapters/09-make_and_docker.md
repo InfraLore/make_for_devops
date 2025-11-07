@@ -57,7 +57,7 @@ dev-lando: ## Start using Lando
 	@$(MAKE) dev-ready
 
 dev-ready:
-	@./scripts/wait-for-services.sh
+	@./scripts/wait-for-services.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 	@$(MAKE) migrate
 	@echo "Ready at http://localhost:8000"
 ```

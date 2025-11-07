@@ -69,7 +69,7 @@ incident-help: ## Show incident response runbooks
 
 incident-db-pool: ## Diagnose database connection pool issues
 	@echo "Diagnosing database connection pool..."
-	@./scripts/check-api-latency.sh
+	@./scripts/check-api-latency.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 	@./scripts/check-connection-pool.sh
 	@./scripts/check-long-queries.sh
 	@echo ""

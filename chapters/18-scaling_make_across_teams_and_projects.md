@@ -54,7 +54,7 @@ docker-build: ## Build with custom optimization
 
 # Add team-specific targets
 load-test: ## Run load tests (team-specific)
-	@./scripts/load-test.sh
+	@./scripts/load-test.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 ```
 
 Teams get useful defaults but retain complete control. They can use shared targets, override them, ignore them, or mix shared and custom targets freely.

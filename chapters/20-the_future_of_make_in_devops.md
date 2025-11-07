@@ -229,7 +229,7 @@ test: ## Run test suite
 	pytest tests/
 
 deploy-staging: ## Deploy to staging environment
-	@./scripts/deploy.sh staging
+	@./scripts/deploy.sh staging \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 ```
 
 When an AI agent encounters this Makefile, it knows exactly how to test changes,

@@ -68,7 +68,7 @@ health: ## Quick infrastructure health check
 _check-resources:
 	@echo ""
 	@echo "Resources:"
-	@./scripts/check-resource-health.sh $(ENVIRONMENT)
+	@./scripts/check-resource-health.sh $(ENVIRONMENT) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 _check-costs:
 	@echo ""

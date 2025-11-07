@@ -66,7 +66,7 @@ help: ## Show Kubernetes operations
 
 deploy: ## Deploy to configured environment
 	@echo "Deploying to $(ENVIRONMENT)..."
-	@./scripts/k8s-deploy.sh $(ENVIRONMENT) $(VERSION)
+	@./scripts/k8s-deploy.sh $(ENVIRONMENT) $(VERSION) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 status: ## Show deployment status
 	@./scripts/k8s-status.sh $(ENVIRONMENT)

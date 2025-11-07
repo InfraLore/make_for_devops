@@ -37,7 +37,7 @@ security-check: ## Run all security scans
 
 security-scan-containers: ## Scan container images
 	@echo "Scanning container images..."
-	@./scripts/scan-containers.sh $(IMAGE_NAME) || \
+	@./scripts/scan-containers.sh $(IMAGE_NAME) || \ \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 		(echo "Fix: make security-fix-containers" && exit 1)
 
 security-scan-code: ## Scan code for vulnerabilities

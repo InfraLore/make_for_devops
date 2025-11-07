@@ -85,7 +85,7 @@ security-quick: ## Basic security scan (30 sec)
 test-integration: ## Integration tests (3 min)
 	@echo "Starting test environment..."
 	@docker compose -f test.yml up -d
-	@./scripts/run-integration-tests.sh
+	@./scripts/run-integration-tests.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 	@docker compose -f test.yml down
 
 security-deep: ## Comprehensive scan (3 min)

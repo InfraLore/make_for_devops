@@ -25,7 +25,7 @@ undocumented, scattered across wiki pages, or locked in senior engineers' minds.
 Modern monitoring stacks are powerful but complex. A typical setup might include:
 
 - Prometheus for metrics collection
-- Grafana for visualization  
+- Grafana for visualization
 - Alertmanager for alert routing
 - Custom exporters for application metrics
 - Service level indicators (SLIs) and objectives (SLOs)
@@ -69,7 +69,7 @@ like:
 
 ```bash
 make metrics-api          # Show key API metrics
-make check-slos           # Verify we're meeting SLOs  
+make check-slos           # Verify we're meeting SLOs
 make compare-performance  # Compare current vs baseline
 make metrics-help         # Learn what's available
 ```
@@ -99,7 +99,7 @@ metrics-help: ## Show available monitoring commands
 metrics-api: ## Show API performance metrics (last 5m)
 	@echo "API Metrics (last 5 minutes)"
 	@echo "============================"
-	@./scripts/prometheus-query.sh \
+	@./scripts/prometheus-query.sh \ \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 	  'rate(http_requests_total[5m])' \
 	  "Request rate"
 	@./scripts/prometheus-query.sh \
@@ -173,7 +173,7 @@ encode the entire process:
 monitoring-setup: ## Deploy complete monitoring stack
 	@echo "Deploying monitoring infrastructure..."
 	@$(MAKE) deploy-prometheus
-	@$(MAKE) deploy-grafana  
+	@$(MAKE) deploy-grafana
 	@$(MAKE) deploy-exporters
 	@$(MAKE) configure-dashboards
 	@$(MAKE) configure-alerts
@@ -230,7 +230,7 @@ Make can transform performance testing into a discoverable, repeatable workflow:
 perf-test: ## Run performance test suite
 	@echo "Running performance tests against $(ENVIRONMENT)..."
 	@$(MAKE) perf-api-load
-	@$(MAKE) perf-api-spike  
+	@$(MAKE) perf-api-spike
 	@$(MAKE) perf-db-queries
 	@$(MAKE) perf-report
 
@@ -243,7 +243,7 @@ perf-api-load: ## Load test: sustained traffic
 perf-api-spike: ## Spike test: traffic burst
 	@echo "→ Spike test (2 min, 500 req/s)..."
 	@k6 run --duration 2m --rps 500 \
-	  tests/performance/api-spike.js  
+	  tests/performance/api-spike.js
 	@echo "  Spike test complete"
 
 perf-baseline: ## Capture performance baseline
@@ -259,7 +259,7 @@ perf-compare: ## Compare current performance to baseline
 	@echo ""
 	@echo "Key Changes:"
 	@echo "  P95 Latency: $(P95_CHANGE)%"
-	@echo "  Throughput:  $(THROUGHPUT_CHANGE)%"  
+	@echo "  Throughput:  $(THROUGHPUT_CHANGE)%"
 	@echo "  Error Rate:  $(ERROR_CHANGE)%"
 ```
 
@@ -310,7 +310,7 @@ slo-budget: ## Show remaining error budget
 	@echo ""
 	@echo "Interpretation:"
 	@echo "  >50%% remaining: Safe to take risks"
-	@echo "  10-50%% remaining: Be cautious"  
+	@echo "  10-50%% remaining: Be cautious"
 	@echo "  <10%% remaining: Focus on reliability"
 ```
 

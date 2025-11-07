@@ -170,7 +170,7 @@ deploy: ## Deploy to environment (ENVIRONMENT=dev|staging|prod)
 	@test -n "$(ENVIRONMENT)" || \
 		(echo "Usage: make deploy ENVIRONMENT=dev|staging|prod" && exit 1)
 	@echo "Deploying to $(ENVIRONMENT)..."
-	@./scripts/deploy.sh $(ENVIRONMENT)
+	@./scripts/deploy.sh $(ENVIRONMENT) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 test: ## Run all tests
 	@echo "Running test suite..."

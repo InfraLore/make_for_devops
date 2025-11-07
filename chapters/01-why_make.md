@@ -632,3 +632,26 @@ In the next chapter, we'll dive deep into the "Executable README" concept—the
 core pattern that makes all of this possible. You'll learn how to transform your
 static documentation into living, breathing, always-current workflow interfaces
 that your team will actually use and maintain.
+
+\begin{calloutbox}[A Note on Examples and Script Delegation] Throughout this
+book, you'll notice that many Makefile examples delegate to scripts like
+\texttt{./scripts/deploy.sh} or \texttt{./scripts/validate-config.sh}. This
+isn't just for brevity---it's an intentional pattern that reflects a core
+principle of this book.
+
+\textbf{Make is the discoverable interface; scripts are the implementation.}
+When you see \texttt{make deploy}, you understand intent immediately. When you
+look inside and see it calls a script, you can learn implementation details at
+your own pace.
+
+This "interface-first" approach serves two purposes:
+
+\begin{enumerate} \item It keeps examples focused on Make patterns rather than
+tool-specific syntax \item It models how Make becomes your personal learning
+tool---you capture the "what" immediately, refine the "how" over time
+\end{enumerate}
+
+We explore this philosophy deeply in Chapter 21: "Make as Your Personal Learning
+Tool," where you'll see how delegating to scripts actually accelerates learning
+rather than obscuring it. The examples throughout Parts III and IV follow this
+pattern deliberately. \end{calloutbox}

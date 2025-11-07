@@ -166,7 +166,7 @@ When environments are mostly identical:
 ```makefile
 deploy-%: validate-% ## Deploy to specified environment
 	@echo "Deploying to $*..."
-	@./scripts/deploy.sh $*
+	@./scripts/deploy.sh $* \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 validate-dev:
 	@./scripts/validate-basic.sh

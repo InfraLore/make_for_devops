@@ -82,7 +82,7 @@ init: check-environment ## Initialize Terraform for this environment
 
 plan: init ## Create infrastructure plan
 	@echo "Planning $(ENVIRONMENT)..."
-	@./scripts/terraform-plan.sh $(ENVIRONMENT)
+	@./scripts/terraform-plan.sh $(ENVIRONMENT) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 	@echo ""
 	@echo "Review plan above. To apply: make apply"
 
@@ -110,7 +110,7 @@ Infrastructure Commands
   init                 Initialize Terraform for this environment
   plan                 Create infrastructure plan
   apply                Apply infrastructure changes
-  
+
 Current: ENVIRONMENT= REGION=
 ```
 

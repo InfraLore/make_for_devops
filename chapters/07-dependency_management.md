@@ -70,7 +70,7 @@ validate-ready: validate-env validate-secrets validate-cluster
 
 # Build phase
 build: lint security-scan
-	@./scripts/build.sh
+	@./scripts/build.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 # Testing phase
 test: build

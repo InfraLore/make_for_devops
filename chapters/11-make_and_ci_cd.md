@@ -87,7 +87,7 @@ help: ## Show available commands
 		{printf "  %-15s %s\n", $$1, $$2}'
 
 setup: ## Set up development environment
-	@./scripts/setup.sh
+	@./scripts/setup.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 test: ## Run all tests
 	@./scripts/run-tests.sh

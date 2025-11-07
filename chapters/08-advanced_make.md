@@ -96,7 +96,7 @@ Pattern rules eliminate repetitive target definitions:
 ```makefile
 # Instead of this repetition:
 deploy-dev:
-	@./scripts/deploy.sh dev
+	@./scripts/deploy.sh dev \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 deploy-staging:
 	@./scripts/deploy.sh staging
