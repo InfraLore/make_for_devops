@@ -53,7 +53,8 @@ trivial, but it's the foundation of discoverability.
 
 ### Building Workflows with Prerequisites
 
-The real power of Make emerges when you start defining **prerequisites**—targets that must run before other targets:
+The real power of Make emerges when you start defining **prerequisites**—targets
+that must run before other targets:
 
 ```makefile
 deploy: test build push
@@ -150,23 +151,28 @@ deploy:
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG) -n $(NAMESPACE)
 ```
 
-The `?=` operator means "set this variable only if it's not already set," allowing users to override defaults:
+The `?=` operator means "set this variable only if it's not already set,"
+allowing users to override defaults:
 
 ```bash
 make deploy ENVIRONMENT=production VERSION=v1.2.3
 ```
 
-This is discoverable configuration—engineers can see what's configurable by reading the Makefile's variable definitions at the top.
+This is discoverable configuration—engineers can see what's configurable by
+reading the Makefile's variable definitions at the top.
 
-\begin{calloutbox}[Variables: Configuration, Not Logic]
-Variables should hold configuration (versions, names, URLs), not encode complex logic. If you're doing string manipulation or computation in variables, that logic probably belongs in a script.
+\begin{calloutbox}[Variables: Configuration, Not Logic] Variables should hold
+configuration (versions, names, URLs), not encode complex logic. If you're doing
+string manipulation or computation in variables, that logic probably belongs in
+a script.
 
 \textbf{Good use:} \texttt{IMAGE\_TAG = \$(REGISTRY)/\$(APP\_NAME):\$(VERSION)}
 
-\textbf{Questionable use:} Complex conditional logic, loops, or multi-line computations in variable definitions
+\textbf{Questionable use:} Complex conditional logic, loops, or multi-line
+computations in variable definitions
 
-Keep variables simple and declarative. Complex logic makes Makefiles hard to understand and debug.
-\end{calloutbox}
+Keep variables simple and declarative. Complex logic makes Makefiles hard to
+understand and debug. \end{calloutbox}
 
 ### Shell Integration for Dynamic Values
 
@@ -187,7 +193,9 @@ build:
 	  -t myapp:$(VERSION) .
 ```
 
-The `:=` operator evaluates the shell command once when the Makefile is parsed, while `=` evaluates it every time the variable is used. For expensive operations like git commands, use `:=`.
+The `:=` operator evaluates the shell command once when the Makefile is parsed,
+while `=` evaluates it every time the variable is used. For expensive operations
+like git commands, use `:=`.
 
 \newpage
 
@@ -217,16 +225,21 @@ scale:
 	kubectl scale deployment/myapp --replicas=$(REPLICA_COUNT)
 ```
 
-\begin{calloutbox}[Conditionals: Separate Targets Usually Win]
-If you're writing complex conditionals in a single target, you probably need separate targets instead:
+\begin{calloutbox}[Conditionals: Separate Targets Usually Win] If you're writing
+complex conditionals in a single target, you probably need separate targets
+instead:
 
-\textbf{Instead of:} One \texttt{deploy} target with branching logic for dev/staging/prod
+\textbf{Instead of:} One \texttt{deploy} target with branching logic for
+dev/staging/prod
 
-\textbf{Prefer:} \texttt{deploy-dev}, \texttt{deploy-staging}, \texttt{deploy-prod} as distinct targets
+\textbf{Prefer:} \texttt{deploy-dev}, \texttt{deploy-staging},
+\texttt{deploy-prod} as distinct targets
 
-Separate targets are self-documenting and easier to understand. Each target clearly shows what it does without requiring you to trace conditional logic.
+Separate targets are self-documenting and easier to understand. Each target
+clearly shows what it does without requiring you to trace conditional logic.
 
-\textbf{Exception:} Use conditionals for truly environment-specific behavior like replica counts or approval gates—small variations on the same workflow.
+\textbf{Exception:} Use conditionals for truly environment-specific behavior
+like replica counts or approval gates—small variations on the same workflow.
 \end{calloutbox}
 
 \newpage
@@ -335,8 +348,8 @@ features you want to take advantage of.
 \begin{calloutbox}[File Dependencies: Optimization, Not Default] Use file-based
 dependencies when: \begin{itemize} \item The operation is expensive
 (multi-minute Docker builds) \item The inputs rarely change (Dockerfile,
-requirements.txt) \item Re-running unnecessarily wastes time or resources \item You're generating a file :-)
-\end{itemize}
+requirements.txt) \item Re-running unnecessarily wastes time or resources \item
+You're generating a file :-) \end{itemize}
 
 Stick with phony targets when:
 \begin{itemize}
@@ -349,7 +362,8 @@ Stick with phony targets when:
 
 ### Order-Only Prerequisites
 
-Sometimes you need something to run first, but don't want to re-run if it changes:
+Sometimes you need something to run first, but don't want to re-run if it
+changes:
 
 ```makefile
 deploy: test build | check-cluster
@@ -449,7 +463,8 @@ makes the whole block fail on first error.
 fail immediately on error. Use \texttt{-} only for cleanup operations where
 failure is acceptable:
 
-\textbf{Good use:} \texttt{-docker rm container-name} (container might not exist)
+\textbf{Good use:} \texttt{-docker rm container-name} (container might not
+exist)
 
 \textbf{Bad use:} \texttt{-kubectl apply -f k8s/} (you want to know if
 deployment fails!)
@@ -516,7 +531,8 @@ logs: ## Show application logs
 ```
 
 Running `make` (or `make help`) shows:
-```
+
+```text
 Available targets:
   deploy          Deploy to Kubernetes
   test            Run test suite

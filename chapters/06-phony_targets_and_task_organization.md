@@ -338,7 +338,7 @@ test: ## Run all tests
 
 Running `make` (with no target) shows:
 
-```
+```text
 Available commands:
   deploy               Deploy to configured environment
   test                 Run all tests
@@ -390,8 +390,8 @@ setup: ## Set up development environment
 	docker-compose pull
 	@echo "✓ Setup complete - run 'make dev' to start"
 
-# continues on next page...
-```
+# continues on next page...```
+
 ```makefile
 # ...continued from previous page
 

@@ -178,6 +178,7 @@ validate-production: validate-dev
 
 OPTION B: Conditionals (for different environments)
 When environments need different logic:
+
 ```makefile
 ENVIRONMENT ?= development
 
@@ -195,6 +196,7 @@ endif
 
 OPTION C: Config Files (for many variables)
 When you have 10+ variables per environment:
+
 ```makefile
 -include config/$(ENVIRONMENT).mk
 
@@ -225,13 +227,13 @@ Include:
 3. Way to show current configuration
 4. Usage examples
 5. Explanation of which pattern you chose and why
-```
 
 ---
 
 ## Prompt 4: Adding Docker Workflow Support
 
 ```
+
 I need to add Docker workflows to my Makefile following these principles:
 
 DOCKER ORCHESTRATION CONTEXT:
@@ -251,6 +253,7 @@ interface to them. Make should:
 COMMON PATTERNS NEEDED:
 
 1. DEVELOPMENT ENVIRONMENT
+
 ```makefile
 dev: ## Start development environment
 	@if [ ! -f .env ]; then cp .env.example .env; fi
@@ -261,6 +264,7 @@ dev: ## Start development environment
 ```
 
 2. MULTI-STAGE BUILDS
+
 ```makefile
 build-dev: ## Build development image
 	docker build --target development -t $(APP_NAME):dev .
@@ -270,6 +274,7 @@ build-prod: ## Build production image
 ```
 
 3. REGISTRY OPERATIONS
+
 ```makefile
 push: build-prod login ## Push to registry
 	docker tag $(APP_NAME):$(VERSION) $(REGISTRY)/$(APP_NAME):$(VERSION)
@@ -400,6 +405,7 @@ PATTERN RULE PRINCIPLES:
 EXAMPLE CONVERSION:
 
 Before (repetitive):
+
 ```makefile
 deploy-dev:
 	@./scripts/deploy.sh dev
@@ -412,6 +418,7 @@ deploy-prod:
 ```
 
 After (pattern rule):
+
 ```makefile
 deploy-%: validate-% ## Deploy to specified environment
 	@echo "Deploying to $*..."

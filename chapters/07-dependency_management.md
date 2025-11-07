@@ -34,6 +34,7 @@ These patterns handle most workflow orchestration needs.
 Dependencies come in different forms:
 
 **Sequential Dependencies** - operations in order:
+
 ```makefile
 deploy: test
 test: build
@@ -41,6 +42,7 @@ build: lint
 ```
 
 **Parallel Dependencies** - operations simultaneously:
+
 ```makefile
 all-checks: lint security-scan  # Both can run in parallel on same source
 lint: src
@@ -48,9 +50,11 @@ security-scan: src
 ```
 
 **Validation Dependencies/Quality Gates** - prerequisites before proceeding:
+
 ```makefile
 deploy: validate-environment validate-secrets build test
 ```
+
 \newpage
 
 ### Real-World Pipeline Dependencies
@@ -138,6 +142,7 @@ deploy-app: infra/.applied k8s/deployment.yaml
 k8s/deployment.yaml: k8s/deployment.yaml.template config/$(ENV).env
 	@./scripts/generate-manifest.sh
 ```
+
 \newpage
 
 ### Docker Image Dependencies
@@ -361,6 +366,7 @@ deploy: push
 push: test
 test: build
 ```
+
 \newpage
 **Avoid parallelizing operations that compete for resources:**
 
@@ -390,6 +396,7 @@ deploy-step: push
 push: build validate  # Skip some validations, parallel where safe
 validate: lint type-check  # Parallel validations only
 ```
+
 \newpage
 
 ### Team Communication

@@ -133,6 +133,7 @@ For all available commands, run `make help`.
 ### Detailed Documentation
 
 See our [detailed setup guide](docs/setup.md) for manual setup instructions.
+
 ```
 
 ### Step 5: Gather Feedback and Iterate

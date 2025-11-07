@@ -10,10 +10,13 @@ every environment is different.
 
 The traditional solutions all have problems:
 
-* **Separate scripts per environment**: Leads to drift—production gets a bug fix that staging doesn't
-* **Template systems**: Hide what's actually running behind layers of indirection
-* **External config management**: Adds dependencies and makes local development painful
-* **Hard-coded values**: Everyone knows this is wrong but we've all done it
+- **Separate scripts per environment**: Leads to drift—production gets a bug fix
+  that staging doesn't
+- **Template systems**: Hide what's actually running behind layers of
+  indirection
+- **External config management**: Adds dependencies and makes local development
+  painful
+- **Hard-coded values**: Everyone knows this is wrong but we've all done it
 
 Make's variable system offers a different approach: **one workflow with
 environment-aware defaults.** The same `make deploy` command works locally, in
@@ -195,6 +198,7 @@ show-config: ## Display current configuration
 ```
 
 **config/development.mk:**
+
 ```makefile
 REGISTRY = localhost:5000
 REPLICAS = 1
@@ -202,6 +206,7 @@ LOG_LEVEL = DEBUG
 ```
 
 **config/production.mk:**
+
 ```makefile
 REGISTRY = prod-registry.company.com
 REPLICAS = 3
@@ -317,6 +322,7 @@ validate-secrets:
 		(echo "DATABASE_PASSWORD too short" && exit 1)
 	@echo "✓ Secrets validated"
 ```
+
 \newpage
 
 ## Validation: Only What Prevents Real Bugs
@@ -425,6 +431,7 @@ VERSION ?= $(shell git describe --tags --always --dirty)
 GIT_COMMIT = $(shell git rev-parse --short HEAD)
 GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 ```
+
 \pagebreak
 
 ### Build Metadata
@@ -449,6 +456,7 @@ CLEAN_BRANCH = $(shell git branch --show-current | \
 	sed 's/[^a-z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
 NAMESPACE = $(APP_NAME)-$(CLEAN_BRANCH)
 ```
+
 \newpage
 
 ## Configuration Help and Documentation

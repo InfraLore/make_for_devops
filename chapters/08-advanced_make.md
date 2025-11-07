@@ -290,6 +290,7 @@ deploy-safe:
 	terraform plan
 	terraform apply
 ```
+
 **This combination is known as "Bash strict mode", a set of flags that
 transforms the shell from permissive to rigorous, catching errors that would
 otherwise fail silently.**
@@ -336,7 +337,9 @@ deploy-with-typo:
 
 deploy-catches-typos:
 	./scripts/deploy.sh $(ENVIRONMNT)  # Error: ENVIRONMNT unbound
+
 ```
+
 \newpage
 **`-o pipefail`**: Pipelines hide failures without this flag:
 
@@ -366,6 +369,7 @@ check-errors:
 	grep "ERROR" app.log || echo "No errors found"
 	# The || operator handles the expected failure
 ```
+
 \newpage
 Common patterns for expected failures:
 
@@ -572,6 +576,7 @@ Some tools return different exit codes for different conditions:
 check-config-drift:
 	- diff config.yaml deployed-config.yaml  # Allow 1, but not 2
 ```
+
 \newpage
 **Better solution**: Test the exit code explicitly:
 
@@ -751,6 +756,7 @@ deploy-dev: build
 build:
 	docker build $(DOCKER_BUILD_FLAGS) -t myapp:$(ENV) .
 ```
+
 \newpage
 Pattern-specific variables apply to all targets matching a pattern:
 
@@ -870,6 +876,7 @@ Makefile:
 # Requires Make 3.82 or later
 .RECIPEPREFIX = >
 ```
+
 \newpage
 
 ### Advanced Automatic Variable Modifiers
@@ -952,6 +959,7 @@ app: api-schema.json code.compiled
 api-schema.json: api.yaml
 	./scripts/generate-schema.sh $< $@
 ```
+
 \newpage
 `.NOTINTERMEDIATE` (Make 4.4+) explicitly prevents intermediate deletion:
 
@@ -989,6 +997,7 @@ ervic]ice...
 Test pPass[edWorkering tes d!
 eployed!
 ```
+
 \newpage
 The `--output-sync` flag groups output by target:
 
@@ -1239,6 +1248,7 @@ The key insight: configuration files change frequently (every project, every tea
 Here's a practical example with a configuration file:
 
 **workflow-config.yaml:**
+
 ```yaml
 workflow_type: canary
 validation_level: strict
@@ -1255,9 +1265,11 @@ notification_channels:
 health_check_retries: 5
 auto_rollback: true
 ```
+
 \newpage
 
 **Makefile:**
+
 ```makefile
 # Load configuration
 load-config: ## Load workflow configuration
@@ -1311,6 +1323,7 @@ list-configs: ## List available environment configurations
 ```
 
 **configs/production.yaml:**
+
 ```yaml
 workflow_type: blue-green
 validation_level: strict
@@ -1321,8 +1334,10 @@ monitoring:
   - datadog
   - pagerduty
 ```
+
 \newpage
 **configs/staging.yaml:**
+
 ```yaml
 workflow_type: canary
 validation_level: standard

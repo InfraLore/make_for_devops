@@ -15,7 +15,7 @@ Use the exact same Make commands locally and in CI/CD pipelines:
 
 \begin{enumerate}
 \item \textbf{Same targets everywhere}: \texttt{make test}, \texttt{make build}, \texttt{make deploy} must work identically on laptops and in CI
-\item \textbf{Environment detection}: Make targets should automatically adapt to CI environments without changing behavior  
+\item \textbf{Environment detection}: Make targets should automatically adapt to CI environments without changing behavior
 \item \textbf{Build once, deploy everywhere}: Generate artifacts locally that deploy identically in production
 \item \textbf{Fast feedback loops}: Structure targets for quick developer validation before pushing to CI
 \item \textbf{Security by default}: Integrate scanning into standard workflows, not as afterthoughts
@@ -29,6 +29,7 @@ When CI/CD uses identical commands to local development, debugging pipeline issu
 The traditional approach creates separate processes for each environment:
 
 **Local Development:**
+
 ```bash
 npm install
 npm test
@@ -37,6 +38,7 @@ kubectl apply -f k8s/
 ```
 
 **CI/CD Pipeline:**
+
 ```bash
 npm ci --only=production
 npm test -- --coverage --bail
@@ -52,10 +54,11 @@ Different commands, different flags, different verification. When something brea
 Make eliminates the consistency gap through identical interfaces:
 
 **With Make - Same Commands Everywhere:**
+
 ```bash
 # Developer's laptop
 make test
-make build  
+make build
 make deploy
 
 # CI/CD pipeline
@@ -86,7 +89,7 @@ help: ## Show available commands
 setup: ## Set up development environment
 	@./scripts/setup.sh
 
-test: ## Run all tests  
+test: ## Run all tests
 	@./scripts/run-tests.sh
 
 build: ## Build application
@@ -116,7 +119,7 @@ ifeq ($(CI),true)
   REGISTRY := registry.company.com
 else
   TEST_FLAGS := --watch=false
-  BUILD_FLAGS := 
+  BUILD_FLAGS :=
   REGISTRY := localhost:5000
 endif
 
@@ -171,7 +174,7 @@ full-validation: ## Full validation (complete)
 validate: ## Smart validation (adapts to context)
 ifeq ($(CI),true)
 	@$(MAKE) full-validation
-else  
+else
 	@$(MAKE) quick-check
 endif
 ```

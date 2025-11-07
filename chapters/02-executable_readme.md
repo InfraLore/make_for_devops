@@ -167,6 +167,7 @@ run           # Run what?
 push          # Push where?
 sync          # Sync what with what?
 ```
+
 \pagebreak
 
 ### The Principle of Safe Defaults
@@ -193,6 +194,7 @@ deploy:
 	kubectl delete -f k8s/production/  # Deletes production without warning!
 	kubectl apply -f k8s/production/
 ```
+
 \pagebreak
 
 ### The Principle of Helpful Output
@@ -225,6 +227,7 @@ setup:
 
 A well-designed Executable README Makefile follows a predictable structure that
 makes it easy for newcomers to understand and use (see next page):
+
 ```makefile
 #################### MyApp Development Workflow ###########################
 # Configuration - all customizable values in one place
@@ -471,6 +474,7 @@ into an Executable README approach.
 - Update image:
 	`kubectl set image deployment/legacyapp app=registry.company.com/legacyapp:latest`
 ```
+
 \pagebreak
 
 ### After: Executable README
@@ -509,6 +513,7 @@ Run `make config-help` for configuration details.
 ````
 
 **Makefile:**
+
 ```makefile
 # LegacyApp Development Workflow
 APP_NAME := legacyapp

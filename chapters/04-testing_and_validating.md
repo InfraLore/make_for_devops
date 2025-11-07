@@ -336,6 +336,7 @@ test-docs: ## Verify documentation is complete
 	@test $(make help | wc -l) -gt 5 || \
 		echo "Warning: Help seems sparse"
 ```
+
 \newpage
 
 ### Performance Testing
@@ -365,6 +366,7 @@ install-hooks:
 	@chmod +x .git/hooks/pre-commit
 	@echo "Git hook installed"
 ```
+
 \newpage
 
 ## Troubleshooting Common Issues

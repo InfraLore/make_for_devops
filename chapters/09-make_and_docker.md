@@ -43,6 +43,7 @@ setup.
 
 Make lets you sidestep this argument—or at least defer it. Instead of forcing
 everyone to use the same underlying tool, Make provides a consistent interface:
+
 ```makefile
 dev: ## Start development environment
 	@$(MAKE) dev-$(DEV_TOOL)
@@ -475,7 +476,7 @@ didn't happen locally.
 
 ### Before: Scattered Scripts and Documentation
 
-```
+```text
 README.md:
   "To build for production:
    docker build --target production -t myapp:$(git describe --tags) ...
@@ -490,6 +491,7 @@ dev-setup.sh:
 
 Result: Confusion, inconsistency, broken builds
 ```
+
 \newpage
 
 ### After: Discoverable Workflow

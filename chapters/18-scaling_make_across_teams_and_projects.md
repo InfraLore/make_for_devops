@@ -130,6 +130,7 @@ VERSION         # Version being built/deployed
 ENVIRONMENT     # Target environment
 IMAGE_NAME      # Full Docker image name
 ```
+
 \pagebreak
 
 ### Help System Conventions
@@ -145,6 +146,7 @@ help: ## Show available commands
 		awk 'BEGIN {FS = ":.*?## "}; \
 		{printf "  %-20s %s\n", $$1, $$2}'
 ```
+
 \pagebreak
 
 ## Creating Template Projects

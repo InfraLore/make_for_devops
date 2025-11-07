@@ -15,6 +15,9 @@
             "tables": false,
             "headings": false
         },
+        "md032": {
+            "enabled": false
+        },
         "md033": {
             "enabled": false
         },

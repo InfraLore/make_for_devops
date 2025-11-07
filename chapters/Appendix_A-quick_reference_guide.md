@@ -13,6 +13,7 @@ target: prerequisites
 ```
 
 **Key points:**
+
 - Commands MUST be indented with a TAB character (not spaces)
 - Each command runs in its own shell unless you use line continuation
 - Prerequisites are separated by spaces
@@ -629,6 +630,7 @@ make deploy ENVIRONMENT=production
 ### Common Errors
 
 **"missing separator"**
+
 ```makefile
 # Wrong: spaces instead of tab
 target:
@@ -640,6 +642,7 @@ target:
 ```
 
 **"No rule to make target"**
+
 ```makefile
 # Check spelling and dependencies
 deploy: buld  # Typo in prerequisite
@@ -651,6 +654,7 @@ deploy: build
 ```
 
 **Variables not expanding**
+
 ```makefile
 # Wrong: trying to use shell variable in Make
 deploy:
@@ -669,6 +673,7 @@ deploy:
 ```
 
 **Target not running**
+
 ```makefile
 # Problem: target name matches directory
 test:
