@@ -142,20 +142,12 @@ variables, use ?= and don't worry about it.}
 
 Only consider := or = when: \begin{itemize} \item You have shell commands that
 are slow (use :=) \item You need dynamic values that change (use =) \item Make
-is noticeably slow (profile, then optimize) \end{itemize}
-
-The performance difference is usually negligible. Use ?= until you have a
-specific reason not to. \end{calloutbox}
+is noticeably slow \end{itemize}
+\end{calloutbox}
 
 ## Environment-Specific Configuration: The Practical Approach
 
-Here's how to handle different environments without over-engineering:
-
-\pagebreak
-
 ### Level 1: Simple Conditionals (Start Here)
-
-For 2-3 environments with a few different settings:
 
 ```makefile
 APP_NAME = myapp
@@ -164,13 +156,10 @@ VERSION ?= $(shell git describe --tags --always)
 
 # Environment-specific settings
 ifeq ($(ENVIRONMENT),production)
-  REPLICAS = 3
   REGISTRY = prod-registry.company.com
 else ifeq ($(ENVIRONMENT),staging)
-  REPLICAS = 2
   REGISTRY = staging-registry.company.com
 else
-  REPLICAS = 1
   REGISTRY = localhost:5000
 endif
 
@@ -181,6 +170,7 @@ IMAGE_TAG = $(REGISTRY)/$(APP_NAME):$(VERSION)
 **This handles most cases.** It's clear, easy to modify, and everything is in
 one place.
 
+\pagebreak
 ### Level 2: Config Files (When Level 1 Gets Messy)
 
 When you have 10+ variables per environment, move to config files:
@@ -214,7 +204,14 @@ LOG_LEVEL = WARN
 BACKUP_ENABLED = true
 ```
 
-The `-include` (with dash) means Make won't error if the file doesn't exist.
+The -include directive (with the leading dash) is Make's way of saying "load
+this file if it exists, but don't fail if it doesn't." This is exactly what you
+want for optional environment-specific config files—if someone runs make deploy
+without creating a config file first, the workflow should still work with the
+defaults defined in the main Makefile. The leading dash is the "ignore errors"
+prefix that tells Make to continue even if the include fails—we covered the
+"ignore prefix" in Chapter 3 "Make Fundamentals" and will explore advanced uses
+in Chapter 8 "Advanced Make."
 
 \newpage
 
@@ -431,6 +428,7 @@ VERSION ?= $(shell git describe --tags --always --dirty)
 GIT_COMMIT = $(shell git rev-parse --short HEAD)
 GIT_BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
 ```
+**Git-based versioning eliminates manual version management.** The git describe command generates version strings like `v1.2.3` (if on a tag) or `v1.2.3-5-g3a2b1c` (if 5 commits past the tag), and adds -dirty if you have uncommitted changes—giving you instant traceability from any deployed artifact back to its exact source code state. The commit hash and branch name are useful for feature environment deployments where you want namespaces like `myapp-feature-xyz` or build tags that include the commit. This approach means your version strings are always accurate and never require manual updating.
 
 \pagebreak
 
@@ -448,6 +446,29 @@ build:
 		-t $(IMAGE_TAG) .
 ```
 
+**Build metadata helps with debugging and audit trails.** When something goes
+wrong in production, knowing exactly when an image was built and by whom can be
+crucial—especially in teams where multiple people might build from the same
+commit. These values are typically embedded into the application itself (via
+Docker build args that become environment variables) so they're available at
+runtime through health check endpoints or logging. The timestamp uses UTC format
+to avoid timezone confusion, and the format `%Y%m%d-%H%M%S` sorts correctly and is
+human-readable. This pattern is especially valuable in organizations with
+compliance requirements.
+
+**Most deployment platforms—Docker, Kubernetes, AWS, GCP, Azure—support labels,
+tags, and annotations on deployed resources.** Your operations team has probably
+already mandated certain tags like `cost-center` or `owner`, but you can add as many
+as you want. Adding Git and build metadata as labels means you can look at any
+running pod, container, or instance and instantly see what commit it's running,
+when it was built, and who built it. This is invaluable during incidents when
+you need to know "is staging running the same code as production?" or "when did
+this version get deployed?" Without these labels, you're stuck correlating
+deployment logs, Git history, and CI timestamps. With them, `kubectl describe pod`
+or checking your cloud console immediately shows you the complete provenance of
+what's running. It takes seconds to add these labels during deployment and saves
+hours during troubleshooting.
+
 ### Dynamic Namespace Names
 
 ```makefile
@@ -456,6 +477,9 @@ CLEAN_BRANCH = $(shell git branch --show-current | \
 	sed 's/[^a-z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
 NAMESPACE = $(APP_NAME)-$(CLEAN_BRANCH)
 ```
+**Feature branch deployments need unique namespaces, but branch names aren't valid Kubernetes identifiers.** A branch named `feature/NEW_Auth-System` needs to become `feature-new-auth-system` to work as a namespace. This pattern strips invalid characters, converts to lowercase, and combines it with your app name to create isolated environments for each feature branch. Run `make deploy` from any branch and you automatically get a namespace like `myapp-feature-new-auth-system` without having to specify anything.
+
+**This pattern really sings if you're also doing Continuous Deployment.** When every push automatically deploys, having a clear, easily understandable name associated with the code that's running is magical. Reviewers can instantly find the right environment to test—no hunting through deployment logs or asking "which URL has your changes?" With multiple feature-testing environments deployed, the predictable naming scheme means everyone knows exactly where to look. When the branch is merged and deleted, you can clean up the corresponding namespace just as easily with `make delete-env` or similar. The combination of automatic deployment and automatic naming means feature environments become: push code, share a link, get feedback.
 
 \newpage
 

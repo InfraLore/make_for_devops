@@ -316,3 +316,12 @@ Even though the exact match isn’t found, there are adjacent ideas that could b
 - **Ironies of Automation** (from human factors) — when automation removes tasks, humans lose practice, get less ready/prepared for exceptional cases. [Wikipedia](https://en.wikipedia.org/wiki/Ironies_of_Automation?utm_source=chatgpt.com)
 
 - **Socio-technical theory of CI / automation tools** — what ADEPT shows.
+
+
+# handy bits of code
+
+## footnote for examples
+\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+
+## find where to put the footnote
+grep -n '@\./scripts/' chapters/*.md
