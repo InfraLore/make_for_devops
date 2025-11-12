@@ -420,21 +420,21 @@ $endif$
   {\LatoFont\Huge\bfseries\setstretch{0.5}}
 
 \titleformat{\chapter}[display]
-  {\LatoFont\huge\bfseries\setstretch{0.9}}
+  {\LatoFont\Huge\bfseries\setstretch{0.9}}
   {\chaptertitlename\ \thechapter}
   {20pt}
   {\LatoFont\huge\raggedright\setstretch{0.9}}
 
 \titleformat{\section}
-  {\LatoFont\Large\bfseries\setstretch{0.9}}
+  {\LatoFont\LARGE\bfseries\setstretch{0.9}}
   {\thesection}{1em}{\raggedright}
 
 \titleformat{\subsection}
-  {\LatoFont\large\bfseries\setstretch{0.9}}
+  {\LatoFont\Large\bfseries\setstretch{0.9}}
   {\thesubsection}{1em}{\raggedright}
 
 \titleformat{\subsubsection}
-  {\LatoFont\normalsize\bfseries\setstretch{0.9}}
+  {\LatoFont\large\bfseries\setstretch{0.9}}
   {\thesubsubsection}{1em}{\raggedright}
 
 % and for the title:
