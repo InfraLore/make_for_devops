@@ -510,6 +510,17 @@ config-help: ## Show configuration help
 	@echo "  make deploy ENVIRONMENT=production VERSION=v1.0.0"
 ```
 
+**Make your configuration discoverable so people don't have to read the Makefile
+to understand it.** A config-help target serves as living documentation—it's
+always up to date because it lives next to the code it documents. New team
+members can run make config-help and immediately understand what variables are
+available, what they do, what the defaults are, and see concrete examples of how
+to use them. This is especially valuable for variables that behave differently
+across environments (like REPLICAS in the example above) or for documenting
+which secrets are required. The ## comment after the target name means it will
+also appear in your main help output (from make help), making configuration help
+easily discoverable.
+
 \newpage
 
 ## Troubleshooting Configuration
@@ -535,13 +546,27 @@ debug-config: ## Debug configuration values
 	@echo "API_KEY: $$(test -n "$$API_KEY" && echo "SET" || echo "NOT SET")"
 ```
 
+**When a deployment fails or behaves unexpectedly, the first question is always
+"what configuration was actually used?"** A debug-config target dumps everything
+relevant—variable values, computed results, git state, and whether required
+secrets are present (without exposing their values). This eliminates the
+guessing game of "did my override actually work?" or "why is it using the wrong
+registry?" The target shows three categories: explicit configuration (the
+variables you set), computed values (what Make calculated from those variables),
+and environment state (secrets and git info). Run make debug-config
+ENVIRONMENT=production before a deployment to verify everything looks correct,
+or run it after a failure to see exactly what configuration was used. This
+single target will save you countless hours of debugging mysterious
+configuration issues.
+
 ## Key Takeaways
 
 Configuration management in Make should be simple and practical:
 
 1. **Start with `?=` and environment variables** - This handles most cases
 
-2. **Use config files when you have 10+ variables** - Not before
+2. **Use config files when you have 10+ variables** - Not before; `-include`
+lets them be optional
 
 3. **Never store secrets in files** - Environment variables only
 
@@ -549,11 +574,18 @@ Configuration management in Make should be simple and practical:
 
 5. **Keep it in one place** - Don't fragment configuration across files
 
-6. **Make it discoverable** - `config-help` target shows what's available
+6. **Make it discoverable** - `config-help` target shows what's available;
+`debug-config` reveals what's actually running
 
 7. **Environment-aware defaults** - Different sensible defaults per environment
 
 8. **Copy-paste over libraries** - Unless maintaining many identical projects
+
+9. **Add Git and build metadata** - Tag your deployments with version, commit,
+timestamp, and builder for instant traceability
+
+10. **Use dynamic namespaces for feature branches** - Especially powerful with
+Continuous Deployment; predictable naming eliminates coordination overhead
 
 The goal isn't sophisticated configuration management—it's having one clear
 place where configuration lives, with sensible defaults that work locally and
