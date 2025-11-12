@@ -423,16 +423,6 @@ comprehensive testing.
 The goal isn't perfect test coverage—it's catching real problems before they
 impact your team's productivity.
 
----
-
-**For More Examples:** See the online companion repository (Appendix D) for:
-
-- Complete test suite examples
-- CI/CD pipeline configurations
-- Advanced testing patterns
-- Property-based testing approaches
-- Fuzzing and regression testing
-
 In the next chapter, we'll explore how to use Make's variable system to create
 flexible, environment-aware workflows that adapt to different deployment
 scenarios while maintaining the reliability we've built through targeted

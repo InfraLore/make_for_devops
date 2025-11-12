@@ -591,15 +591,6 @@ The goal isn't sophisticated configuration management—it's having one clear
 place where configuration lives, with sensible defaults that work locally and
 simple overrides for other environments.
 
----
-
-**For More Examples:** See the online companion repository (Appendix D) for:
-
-- External config system integrations (AWS, GCP, Vault)
-- Multi-format config file support (YAML, JSON, TOML)
-- Configuration drift detection
-- Complex variable library examples
-
 In the next chapter, we'll explore how to organize targets and dependencies to
 create intuitive, discoverable workflows that match how your team actually
 thinks about their deployment process.

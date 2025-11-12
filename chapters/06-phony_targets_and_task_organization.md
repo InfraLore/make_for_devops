@@ -603,15 +603,6 @@ intuitive interface. The goal isn't comprehensive coverage of every possible
 operation—it's making the common cases obvious and the advanced cases
 discoverable.
 
----
-
-**For More Examples:** See the online companion repository (Appendix D) for:
-
-- Multi-component system organization patterns
-- Advanced help systems with categories
-- State-based target organization
-- Large-scale Makefile examples (50+ targets)
-
 In the next chapter, we'll explore advanced workflow patterns and how to handle
 complex operational scenarios while maintaining the simplicity and
 discoverability we've built through good target organization.

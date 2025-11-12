@@ -403,11 +403,6 @@ gitops-argocd-sync: ## Trigger ArgoCD sync
 The pattern is: clone the GitOps repo (or pull updates), generate new manifests,
 commit, and push. ArgoCD or Flux detects the change and applies it.
 
-## Complete Pipeline Integration example is in the online companion site
-
-See the online companion for a complete example of how all these patterns come
-together.
-
 ## Key Takeaways
 
 This chapter covered practical CI/CD integration patterns:
