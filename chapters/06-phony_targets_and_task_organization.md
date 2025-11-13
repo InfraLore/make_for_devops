@@ -157,6 +157,9 @@ help:     ## Show this help message
 
 This covers 80% of projects. Don't add complexity until you need it.
 
+
+\pagebreak
+
 ### Level 2: Grouped Organization (When You Hit ~15 Targets)
 
 Group related targets with prefixes:
@@ -182,6 +185,9 @@ reset:         ## Reset to clean state
 ```
 
 The prefixes create natural groupings that work with tab completion.
+
+
+\pagebreak
 
 ### Level 3: Categorized Help (When You Hit ~25+ Targets)
 

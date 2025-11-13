@@ -130,6 +130,8 @@ documentation should be updated. In practice, this rarely happens consistently:
 - There's no programmatic way to know that documentation has become outdated
 - The person making the change may not know all the places that need updating
 
+\pagebreak
+
 Consider this sequence:
 
 ```bash
@@ -170,6 +172,9 @@ entire document.
 Unlike code, documentation has no compiler, no tests, no validation. You can
 document a process that's completely broken, and you won't discover the problem
 until someone tries to follow the instructions and fails.
+
+
+\pagebreak
 
 This creates a vicious cycle:
 
@@ -240,6 +245,8 @@ validate that your deployment process works in CI before anyone uses it.
 across different projects and organizations. The interface is consistent even
 when the implementations differ.
 
+\pagebreak
+
 ### Make as the Universal Interface
 
 Think of Make as the "universal remote control" for your infrastructure. Instead
@@ -271,6 +278,8 @@ The commands `make build`, `make plan`, and `make deploy` become muscle memory.
 The specific tools underneath can change—you might switch from Docker to
 Buildah, from Terraform to Pulumi, from kubectl to Helm—but the interface
 remains stable.
+
+\pagebreak
 
 ### The Mental Model Shift
 
