@@ -35,7 +35,7 @@ The right approach balances consistency with autonomy through shared libraries, 
 
 ## The Pattern: Shared Libraries with Local Flexibility
 
-Provide shared, reusable components while letting teams compose and customize:
+Provide shared, reusable components while letting teams compose and customize:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 # Team's project Makefile - they own this
@@ -54,7 +54,7 @@ docker-build: ## Build with custom optimization
 
 # Add team-specific targets
 load-test: ## Run load tests (team-specific)
-	@./scripts/load-test.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/load-test.sh 
 ```
 
 Teams get useful defaults but retain complete control. They can use shared targets, override them, ignore them, or mix shared and custom targets freely.

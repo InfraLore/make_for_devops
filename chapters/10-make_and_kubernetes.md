@@ -45,7 +45,7 @@ and verification steps. Different engineers follow different procedures.
 Documentation drifts.
 
 \newpage
-Here's the discovery-based approach:
+Here's the discovery-based approach:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -66,7 +66,7 @@ help: ## Show Kubernetes operations
 
 deploy: ## Deploy to configured environment
 	@echo "Deploying to $(ENVIRONMENT)..."
-	@./scripts/k8s-deploy.sh $(ENVIRONMENT) $(VERSION) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/k8s-deploy.sh $(ENVIRONMENT) $(VERSION)
 
 status: ## Show deployment status
 	@./scripts/k8s-status.sh $(ENVIRONMENT)

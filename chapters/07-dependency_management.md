@@ -59,7 +59,7 @@ deploy: validate-environment validate-secrets build test
 
 ### Real-World Pipeline Dependencies
 
-Model a complete deployment pipeline:
+Model a complete deployment pipeline:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 # Final deployment with all prerequisites
@@ -70,7 +70,7 @@ validate-ready: validate-env validate-secrets validate-cluster
 
 # Build phase
 build: lint security-scan
-	@./scripts/build.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/build.sh
 
 # Testing phase
 test: build

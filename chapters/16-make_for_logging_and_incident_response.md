@@ -53,7 +53,7 @@ Here's the traditional documentation approach:
 
 This requires you to remember complex commands, doesn't validate context, and doesn't protect you from dangerous operations.
 
-Here's the discovery-based approach:
+Here's the discovery-based approach:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 .PHONY: incident-help incident-db-pool
@@ -69,7 +69,7 @@ incident-help: ## Show incident response runbooks
 
 incident-db-pool: ## Diagnose database connection pool issues
 	@echo "Diagnosing database connection pool..."
-	@./scripts/check-api-latency.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/check-api-latency.sh 
 	@./scripts/check-connection-pool.sh
 	@./scripts/check-long-queries.sh
 	@echo ""

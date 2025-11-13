@@ -62,7 +62,7 @@ The challenge is compounded by:
 Rather than trying to document every step and flag, Make lets you create a
 discoverable interface that reveals workflows as you need them.
 
-Here's how that same workflow becomes discoverable (see next page):
+Here's how that same workflow becomes discoverable (see next page):\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -82,7 +82,7 @@ init: check-environment ## Initialize Terraform for this environment
 
 plan: init ## Create infrastructure plan
 	@echo "Planning $(ENVIRONMENT)..."
-	@./scripts/terraform-plan.sh $(ENVIRONMENT) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/terraform-plan.sh $(ENVIRONMENT) 
 	@echo ""
 	@echo "Review plan above. To apply: make apply"
 

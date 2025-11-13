@@ -74,7 +74,7 @@ make compare-performance  # Compare current vs baseline
 make metrics-help         # Learn what's available
 ```
 
-Let's start with a basic pattern for making metrics discoverable:
+Let's start with a basic pattern for making metrics discoverable:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 .PHONY: metrics-help metrics-api metrics-db metrics-cache
@@ -99,7 +99,7 @@ metrics-help: ## Show available monitoring commands
 metrics-api: ## Show API performance metrics (last 5m)
 	@echo "API Metrics (last 5 minutes)"
 	@echo "============================"
-	@./scripts/prometheus-query.sh \ \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/prometheus-query.sh \ 
 	  'rate(http_requests_total[5m])' \
 	  "Request rate"
 	@./scripts/prometheus-query.sh \

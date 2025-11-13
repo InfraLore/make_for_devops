@@ -73,7 +73,7 @@ The magic happens inside the targets, which adapt automatically to the environme
 
 ### Pattern 1: Same Targets Everywhere
 
-The foundational pattern is identical target names:
+The foundational pattern is identical target names:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -87,7 +87,7 @@ help: ## Show available commands
 		{printf "  %-15s %s\n", $$1, $$2}'
 
 setup: ## Set up development environment
-	@./scripts/setup.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/setup.sh 
 
 test: ## Run all tests
 	@./scripts/run-tests.sh

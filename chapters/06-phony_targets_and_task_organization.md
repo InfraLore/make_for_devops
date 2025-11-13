@@ -65,6 +65,8 @@ deploy:
 **Declare all your action targets as phony.** It's a one-line insurance policy
 against weird bugs.
 
+\pagebreak
+
 ## Naming Targets: Clear Beats Clever
 
 ### The Verb-Object Pattern (Use This)
@@ -132,6 +134,8 @@ No need to check documentation \end{itemize}
 
 Test: Can a new team member guess the command to deploy to staging? If not,
 rename it. \end{calloutbox}
+
+\pagebreak
 
 ## Organizing Targets: Match Your Workflow
 

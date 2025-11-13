@@ -91,13 +91,12 @@ evaluation pass that can confuse debugging.
 
 ## Pattern Rules for Handling Multiple Environments
 
-Pattern rules eliminate repetitive target definitions:
+Pattern rules eliminate repetitive target definitions: \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 # Instead of this repetition:
 deploy-dev:
-	@./scripts/deploy.sh dev \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
-
+	@./scripts/deploy.sh dev
 deploy-staging:
 	@./scripts/deploy.sh staging
 

@@ -216,7 +216,7 @@ Make provides exactly what AI coding agents need to be effective:
 
 **Discoverability**: An AI agent can run `make help` and immediately understand
 what's possible in a codebase. No guessing about build commands, no hunting
-through documentation, no trial-and-error with different tool invocations.
+through documentation, no trial-and-error with different tool invocations.\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 # AI agents can discover capabilities
@@ -229,7 +229,7 @@ test: ## Run test suite
 	pytest tests/
 
 deploy-staging: ## Deploy to staging environment
-	@./scripts/deploy.sh staging \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/deploy.sh staging 
 ```
 
 When an AI agent encounters this Makefile, it knows exactly how to test changes,

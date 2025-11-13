@@ -48,7 +48,7 @@ fast**.
 ## Optimization Strategy 1: Layered Validation
 
 The most effective pipeline optimization is running only what's necessary. Not
-every commit requires full validation—implement a layered approach:
+every commit requires full validation—implement a layered approach:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 # Progressive validation layers
@@ -85,7 +85,7 @@ security-quick: ## Basic security scan (30 sec)
 test-integration: ## Integration tests (3 min)
 	@echo "Starting test environment..."
 	@docker compose -f test.yml up -d
-	@./scripts/run-integration-tests.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/run-integration-tests.sh 
 	@docker compose -f test.yml down
 
 security-deep: ## Comprehensive scan (3 min)

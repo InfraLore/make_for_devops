@@ -42,7 +42,7 @@ opinions based on their previous projects, their mental models, their laptop
 setup.
 
 Make lets you sidestep this argument—or at least defer it. Instead of forcing
-everyone to use the same underlying tool, Make provides a consistent interface:
+everyone to use the same underlying tool, Make provides a consistent interface:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 dev: ## Start development environment
@@ -57,7 +57,7 @@ dev-lando: ## Start using Lando
 	@$(MAKE) dev-ready
 
 dev-ready:
-	@./scripts/wait-for-services.sh \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/wait-for-services.sh
 	@$(MAKE) migrate
 	@echo "Ready at http://localhost:8000"
 ```

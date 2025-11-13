@@ -161,7 +161,7 @@ scripts/
 
 ### Step 2: Create Wrapper Targets
 
-Don't rewrite scripts immediately—wrap them with Make targets:
+Don't rewrite scripts immediately—wrap them with Make targets:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 .PHONY: deploy test build backup clean
@@ -170,7 +170,7 @@ deploy: ## Deploy to environment (ENVIRONMENT=dev|staging|prod)
 	@test -n "$(ENVIRONMENT)" || \
 		(echo "Usage: make deploy ENVIRONMENT=dev|staging|prod" && exit 1)
 	@echo "Deploying to $(ENVIRONMENT)..."
-	@./scripts/deploy.sh $(ENVIRONMENT) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/deploy.sh $(ENVIRONMENT) 
 
 test: ## Run all tests
 	@echo "Running test suite..."

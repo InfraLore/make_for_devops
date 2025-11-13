@@ -124,7 +124,11 @@ $endif$
 $if(monofont)$
   \setmonofont[$for(monofontoptions)$$monofontoptions$$sep$,$endfor$]{$monofont$}
 $endif$
-\newfontfamily\LatoFont[]{Lato}
+\newfontfamily\LatoFont[
+  ItalicFont = Lato-Italic,
+  BoldFont = Lato-Bold,
+  BoldItalicFont = Lato-BoldItalic
+]{Lato}
 $for(fontfamilies)$
   \newfontfamily{$fontfamilies.name$}[$for(fontfamilies.options)$$fontfamilies.options$$sep$,$endfor$]{$fontfamilies.font$}
 $endfor$

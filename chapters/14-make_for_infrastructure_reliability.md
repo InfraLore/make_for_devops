@@ -51,7 +51,7 @@ documentation rarely keeps pace.
 
 ## Discovering Infrastructure Health
 
-The first reliability pattern is making health checks discoverable:
+The first reliability pattern is making health checks discoverable:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := health
@@ -68,7 +68,7 @@ health: ## Quick infrastructure health check
 _check-resources:
 	@echo ""
 	@echo "Resources:"
-	@./scripts/check-resource-health.sh $(ENVIRONMENT) \footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+	@./scripts/check-resource-health.sh $(ENVIRONMENT)
 
 _check-costs:
 	@echo ""
