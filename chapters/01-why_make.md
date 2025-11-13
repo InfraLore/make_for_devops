@@ -7,7 +7,7 @@ It's 3 AM, and your production system is down. The on-call engineer—Sage, who
 joined three months ago—is frantically searching through Slack history, wiki
 pages, and a sprawling documentation site trying to figure out how to roll back
 the deployment. She finds five different runbooks, each with slightly different
-commands. Two reference scripts that no longer exist. One points to a Confluence
+commands. Two mention scripts that no longer exist. One points to a Confluence
 page that requires permissions she doesn't have. The senior engineer who wrote
 most of these procedures left four months ago, and with them went years of
 operational knowledge—the team lore that makes systems actually work.
@@ -320,7 +320,7 @@ we'll call DataFlow Inc. They operate a microservices architecture with 23
 services across three environments, managed by a DevOps team of 8 engineers.
 
 \begin{calloutbox}[DataFlow Inc. Does Not Exist] To be absolutely clear, what
-follows is a fictional case study. DataFlow Inc. *does not exist*. None of the
+follows is a fictional case study. DataFlow Inc. **does not exist**. None of the
 numbers are real, they are included for illustrative purposes. It would not be
 fair to call this section a "hallucination." It's what AIs do a lot: generate
 convincing narratives in order to make a point. Please bear with us. It's a good
