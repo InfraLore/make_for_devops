@@ -475,31 +475,21 @@ Guide":
 ```markdown
 # Deploying to Staging
 
-Prerequisites:
-
-- AWS CLI installed (version 2.x)
-- Terraform 1.5.0 or higher
-- Access to 1Password for credentials
-- VPN connected to staging network
+Prerequisites: AWS CLI, Terraform, 1Password, VPN
 
 Steps:
-
 1. Configure AWS credentials...
-   [15 lines of instructions]
 2. Initialize Terraform backend...
-   [20 lines of commands and troubleshooting]
 3. Select workspace...
-   [10 lines about workspace selection]
 ...
 [45 more pages of similar content]
 ```
 
-New engineers faced:
+New engineers spent 2-3 days learning outdated procedures with no confidence
+about what commands to run, and different engineers followed different
+procedures.
 
-- 2-3 days to read and understand the guide
-- Instructions that were outdated
-- No confidence about what commands to run
-- Different engineers following different procedures
+\pagebreak
 
 ### The New Way: Discovery Through Make
 
@@ -525,15 +515,8 @@ Staging Environment
   make apply           - Apply changes (requires review)
   ...
 
-Current: ENVIRONMENT=staging REGION=us-west-2
-
 # They follow the discovery path
 $ make plan ENVIRONMENT=staging
-Pre-flight checks for staging...
-AWS credentials valid
-Terraform version correct
-Configuration file found
-
 Creating plan for staging...
 [terraform output]
 
@@ -541,13 +524,9 @@ Review plan above. To apply:
   make apply ENVIRONMENT=staging
 ```
 
-Results after migration:
-
-- Onboarding time: 2-3 days → 2-3 hours
-- Wiki reduced from 50 pages to: "Run `make help`"
-- Zero deployments to wrong environment
-- Consistent procedures across all engineers
-- Junior engineers deploying infrastructure safely within first week
+Results after migration: onboarding time dropped from 2-3 days to 2-3 hours, the
+wiki reduced from 50 pages to "Run make help", and junior engineers were
+deploying infrastructure safely within their first week.
 
 The key insight: **discovery replaces documentation**. Instead of maintaining
 prose that describes what to do, create targets that reveal the workflow as

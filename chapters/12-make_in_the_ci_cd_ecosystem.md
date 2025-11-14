@@ -45,6 +45,10 @@ software development.
 The key insight: **Make targets designed for pipelines must be both correct and
 fast**.
 
+![Layered Validation Workflow](images/chapter12.png)
+
+\pagebreak
+
 ## Optimization Strategy 1: Layered Validation
 
 The most effective pipeline optimization is running only what's necessary. Not
@@ -55,52 +59,26 @@ every commit requires full validation—implement a layered approach:\footnote{S
 .PHONY: ci-quick ci-full ci-merge ci-deploy
 
 # Layer 1: Quick checks (< 2 min) - Every commit
-ci-quick: lint format-check test-unit security-quick
-	@echo "Quick validation passed"
+ci-quick: lint test-unit security-quick
 
-# Layer 2: Full validation (< 10 min) - Pull requests
+# Layer 2: Full validation (< 10 min) - Pull requests  
 ci-full: ci-quick test-integration build
-	@echo "Full validation passed"
 
 # Layer 3: Pre-merge (< 15 min) - Before merge
 ci-merge: ci-full security-deep verify-migrations
-	@echo "Ready to merge"
 
 # Layer 4: Post-merge (< 20 min) - Main branch only
 ci-deploy: ci-merge build-release package-artifacts
 	@echo "Ready to deploy"
 
+# Example implementations
 lint: ## Fast linting (30 sec)
 	@golangci-lint run --fast ./...
-	@eslint src/ --max-warnings=0
-
-test-unit: ## Unit tests only (1 min)
-	@go test -short ./...
-	@npm test -- --maxWorkers=50%
-
-security-quick: ## Basic security scan (30 sec)
-	@gosec -quiet ./...
-	@npm audit --audit-level=high
 
 test-integration: ## Integration tests (3 min)
-	@echo "Starting test environment..."
 	@docker compose -f test.yml up -d
 	@./scripts/run-integration-tests.sh 
 	@docker compose -f test.yml down
-
-security-deep: ## Comprehensive scan (3 min)
-	@trivy fs --severity HIGH,CRITICAL .
-	@snyk test
-
-verify-migrations: ## Database migration validation (2 min)
-	@./scripts/test-migrations.sh
-
-build-release: ## Production build (5 min)
-	@docker build -t $(IMAGE):$(VERSION) .
-	@docker tag $(IMAGE):$(VERSION) $(IMAGE):latest
-
-package-artifacts: ## Package for deployment (2 min)
-	@./scripts/create-release-bundle.sh
 ```
 
 This pattern provides crucial benefits:
@@ -109,10 +87,9 @@ This pattern provides crucial benefits:
 - **Cost Optimization**: Expensive checks run only when necessary
 - **Clear Expectations**: Each layer has defined time limits and purposes
 
-The discovery aspect matters here too. When `ci-quick` fails, developers
-immediately know they've hit a basic issue. When `ci-merge` fails on
-`security-deep`, they understand this is a more serious concern that requires
-attention before merge.
+When ci-quick fails, developers immediately know they've hit a basic issue. When
+`ci-merge` fails on security-deep, they understand this requires attention before
+merge.
 
 ## Optimization Strategy 2: Intelligent Parallelization
 
@@ -225,7 +202,17 @@ cache source, and push the new version as the cache for next time.
 
 ## Platform Integration: GitHub Actions
 
-GitHub Actions integration focuses on leveraging Make while using platform features:
+GitHub Actions integration focuses on leveraging Make while using platform
+features. One of the most useful capabilities is **collapsible log groups**—when
+your CI run produces hundreds of lines of output, being able to collapse
+successful sections and focus on failures dramatically improves readability.
+
+GitHub Actions provides this through special annotations: wrapping output in
+`::group::NAME` and `::endgroup::` creates collapsible sections in the web UI.
+The challenge is maintaining a Makefile that produces nicely formatted output in
+GitHub Actions while still working normally when run locally.
+
+The solution is a conditional macro that adapts to the environment:
 
 ```makefile
 # GitHub Actions helpers
@@ -257,6 +244,17 @@ gh-artifacts: ## Prepare artifacts for GitHub
 	@cp bin/* artifacts/
 	@tar -czf artifacts.tar.gz artifacts/
 ```
+
+When this runs in GitHub Actions, each section (Linting, Unit Tests, Security)
+appears as a collapsible group in the workflow logs. Click to expand failures,
+leave successful sections collapsed. When run locally with `make gh-test`, you
+simply get section headers—no special syntax, no broken output.
+
+This pattern demonstrates a key principle: **platform-aware while remaining
+portable**. The same Makefile works everywhere, but takes advantage of
+platform-specific features when available. You could extend this pattern for
+other CI systems (GitLab CI supports similar folding with
+`section_start`/`section_end`), but the basic approach remains the same.
 
 **Minimal GitHub Actions workflow**:
 
@@ -291,7 +289,20 @@ invokes the right targets.
 
 ## Platform Integration: GitLab CI
 
-GitLab CI follows the same principle—minimal YAML, maximum Make:
+GitLab CI follows the same principle—minimal YAML, maximum Make—but leverages
+different platform-specific features. Where GitHub Actions focuses on log
+grouping, GitLab excels at **artifact management** and **integrated coverage
+reporting**.
+
+GitLab's artifact system allows you to preserve build outputs, test results, and
+coverage data between pipeline stages. The key is preparing these artifacts in
+the expected format. Similarly, GitLab can parse coverage percentages directly
+from job output and display them in merge requests—but you need to output
+coverage in a format it recognizes.
+
+The cache configuration is also explicit in GitLab: you specify exactly which
+directories to cache, and Make targets can help document and validate these
+paths:
 
 ```makefile
 # GitLab CI helpers
@@ -308,6 +319,13 @@ gitlab-cache-paths: ## Show cache paths for GitLab
 	@echo "node_modules/"
 	@echo "~/.cache/go-build"
 ```
+
+The `gitlab-artifacts` target does three important things: copies binaries for
+deployment, preserves Go coverage output, and converts test results to JUnit XML
+format (which GitLab can parse to show test summaries in the UI). The
+`gitlab-cache-paths` target serves as **documentation-as-code**—run it to see
+exactly what should be cached, ensuring your `.gitlab-ci.yml` cache
+configuration stays in sync with your actual build needs.
 
 **Minimal GitLab configuration**:
 
@@ -339,9 +357,55 @@ build:
   only: [main]
 ```
 
+The YAML remains minimal—stages are defined, but the actual work lives in Make
+targets. The `coverage:` regex tells GitLab how to extract coverage percentages
+from output. The pattern is consistent: **CI configuration declares what to run
+and when; Make defines how to run it**.
+
+This separation means you can test the full pipeline locally with `make ci-full`
+without needing a GitLab runner. When something fails in CI, you can reproduce
+it exactly on your machine. The platform-specific helpers (artifact preparation,
+cache paths) exist only to integrate with GitLab's features, not to change the
+core workflow.
+
 ## Artifact Management: Build Once, Deploy Everywhere
 
-The key pattern is packaging everything needed for deployment:
+One of the most critical patterns in modern CI/CD is **building once and
+deploying everywhere**. The anti-pattern is rebuilding your application for each
+environment: once for dev, again for staging, again for production. This wastes
+time, costs money, and introduces risk—what guarantee do you have that the
+production build is identical to what you tested in staging?
+
+The solution is artifact packaging: build once in CI, create a deployment
+package containing everything needed to run the application, then deploy that
+exact artifact to multiple environments. The artifact becomes your unit of
+deployment—a tamper-evident bundle that moves through your pipeline unchanged.
+
+This pattern is well-established. Maven and Gradle create versioned JAR/WAR
+files, npm publishes packages to registries, Docker builds immutable images.
+These tools handle artifact creation for their ecosystems. Make enters the
+picture when you need to orchestrate across multiple tools or package polyglot
+applications—bundling compiled Go binaries with Node.js frontends with database
+migrations into a single deployment unit.
+
+What goes into an artifact? Not just the compiled binaries. Include
+configuration files, deployment scripts, Kubernetes manifests, database
+migrations—everything required to deploy and run the application. Version the
+artifact clearly, and generate checksums to verify integrity. When you deploy to
+production, you're deploying the exact bytes that were tested in staging, not a
+rebuild that "should" be identical.
+
+The benefits are substantial:
+- **Speed**: Building is slow (compilation, optimization, bundling). Deploying a
+  pre-built artifact is fast.
+- **Consistency**: The same artifact in every environment eliminates "works on
+  my machine" and "works in staging" surprises.
+- **Auditability**: Checksums prove nothing changed between build and
+  deployment.
+- **Rollback**: Keep old artifacts around and rolling back means deploying a
+  previous version, not rebuilding old code.
+
+Here's the pattern implemented in Make:
 
 ```makefile
 # Artifact packaging
@@ -364,44 +428,17 @@ artifacts-deploy: artifacts-verify ## Deploy from artifact
 	@./artifacts/scripts/deploy.sh $(ENVIRONMENT)
 ```
 
-This enables the "build once, deploy everywhere" pattern. Build the artifact
-once in CI, then deploy it to multiple environments without rebuilding.
+The workflow is straightforward: `make artifacts-create` packages everything
+into a versioned tarball and generates a checksum. Upload this to your artifact
+repository (S3, Artifactory, GitHub Releases). When deploying, download the
+artifact, run `make artifacts-deploy`, and the verification step checks the
+checksum before extraction. If the checksum fails, deployment stops—you know
+something's wrong before broken code reaches your environment.
 
-## GitOps Integration
-
-GitOps requires generating and committing manifests:
-
-```makefile
-# GitOps workflow
-GITOPS_REPO := git@github.com:company/gitops.git
-GITOPS_DIR := .gitops
-
-gitops-update: ## Update GitOps repository
-	@echo "Updating GitOps repository..."
-	@if [ ! -d $(GITOPS_DIR) ]; then \
-	  git clone $(GITOPS_REPO) $(GITOPS_DIR); \
-	fi
-	@cd $(GITOPS_DIR) && git pull
-	@$(MAKE) gitops-generate
-	@cd $(GITOPS_DIR) && \
-	  git add . && \
-	  git commit -m "Deploy $(APP) $(VERSION) to $(ENV)" && \
-	  git push
-
-gitops-generate: ## Generate Kubernetes manifests
-	@echo "Generating manifests for $(ENV)..."
-	@helm template $(APP) ./charts \
-	  --values ./charts/values-$(ENV).yaml \
-	  --set image.tag=$(VERSION) \
-	  --output-dir $(GITOPS_DIR)/$(ENV)/
-
-gitops-argocd-sync: ## Trigger ArgoCD sync
-	@argocd app sync $(APP)-$(ENV)
-	@argocd app wait $(APP)-$(ENV) --health
-```
-
-The pattern is: clone the GitOps repo (or pull updates), generate new manifests,
-commit, and push. ArgoCD or Flux detects the change and applies it.
+This pattern enables the pipeline optimization discussed earlier: build
+artifacts once in the expensive "build" stage, then quickly deploy to multiple
+environments without rebuilding. A 10-minute build becomes a 30-second
+deployment.
 
 ## Key Takeaways
 
@@ -422,10 +459,8 @@ This chapter covered practical CI/CD integration patterns:
 
 **Core Patterns**:
 
-- Build once, deploy everywhere via artifact management
-- GitOps integration for declarative deployments
-- Environment detection for adaptive behavior
-- Performance tracking for continuous improvement
+- Build once, deploy everywhere via artifact management and verification
+- Platform-aware output (log grouping, coverage reporting) while remaining portable
 
 **The Bottom Line**: Make's consistency enables speed. By standardizing
 workflows in Make, you optimize once and benefit everywhere—in local

@@ -1,0 +1,15 @@
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+
+graph TD
+    A[Every Commit] --> B[ci-quick: under 2 min]
+    B --> |lint, unit tests, quick security| C[ci-full: under 10 min]
+    C --> |integration tests, build| D[ci-merge: under 15 min]
+    D --> |deep security, migrations| E[ci-deploy: under 20 min]
+    E --> |release build, packaging| F[Ready to Deploy]
+
+    classDef whiteBox fill:#ffffff,stroke:#000000
+    class A,B,C,D,E,F whiteBox

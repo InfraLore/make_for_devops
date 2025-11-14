@@ -1,619 +1,521 @@
 # Chapter 19 - Troubleshooting and Debugging Make Workflows
 
-\chaptersubtitle{Mastering the tools and techniques to diagnose, fix, and optimize Make-based workflows.}
+\chaptersubtitle{Mastering the tools and techniques to diagnose, fix, and
+optimize complex Make-based workflows.}
 
-You run `make deploy-staging` and it fails with a cryptic error. No clear indication of what went wrong. No obvious next step. Just a failed target somewhere in a chain of dependencies and a confused engineer staring at the terminal.
+You run `make deploy-staging` and it fails. But it's not a simple failure—you've
+already checked the obvious things. You've run `make -n` to see what commands
+would execute. You've verified your variables with `$(info ...)`. You've
+confirmed the target is declared `.PHONY`. The basics are correct, yet something
+deeper is wrong.
 
-Or worse: the deployment succeeds, but something's wrong. Environment variables aren't set correctly. A dependency ran in the wrong order. A file that should have been updated wasn't. The Makefile executes without errors, but the results aren't what you expected.
+Maybe the deployment succeeds but produces incorrect results. Maybe targets run
+in an unexpected order despite explicit prerequisites. Maybe the workflow works
+on your machine but fails in CI. Maybe it worked yesterday and fails today with
+no obvious changes.
 
-Make's terseness—usually an asset—becomes a liability when things go wrong. Unlike higher-level orchestration tools with verbose logging and debugging interfaces, Make provides minimal feedback by default. Understanding how to debug Make workflows is essential for both maintaining existing Makefiles and helping others when they encounter issues.
+These are the hard debugging problems—the ones that require understanding Make's
+execution model at a deeper level, the ones that surface only in complex
+multi-service deployments, the ones that appear under load or in production.
 
-This chapter equips you with the techniques, tools, and mental models for troubleshooting Make workflows effectively.
+This chapter equips you with advanced techniques for diagnosing and fixing these
+challenging issues.
 
-## Understanding Make's Execution Model
+\begin{calloutbox}[Prerequisites: Chapter 3] This chapter assumes you're
+comfortable with the debugging basics covered in Chapter 3: using \texttt{make
+-n} for dry runs, \texttt{make -p} to inspect variables, adding \texttt{@} for
+output control, and basic error handling patterns. If you're new to Make
+debugging, start with Chapter 3's "Debugging and Troubleshooting Makefile
+Execution" section before proceeding here. \end{calloutbox}
 
-Most Make debugging starts with understanding what Make is actually doing. Make's execution model has several layers:
+\pagebreak
+
+![Make's Execution Model](images/chapter19.png)
+
+\pagebreak
+
+## Understanding Make's Execution Model in Depth
+
+Most advanced Make debugging requires understanding what happens between when
+you press Enter and when commands execute. Make's execution has three distinct
+phases, and problems can hide in any of them:
 
 ### 1. Parsing Phase
 
-Make reads the Makefile, expands variables, evaluates conditions, and builds a dependency graph.
+Make reads all Makefiles, expands immediate variables (`:=`), evaluates
+includes, processes conditionals, and builds an internal representation of
+targets and their relationships. 
+
+**Common issues in this phase:**
+- Syntax errors in conditionals or function calls
+- Circular includes or recursive variable definitions
+- Expensive shell commands in `:=` assignments slowing Makefile loading
 
 ### 2. Dependency Resolution Phase
 
-Make determines which targets need to run based on file timestamps or phony declarations.
+Make walks the dependency graph, determines which targets are out of date based
+on file timestamps or phony declarations, and decides what needs to run.
+
+**Common issues in this phase:**
+- Unexpected target execution order in complex graphs
+- File-based dependencies behaving incorrectly
+- Timestamp confusion in networked filesystems or containers
+- Race conditions in parallel execution
 
 ### 3. Execution Phase
 
-Make runs the shell commands for each required target.
+Make runs shell commands for each selected target, handling errors and
+maintaining the execution environment.
 
-Problems can occur in any of these phases, and the symptoms differ:
+**Common issues in this phase:**
+- Environment variable scoping problems
+- Shell flags not propagating correctly
+- Resource exhaustion in long-running workflows
+- Subtle shell behavior differences across systems
 
-**Parsing errors**: Syntax errors, undefined variables, include failures
-**Dependency errors**: Wrong execution order, missing prerequisites
-**Execution errors**: Command failures, environment issues, resource problems
+Understanding which phase contains your problem dramatically narrows the
+debugging space.
 
-## Essential Debugging Flags
+## Advanced Debugging Techniques
 
-Make provides several flags that illuminate what's happening:
+### Debugging Complex Dependency Graphs
 
-### The Dry Run Flag: `-n`
-
-Shows what Make would do without actually doing it:
-
-```bash
-# See what commands would run
-make -n deploy-staging
-
-# Output shows the exact commands
-docker build -t myapp:v1.2.3 .
-docker push myapp:v1.2.3
-kubectl apply -f k8s/staging/
-```
-
-This is invaluable for:
-
-- Verifying variable expansion
-- Checking command correctness
-- Understanding execution order
-- Testing dangerous operations safely
-
-### The Debug Flag: `--debug`
-
-Provides detailed information about Make's decision-making:
-
-```bash
-# Basic debugging info
-make --debug=b deploy-staging
-
-# Verbose debugging
-make --debug=v deploy-staging
-
-# All debugging information
-make --debug=a deploy-staging
-```
-
-Output shows:
-
-- Which targets need rebuilding and why
-- Dependency relationships
-- File timestamp comparisons
-- Variable expansions
-
-### The Print Flag: `-p`
-
-Dumps Make's internal database:
-
-```bash
-# Show all variables and targets
-make -p
-
-# Show database then exit (don't run targets)
-make -p -f /dev/null
-```
-
-This reveals:
-
-- All defined variables and their values
-- All targets and their prerequisites
-- Implicit rules being applied
-- Built-in Make variables
-
-### The What-If Flag: `-W`
-
-Pretends a file is modified:
-
-```bash
-# See what would rebuild if config.yaml changed
-make -W config.yaml -n deploy
-```
-
-## Common Problems and Solutions
-
-### Problem 1: Silent Failures
-
-**Symptom**: Target completes but didn't do what you expected
-
-**Cause**: Commands succeed but produce wrong results
-
-**Solution**: Add explicit validation
+When you have targets with 3+ levels of prerequisites and things execute in the
+wrong order:
 
 ```makefile
-# Before: Silent failure
-deploy: build
-	kubectl apply -f k8s/
+# Visualize the actual dependency resolution
+debug-deps: ## Show detailed dependency resolution
+	@echo "Dependency analysis for: $(TARGET)"
+	@make --debug=v $(TARGET) 2>&1 | \
+		grep -E "(Considering|prerequisite|newer|Must remake)" | \
+		head -50
 
-# After: Validated execution
-deploy: build _validate-deployment
-	kubectl apply -f k8s/
-	@$(MAKE) _check-deployment-health
-
-_validate-deployment:
-	@test -n "$(VERSION)" || \
-		(echo "VERSION not set" && exit 1)
-	@test -n "$(NAMESPACE)" || \
-		(echo "NAMESPACE not set" && exit 1)
-
-_check-deployment-health:
-	@kubectl rollout status deployment/$(SERVICE_NAME) \
-		-n $(NAMESPACE) --timeout=60s || \
-		(echo "Deployment failed health check" && exit 1)
+# Example: make debug-deps TARGET=deploy-production
 ```
 
-### Problem 2: Variable Expansion Issues
-
-**Symptom**: Variables contain unexpected values
-
-**Diagnosis**: Use `$(info ...)` to inspect variables
+For really complex graphs, export to GraphViz:
 
 ```makefile
-# Debug variable values
+graph-deps: ## Generate dependency graph
+	@make -Bnd $(TARGET) | \
+		make2graph | \
+		dot -Tpng -o deps-$(TARGET).png
+	@echo "Generated deps-$(TARGET).png"
+
+# Requires: apt-get install make2graph graphviz
+```
+
+**Real-world example:** A deployment target wasn't running tests because an
+intermediate target (`validate-manifests`) inadvertently created a file called
+`test`, causing Make to think tests were up to date:
+
+```makefile
+# Problem: validate-manifests creates 'test' file
+validate-manifests:
+	helm template charts/ --output-dir test/
+	yamllint test/
+
+# Solution: Use a uniquely named output directory
+validate-manifests:
+	helm template charts/ --output-dir .helm-output/
+	yamllint .helm-output/
+```
+
+### Debugging Recursive Make
+
+When orchestrating multiple services with recursive Make calls, failures become
+opaque:
+
+```makefile
+# Poor: Silent failures in recursive make
+deploy-all:
+	for service in $(SERVICES); do \
+		$(MAKE) -C services/$$service deploy; \
+	done
+
+# Better: Explicit error handling and context
+deploy-all:
+	@failed=""; \
+	for service in $(SERVICES); do \
+		echo "Deploying $$service..."; \
+		if ! $(MAKE) -C services/$$service deploy; then \
+			failed="$$failed $$service"; \
+			echo "FAILED: $$service"; \
+		fi; \
+	done; \
+	if [ -n "$$failed" ]; then \
+		echo ""; \
+		echo "Deployment failed for:$$failed"; \
+		echo ""; \
+		echo "To retry individual services:"; \
+		for service in $$failed; do \
+			echo "  make -C services/$$service deploy"; \
+		done; \
+		exit 1; \
+	fi
+```
+
+Add recursive make debugging:
+
+```makefile
+# Track recursive make depth
+export MAKE_DEPTH ?= 0
+
 deploy:
-	$(info VERSION=$(VERSION))
-	$(info IMAGE=$(IMAGE_NAME):$(VERSION))
-	$(info NAMESPACE=$(NAMESPACE))
-	@echo "Deploying..."
-	# ... rest of target
-```
-
-**Common causes**:
-
-- Variables defined too late
-- Recursive vs. simple expansion confusion
-- Environment variables conflicting
-
-```makefile
-# Problem: Recursive expansion evaluated too late
-VERSION = $(shell git describe --tags)
-COMMIT = $(shell git rev-parse HEAD)
-IMAGE = myapp:$(VERSION)-$(COMMIT)
-
-# Solution: Use := for immediate expansion
-VERSION := $(shell git describe --tags)
-COMMIT := $(shell git rev-parse HEAD)
-IMAGE := myapp:$(VERSION)-$(COMMIT)
-```
-
-### Problem 3: Dependency Order Issues
-
-**Symptom**: Targets run in wrong order or don't run at all
-
-**Diagnosis**: Check dependency graph
-
-```makefile
-# Show what would run and in what order
-make -n target-name
-
-# Verbose dependency info
-make --debug=v target-name 2>&1 | grep "Considering"
-```
-
-**Solution**: Explicit dependencies
-
-```makefile
-# Problem: Unclear dependencies
-deploy: build test
-	kubectl apply -f k8s/
-
-# Solution: Make dependencies explicit
-deploy: docker-push validate-manifests
-	kubectl apply -f k8s/
-
-docker-push: docker-build security-scan
-	docker push $(IMAGE_NAME)
-
-docker-build: lint test
-	docker build -t $(IMAGE_NAME) .
-```
-
-### Problem 4: Environment Variable Confusion
-
-**Symptom**: Different behavior in different environments
-
-**Diagnosis**: Show all environment
-
-```makefile
-debug-env: ## Show all environment variables
-	@echo "=== Make Variables ==="
-	@echo "VERSION: $(VERSION)"
-	@echo "ENVIRONMENT: $(ENVIRONMENT)"
-	@echo "IMAGE_NAME: $(IMAGE_NAME)"
-	@echo ""
-	@echo "=== Shell Environment ==="
-	@env | grep -E "(AWS|KUBECONFIG|DOCKER)" | sort
-```
-
-**Solution**: Explicit defaults and validation
-
-```makefile
-# Provide clear defaults
-ENVIRONMENT ?= dev
-REGION ?= us-west-2
-NAMESPACE ?= $(ENVIRONMENT)
-
-# Validate required variables
-_check-required-vars:
-	@test -n "$(AWS_ACCOUNT)" || \
-		(echo "AWS_ACCOUNT required. Set: export AWS_ACCOUNT=xxx" && exit 1)
-	@test -n "$(VERSION)" || \
-		(echo "VERSION required. Run: export VERSION=\$$(git describe)" && \
-		exit 1)
-
-deploy: _check-required-vars
-	# ... deployment commands
-```
-
-### Problem 5: Phony Target Confusion
-
-**Symptom**: Target doesn't run even though prerequisites changed
-
-**Cause**: Target name matches a file or directory
-
-```makefile
-# Problem: 'test' directory exists, so target never runs
-test:
-	pytest tests/
-
-# Solution: Declare as phony
-.PHONY: test
-test:
-	pytest tests/
-```
-
-**Diagnosis**: Check for file/directory conflicts
-
-```bash
-# See if target names conflict with files
-ls -la | grep -E "^(test|build|deploy|clean)$"
-```
-
-## Building Debuggable Makefiles
-
-Design Makefiles that are easy to troubleshoot:
-
-### 1. Verbose Mode Toggle
-
-```makefile
-# Support verbose mode for debugging
-VERBOSE ?= 0
-
-ifeq ($(VERBOSE),1)
-  Q :=
-  QUIET :=
-else
-  Q := @
-  QUIET := --quiet
-endif
-
-# Use in targets
-build:
-	$(Q)echo "Building $(SERVICE_NAME)..."
-	$(Q)docker build $(QUIET) -t $(IMAGE_NAME) .
-
-# Run with: make build VERBOSE=1
-```
-
-### 2. Step-by-Step Execution
-
-```makefile
-# Allow skipping to specific steps
-SKIP_TESTS ?= 0
-SKIP_BUILD ?= 0
-
-deploy: _maybe-build _maybe-test _deploy
-
-_maybe-build:
-ifneq ($(SKIP_BUILD),1)
-	@$(MAKE) build
-else
-	@echo "Skipping build (SKIP_BUILD=1)"
-endif
-
-_maybe-test:
-ifneq ($(SKIP_TESTS),1)
-	@$(MAKE) test
-else
-	@echo "Skipping tests (SKIP_TESTS=1)"
-endif
+	@echo "$(shell printf '%*s' $$((MAKE_DEPTH * 2)) '')→ Deploying $(SERVICE_NAME)"
+	@MAKE_DEPTH=$$((MAKE_DEPTH + 1)) $(MAKE) _deploy
 
 _deploy:
-	@echo "Deploying..."
-	kubectl apply -f k8s/
-
-# Quick iteration: make deploy SKIP_TESTS=1 SKIP_BUILD=1
+	# Actual deployment commands
 ```
 
-### 3. Checkpoint Targets
+### Race Conditions in Parallel Execution
+
+Parallel make (`make -j`) can expose hidden dependencies:
 
 ```makefile
-# Save state between steps for debugging
-checkpoint-build:
-	@echo "$(VERSION)" > .checkpoint-version
-	@echo "$(IMAGE_NAME):$(VERSION)" > .checkpoint-image
-	@echo "Checkpoint saved"
+# Problem: These targets aren't truly independent
+test-unit test-integration:
+	pytest tests/$@/ --cov-report=xml
 
-checkpoint-restore:
-	@test -f .checkpoint-version || \
-		(echo "No checkpoint found" && exit 1)
-	$(eval VERSION := $(shell cat .checkpoint-version))
-	$(eval IMAGE_TAG := $(shell cat .checkpoint-image))
-	@echo "Restored: VERSION=$(VERSION), IMAGE=$(IMAGE_TAG)"
+# Both write to the same coverage file, causing corruption
 
-# Use checkpoints to resume after failures
-deploy: build checkpoint-build push deploy-k8s
+# Solution: Separate outputs or serialize
+test-unit:
+	pytest tests/unit/ --cov-report=xml:coverage-unit.xml
+
+test-integration:
+	pytest tests/integration/ --cov-report=xml:coverage-integration.xml
+
+# Or explicitly prevent parallelism for this target
+.NOTPARALLEL: test-unit test-integration
 ```
 
-### 4. Detailed Error Messages
+**Detecting race conditions:**
 
 ```makefile
-# Before: Cryptic failure
-deploy:
-	kubectl apply -f k8s/ || exit 1
-
-# After: Helpful error message
-deploy:
-	@kubectl apply -f k8s/ || \
-		(echo ""; \
-		 echo "Deployment failed"; \
-		 echo ""; \
-		 echo "Troubleshooting steps:"; \
-		 echo "  1. Check kubectl context: kubectl config current-context"; \
-		 echo "  2. Verify namespace exists: kubectl get ns $(NAMESPACE)"; \
-		 echo "  3. Check manifest syntax: make validate-manifests"; \
-		 echo "  4. View detailed logs: make logs-deploy"; \
-		 echo ""; \
-		 exit 1)
+test-race: ## Test for race conditions
+	@echo "Running targets in parallel 10 times..."
+	@for i in $$(seq 1 10); do \
+		echo "Iteration $$i"; \
+		make -j4 build test > /dev/null 2>&1 || \
+			(echo "FAILED on iteration $$i" && exit 1); \
+	done
+	@echo "No race conditions detected"
 ```
 
-### 5. Debug Helper Targets
+### Timestamp Issues in Distributed Systems
+
+File timestamps behave unexpectedly in Docker, NFS, or CI environments:
 
 ```makefile
-# Comprehensive debugging target
-debug: ## Show debug information
-	@echo "Debug Information"
-	@echo "==================="
-	@echo ""
-	@echo "Make Version:"
-	@make --version | head -1
-	@echo ""
-	@echo "Variables:"
-	@echo "  SERVICE_NAME: $(SERVICE_NAME)"
-	@echo "  VERSION: $(VERSION)"
-	@echo "  ENVIRONMENT: $(ENVIRONMENT)"
-	@echo "  IMAGE_NAME: $(IMAGE_NAME)"
-	@echo ""
-	@echo "Git Info:"
-	@echo "  Branch: $$(git rev-parse --abbrev-ref HEAD)"
-	@echo "  Commit: $$(git rev-parse --short HEAD)"
-	@echo "  Status: $$(git status --short | wc -l) files changed"
-	@echo ""
-	@echo "Docker:"
-	@docker --version
-	@echo "  Images: $$(docker images | grep $(SERVICE_NAME) | wc -l)"
-	@echo ""
-	@echo "Kubernetes:"
-	@kubectl version --client --short 2>/dev/null
-	@echo "  Context: $$(kubectl config current-context)"
-	@echo "  Namespace: $(NAMESPACE)"
-	@echo ""
-	@echo "Environment Variables:"
-	@env | grep -E "(AWS|KUBE|DOCKER)" | sort
+# Problem: Docker build always runs because context files have "future" timestamps
+docker-build: .docker-build-timestamp
 
-debug-target: ## Debug specific target (make debug-target TARGET=deploy)
-	@echo "Analyzing target: $(TARGET)"
-	@echo ""
-	@echo "Dependencies:"
-	@make -n $(TARGET) 2>&1 | head -20
-	@echo ""
-	@echo "Would execute:"
-	@make -n $(TARGET)
-```
-
-## Performance Optimization
-
-Slow Makefiles harm developer productivity:
-
-### Identifying Bottlenecks
-
-```makefile
-# Time each major step
-timed-deploy: ## Deploy with timing information
-	@echo "Timed Deployment"
-	@echo "==================="
-	@start=$$(date +%s); \
-	$(MAKE) build; \
-	echo "Build: $$((($$(date +%s) - start))) seconds"; \
-	start=$$(date +%s); \
-	$(MAKE) test; \
-	echo "Test: $$((($$(date +%s) - start))) seconds"; \
-	start=$$(date +%s); \
-	$(MAKE) push; \
-	echo "Push: $$((($$(date +%s) - start))) seconds"; \
-	start=$$(date +%s); \
-	$(MAKE) deploy-k8s; \
-	echo "Deploy: $$((($$(date +%s) - start))) seconds"
-```
-
-### Parallel Execution
-
-```makefile
-# Enable parallel builds
-.NOTPARALLEL: deploy  # Some targets must be serial
-
-# These can run in parallel
-test-unit test-integration test-e2e:
-	# ... test commands
-
-# Run with: make -j4 test-unit test-integration test-e2e
-```
-
-### Caching Strategies
-
-```makefile
-# Cache expensive operations
-.make-cache/docker-build.timestamp: Dockerfile $(shell find src -type f)
+.docker-build-timestamp: Dockerfile $(shell find src/ -type f)
 	docker build -t $(IMAGE_NAME) .
-	@mkdir -p .make-cache
-	@touch .make-cache/docker-build.timestamp
+	touch .docker-build-timestamp
 
-docker-build: .make-cache/docker-build.timestamp
-
-clean-cache: ## Clean make cache
-	rm -rf .make-cache
+# In CI, this fails because git checkout sets weird timestamps
 ```
 
-## Common Pitfalls and How to Avoid Them
-
-### Pitfall 1: Shell vs. Make Variables
+**Solution:** Use content hashing instead of timestamps:
 
 ```makefile
-# Wrong: Shell variable in Make
-deploy:
-	VERSION=1.2.3
-	docker build -t app:$(VERSION) .  # VERSION is empty!
+# Content-based dependency
+.docker-build.hash: Dockerfile $(shell find src/ -type f)
+	@current=$$(find src/ Dockerfile -type f -exec sha256sum {} \; | \
+		sha256sum | cut -d' ' -f1); \
+	if [ -f .docker-build.hash ]; then \
+		previous=$$(cat .docker-build.hash); \
+		if [ "$$current" = "$$previous" ]; then \
+			echo "Docker build not needed (content unchanged)"; \
+			exit 0; \
+		fi; \
+	fi; \
+	docker build -t $(IMAGE_NAME) .; \
+	echo "$$current" > .docker-build.hash
 
-# Right: Make variable
-VERSION := 1.2.3
-deploy:
-	docker build -t app:$(VERSION) .
-
-# Or: Shell variable properly used
-deploy:
-	VERSION=1.2.3; \
-	docker build -t app:$$VERSION .  # Note: $$VERSION
+docker-build: .docker-build.hash
 ```
 
-### Pitfall 2: Silent Command Failures
+## Performance Debugging
+
+Slow Makefiles kill productivity. Here's how to find and fix bottlenecks:
+
+### Profiling Make Execution
 
 ```makefile
-# Wrong: Failure in pipeline goes unnoticed
-deploy:
-	kubectl apply -f k8s/ | tee deploy.log
+# Time every target automatically
+SHELL := /usr/bin/time -f "Target took: %E elapsed, %U user, %S system" /bin/bash
 
-# Right: Set pipefail
-.SHELLFLAGS := -ec
-deploy:
-	set -o pipefail; \
-	kubectl apply -f k8s/ | tee deploy.log
+# Or build custom profiling
+profile-deploy: ## Profile deployment workflow
+	@echo "Profiling: deploy workflow"
+	@echo "=========================="
+	@echo ""
+	@start=$$(date +%s); \
+	$(MAKE) lint; \
+	echo "[$$((($$(date +%s) - start)))s] lint completed"; \
+	\
+	start=$$(date +%s); \
+	$(MAKE) test-unit; \
+	echo "[$$((($$(date +%s) - start)))s] test-unit completed"; \
+	\
+	start=$$(date +%s); \
+	$(MAKE) test-integration; \
+	echo "[$$((($$(date +%s) - start)))s] test-integration completed"; \
+	\
+	start=$$(date +%s); \
+	$(MAKE) docker-build; \
+	echo "[$$((($$(date +%s) - start)))s] docker-build completed"; \
+	\
+	start=$$(date +%s); \
+	$(MAKE) docker-push; \
+	echo "[$$((($$(date +%s) - start)))s] docker-push completed"
 ```
 
-### Pitfall 3: Working Directory Confusion
+### Optimizing Expensive Shell Operations
 
 ```makefile
-# Wrong: Commands run in different directories
-build:
-	cd docker/
-	docker build -t app .  # Builds in wrong directory!
+# Problem: Git commands run on every invocation
+VERSION = $(shell git describe --tags --always)
+BRANCH = $(shell git rev-parse --abbrev-ref HEAD)
+COMMIT = $(shell git rev-parse --short HEAD)
 
-# Right: One shell per command
-build:
-	cd docker && docker build -t app .
+# These run even for 'make help'!
 
-# Better: Explicit directory
-build:
-	docker build -t app -f docker/Dockerfile docker/
+# Solution: Lazy evaluation for expensive operations
+_git_version = $(shell git describe --tags --always)
+_git_branch = $(shell git rev-parse --abbrev-ref HEAD)
+_git_commit = $(shell git rev-parse --short HEAD)
+
+VERSION = $(if $(VERSION_CACHED),$(VERSION_CACHED),\
+	$(eval VERSION_CACHED := $(_git_version))$(VERSION_CACHED))
+
+# Or: Only compute when needed
+docker-build:
+	@VERSION=$$(git describe --tags --always); \
+	docker build --build-arg VERSION=$$VERSION -t $(IMAGE_NAME) .
 ```
 
-### Pitfall 4: Quoting Issues
+### Parallel Execution Strategy
 
 ```makefile
-# Wrong: Breaks with spaces in paths
+# Identify parallelizable targets
+test-unit test-integration test-e2e:
+	pytest tests/$@/
+
+# Run with: make -j3 test-unit test-integration test-e2e
+
+# But serialize where needed
+deploy-services: _deploy-database _deploy-backend _deploy-frontend
+
+_deploy-database:
+	kubectl apply -f k8s/database/
+
+# Backend depends on database
+_deploy-backend: _deploy-database
+	kubectl apply -f k8s/backend/
+
+# Frontend depends on backend
+_deploy-frontend: _deploy-backend
+	kubectl apply -f k8s/frontend/
+```
+
+## Production Incident Debugging
+
+When a deployment fails in production at 2 AM:
+
+### Forensic Debugging
+
+```makefile
+# Capture state for post-mortem
+incident-snapshot: ## Capture debugging snapshot
+	@mkdir -p incident-$$(date +%Y%m%d-%H%M%S)
+	@cd incident-$$(date +%Y%m%d-%H%M%S) && \
+	echo "Capturing incident snapshot..." && \
+	kubectl get all -n $(NAMESPACE) > k8s-state.txt && \
+	kubectl describe deployment/$(SERVICE_NAME) -n $(NAMESPACE) > deployment.txt && \
+	kubectl logs deployment/$(SERVICE_NAME) -n $(NAMESPACE) --tail=500 > logs.txt && \
+	make debug > make-debug.txt && \
+	env > environment.txt && \
+	git log -1 --pretty=fuller > git-info.txt && \
+	git diff > git-changes.txt
+	@echo "Snapshot captured in incident-*/"
+```
+
+### Emergency Rollback with Diagnostics
+
+```makefile
+emergency-rollback: ## Rollback with full diagnostics
+	@echo "=== EMERGENCY ROLLBACK ==="
+	@echo ""
+	@echo "Current state:"
+	@kubectl get deployment/$(SERVICE_NAME) -n $(NAMESPACE)
+	@echo ""
+	@echo "Rolling back..."
+	@kubectl rollout undo deployment/$(SERVICE_NAME) -n $(NAMESPACE)
+	@echo ""
+	@echo "Waiting for rollback to complete..."
+	@kubectl rollout status deployment/$(SERVICE_NAME) -n $(NAMESPACE) --timeout=120s
+	@echo ""
+	@echo "New state:"
+	@kubectl get deployment/$(SERVICE_NAME) -n $(NAMESPACE)
+	@echo ""
+	@echo "Recent events:"
+	@kubectl get events -n $(NAMESPACE) --sort-by='.lastTimestamp' | tail -20
+	@echo ""
+	@echo "Rollback complete. Capture logs with: make incident-snapshot"
+```
+
+## CI/CD-Specific Debugging
+
+### Reproducing CI Failures Locally
+
+```makefile
+# Run in CI-like environment
+ci-shell: ## Start shell in CI environment
+	docker run -it --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		-e CI=true \
+		-e ENVIRONMENT=ci \
+		--entrypoint /bin/bash \
+		$(CI_IMAGE)
+
+ci-test: ## Run tests exactly as CI does
+	docker run --rm \
+		-v $(PWD):/workspace \
+		-w /workspace \
+		-e CI=true \
+		$(CI_IMAGE) \
+		make test
+```
+
+### Debugging CI-Only Failures
+
+```makefile
+# Add CI debugging mode
+ifdef CI
+  # In CI: verbose output
+  Q :=
+  QUIET :=
+  DEBUG := 1
+else
+  # Locally: clean output
+  Q := @
+  QUIET := --quiet
+  DEBUG := 0
+endif
+
 deploy:
-	kubectl apply -f $(MANIFEST_DIR)  # Fails if path has spaces
-
-# Right: Proper quoting
-deploy:
-	kubectl apply -f "$(MANIFEST_DIR)"
+	$(Q)echo "Deploying $(IMAGE_NAME)..."
+ifeq ($(DEBUG),1)
+	$(Q)echo "Environment: $(ENVIRONMENT)"
+	$(Q)echo "Namespace: $(NAMESPACE)"
+	$(Q)echo "Image: $(IMAGE_NAME)"
+	$(Q)kubectl version
+	$(Q)kubectl config current-context
+endif
+	$(Q)kubectl apply -f k8s/
 ```
 
-## Testing Makefiles
+## Memory and Resource Debugging
 
-Yes, you can test Makefiles:
+Large builds can exhaust system resources:
 
 ```makefile
-# Self-test target
-test-makefile: ## Test Makefile functionality
-	@echo "Testing Makefile..."
-	@$(MAKE) _test-variables
-	@$(MAKE) _test-required-commands
-	@$(MAKE) _test-target-dependencies
-	@echo "All tests passed"
+# Monitor resource usage
+monitor-build: ## Build with resource monitoring
+	@(while true; do \
+		echo "$$(date): CPU: $$(top -bn1 | grep "Cpu(s)" | awk '{print $$2}')% \
+		MEM: $$(free -m | awk 'NR==2{printf "%.0f%%", $$3*100/$$2}')"; \
+		sleep 5; \
+	done) & \
+	monitor_pid=$$!; \
+	$(MAKE) docker-build; \
+	kill $$monitor_pid 2>/dev/null
 
-_test-variables:
-	@test -n "$(SERVICE_NAME)" || \
-		(echo "SERVICE_NAME not set" && exit 1)
-	@test -n "$(VERSION)" || \
-		(echo "VERSION not set" && exit 1)
-
-_test-required-commands:
-	@command -v docker >/dev/null || \
-		(echo "docker not found" && exit 1)
-	@command -v kubectl >/dev/null || \
-		(echo "kubectl not found" && exit 1)
-
-_test-target-dependencies:
-	@# Verify critical targets exist
-	@make -n deploy >/dev/null || \
-		(echo "deploy target broken" && exit 1)
-	@make -n test >/dev/null || \
-		(echo "test target broken" && exit 1)
+# Limit Docker build resources
+docker-build:
+	docker build \
+		--memory=4g \
+		--cpu-quota=200000 \
+		-t $(IMAGE_NAME) .
 ```
 
-## Helping Others Debug
+## Testing Your Debugging Tools
 
-When helping teammates with Make issues:
-
-### 1. Collect Information
+Yes, test your debugging infrastructure:
 
 ```makefile
-support-bundle: ## Generate support bundle for debugging
+test-debugging: ## Test debugging tools work
+	@echo "Testing debug infrastructure..."
+	@$(MAKE) debug > /dev/null || \
+		(echo "FAIL: debug target broken" && exit 1)
+	@$(MAKE) -n deploy > /dev/null || \
+		(echo "FAIL: deploy dry-run broken" && exit 1)
+	@$(MAKE) incident-snapshot > /dev/null || \
+		(echo "FAIL: incident-snapshot broken" && exit 1)
+	@echo "All debugging tools functional"
+```
+
+## Building a Support Bundle
+
+Help others help you:
+
+```makefile
+support-bundle: ## Generate complete debugging bundle
 	@echo "Generating support bundle..."
 	@mkdir -p support-bundle
-	@echo "Make version:" > support-bundle/info.txt
-	@make --version >> support-bundle/info.txt
-	@echo "" >> support-bundle/info.txt
-	@echo "Variables:" >> support-bundle/info.txt
-	@$(MAKE) debug >> support-bundle/info.txt
-	@make -p > support-bundle/database.txt
+	@echo "=== Make Information ===" > support-bundle/make-info.txt
+	@make --version >> support-bundle/make-info.txt
+	@echo "" >> support-bundle/make-info.txt
+	@echo "=== Variables ===" >> support-bundle/make-info.txt
+	@$(MAKE) debug >> support-bundle/make-info.txt 2>&1
+	@echo "" >> support-bundle/make-info.txt
+	@echo "=== Dependency Graph ===" >> support-bundle/make-info.txt
+	@$(MAKE) -nd deploy 2>&1 | head -100 >> support-bundle/make-info.txt
+	@echo "" >> support-bundle/make-info.txt
+	@echo "=== Environment ===" > support-bundle/environment.txt
+	@env | sort >> support-bundle/environment.txt
+	@echo "=== Git State ===" > support-bundle/git-state.txt
+	@git status >> support-bundle/git-state.txt
+	@git log -5 --oneline >> support-bundle/git-state.txt
+	@echo "=== System Info ===" > support-bundle/system.txt
+	@uname -a >> support-bundle/system.txt
+	@docker version >> support-bundle/system.txt 2>&1 || true
+	@kubectl version --client >> support-bundle/system.txt 2>&1 || true
 	@cp Makefile support-bundle/
-	@tar czf support-bundle.tar.gz support-bundle/
-	@echo "Created support-bundle.tar.gz"
-```
-
-### 2. Provide Diagnostic Targets
-
-```makefile
-doctor: ## Run diagnostic checks
-	@echo "Running diagnostics..."
-	@echo ""
-	@$(MAKE) _check-make-version
-	@$(MAKE) _check-required-tools
-	@$(MAKE) _check-configuration
-	@$(MAKE) _check-connectivity
-	@echo ""
-	@echo "All checks passed"
-
-_check-make-version:
-	@version=$$(make --version | head -1 | grep -o '[0-9.]\+'); \
-	required="4.0"; \
-	if [ "$$(printf '%s\n' "$$required" "$$version" | \
-		sort -V | head -n1)" != "$$required" ]; then \
-		echo "Make version too old ($$version < $$required)"; \
-		exit 1; \
-	else \
-		echo "Make version: $$version"; \
-	fi
+	@tar czf support-bundle-$$(date +%Y%m%d-%H%M%S).tar.gz support-bundle/
+	@rm -rf support-bundle/
+	@echo "Created support-bundle-*.tar.gz"
 ```
 
 ## Key Takeaways
 
-Effective Make debugging requires understanding:
+Advanced Make debugging requires:
 
-1. **Make's execution model**: Parsing, dependency resolution, execution
-2. **Debug flags**: `-n`, `--debug`, `-p` for different insights
-3. **Common pitfalls**: Variable expansion, shell behavior, dependencies
-4. **Preventive design**: Build debuggability into Makefiles from the start
-5. **Testing**: Validate Makefiles like any other code
+1. **Understanding the three execution phases**: parsing, dependency resolution,
+   execution
+2. **Specialized techniques for complex scenarios**: recursive make, parallel
+   execution, timestamp issues
+3. **Production-ready debugging tools**: incident snapshots, emergency
+   rollbacks, support bundles
+4. **Performance profiling**: identifying bottlenecks in large workflows
+5. **CI/CD awareness**: reproducing failures and debugging in automated
+   environments
 
-Most importantly, remember that debugging Make workflows is a skill that improves with practice. The patterns in this chapter—verbose modes, debug targets, validation steps, helpful error messages—make Makefiles that are easier to understand, easier to fix, and easier for others to learn from.
+The most important skill is knowing *which layer* contains your problem. Is it
+dependency ordering? Variable expansion? Shell behavior? Resource constraints?
+Once you identify the layer, the appropriate debugging technique becomes clear.
 
-When your Makefile becomes a tool that not only executes workflows but also teaches how to diagnose and fix issues, you've created something that scales far beyond your own expertise.
+Build debugging capabilities into your Makefiles from the start. The `debug`,
+`profile`, `incident-snapshot`, and `support-bundle` targets aren't
+overhead—they're essential infrastructure that pays for itself the first time
+something goes wrong at 2 AM.
+
+When your Makefile can diagnose its own problems and guide users toward
+solutions, you've created something that scales far beyond your own expertise.

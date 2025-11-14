@@ -1,0 +1,39 @@
+---
+config:
+  look: handDrawn
+  theme: neutral
+---
+graph TD
+    Start([make deploy-staging]) --> Parse[Phase 1: Parsing]
+
+    Parse --> ParseOps[Read Makefile<br/>Expand variables<br/>Evaluate conditionals<br/>Build dependency graph]
+
+    ParseOps --> ParseCheck{Parse<br/>Successful?}
+    ParseCheck -->|No| ParseError[✗ Parsing Errors<br/>• Syntax errors<br/>• Undefined variables<br/>• Include failures<br/>• Malformed rules]
+
+    ParseCheck -->|Yes| Resolve[Phase 2: Dependency Resolution]
+
+    Resolve --> ResolveOps[Check file timestamps<br/>Identify phony targets<br/>Determine execution order<br/>Build target list]
+
+    ResolveOps --> ResolveCheck{Dependencies<br/>Valid?}
+    ResolveCheck -->|No| ResolveError[✗ Dependency Errors<br/>• Wrong execution order<br/>• Missing prerequisites<br/>• Circular dependencies<br/>• Phony target issues]
+
+    ResolveCheck -->|Yes| Execute[Phase 3: Execution]
+
+    Execute --> ExecOps[Run shell commands<br/>Execute recipes<br/>Update timestamps<br/>Check exit codes]
+
+    ExecOps --> ExecCheck{Execution<br/>Successful?}
+    ExecCheck -->|No| ExecError[✗ Execution Errors<br/>• Command failures<br/>• Environment issues<br/>• Resource problems<br/>• Permission errors]
+
+    ExecCheck -->|Yes| Success([✓ Target Complete])
+
+    ParseError --> End([Build Failed])
+    ResolveError --> End
+    ExecError --> End
+
+    classDef whiteBox fill:#ffffff,stroke:#000000
+
+    class Parse,ParseOps,Resolve,ResolveOps,Execute,ExecOps whiteBox
+    class ParseCheck,ResolveCheck,ExecCheck whiteBox
+    class ParseError,ResolveError,ExecError whiteBox
+    class Start,Success,End whiteBox

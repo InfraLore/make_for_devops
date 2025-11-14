@@ -72,9 +72,9 @@
         "make validate && echo '✅ Content valid' || (echo '❌ Content invalid' && exit 1)",
         "echo '⚡ Quick test passed!'"
       ],
-      "pdf": ["make clean", "make pdf"],
-      "final": ["make clean", "make final"],
-      "publish": ["make clean", "make publish"],
+      "pdf": ["make clean && make pdf"],
+      "final": ["make clean && make final"],
+      "publish": ["make clean && make publish"],
       "make": ["make $@"]
     }
   }
