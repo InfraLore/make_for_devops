@@ -45,7 +45,8 @@ software development.
 The key insight: **Make targets designed for pipelines must be both correct and
 fast**.
 
-![Layered Validation Workflow](images/chapter12.png)
+
+![Layered Validation Workflow](images/chapter12.png){height=70%}
 
 \pagebreak
 
@@ -87,9 +88,7 @@ This pattern provides crucial benefits:
 - **Cost Optimization**: Expensive checks run only when necessary
 - **Clear Expectations**: Each layer has defined time limits and purposes
 
-When ci-quick fails, developers immediately know they've hit a basic issue. When
-`ci-merge` fails on security-deep, they understand this requires attention before
-merge.
+\pagebreak
 
 ## Optimization Strategy 2: Intelligent Parallelization
 

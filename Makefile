@@ -141,6 +141,15 @@ clean: ## Remove build directory and all generated files
 	else \
 		echo "$(BUILD) directory already clean."; \
 	fi
+	# TODO also remove the published PDF file
+	# if "$(PUBLISH_PATH)/$(OUTPUT_FILENAME).pdf" exists, delete it
+	@if [ -f "$(PUBLISH_PATH)/$(OUTPUT_FILENAME).pdf" ]; then \
+		echo "Removing published PDF file..."; \
+		rm "$(PUBLISH_PATH)/$(OUTPUT_FILENAME).pdf"; \
+	else \
+		echo "Published PDF file not found."; \
+	fi
+
 
 ####################################################################################################
 # Utilities
