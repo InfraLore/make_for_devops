@@ -134,6 +134,8 @@ k8s-contexts: ## List available contexts
 
 These are the basics you use daily. Simple names, clear purposes.
 
+\pagebreak
+
 ### Growing with Experience: Debugging Commands
 
 As you debug production issues, you learn more complex commands:
@@ -254,6 +256,7 @@ aws-cost-by-service: ## Show costs by service this month
 		--granularity MONTHLY --metrics BlendedCost \
 		--group-by Type=DIMENSION,Key=SERVICE | \
 		jq -r '.ResultsByTime[].Groups[] | "\(.Keys[0]): $\(.Metrics.BlendedCost.Amount)"'
+
 
 aws-list-unencrypted-volumes: ## Find unencrypted EBS volumes
 	aws ec2 describe-volumes --filters Name=encrypted,Values=false \
@@ -465,6 +468,8 @@ require asking senior engineers now have solutions in your Makefile.
 You've built your own DevOps reference manual, customized to the tools you use,
 the problems you face, and the way you think.
 
+\pagebreak
+
 ## Practical Patterns
 
 ### Start Every Project with a Makefile
@@ -499,6 +504,7 @@ dev: ## Start development server
 	python -m http.server 8000
 ```
 
+\pagebreak
 **Day 3**: You learn how to run tests:
 ```makefile
 test: ## Run test suite
@@ -535,21 +541,22 @@ because it's right there in the repository root.
 Make it a habit: `git init`, then `touch Makefile`. Your future self (and your
 teammates) will thank you.
 
-\begin{calloutbox}{Automate Makefile creation}
+\begin{calloutbox}[Automate Makefile creation]
 Keep a Makefile template handy to speed this up. Add a shell function to your \texttt{.bashrc} or \texttt{.zshrc}:
-\begin{lstlisting}[language=bash]
+
+\begin{verbatim}
 make-init() {
 cat > Makefile << 'EOF'
 .DEFAULT_GOAL := help
 help: ## Show available commands
-@grep -E '^[a-zA-Z_-]+:.?## .$$' $(MAKEFILE_LIST) | 
-awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 EOF
 echo "Created Makefile with help target"
 }
-\end{lstlisting}
-Now \texttt{make-init} gives you a working starting point in any new project. Or keep a \texttt{\textasciitilde/templates/Makefile.template} you can copy. The goal is to reduce friction---make creating a Makefile as automatic as running \texttt{git init}.
-\end{callout}
+\end{verbatim}
+
+Now \texttt{make-init} gives you a working starting point in any new project. Or keep a \texttt{\textasciitilde/templates/Makefile.template} you can copy. The goal is to reduce friction---make creating a Makefile as automatic as running \texttt{git init}.\end{calloutbox}
 
 ### A Personal Learning Repository
 
