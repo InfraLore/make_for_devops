@@ -77,7 +77,7 @@ knowledge lives where you need it, in executable form.
 
 **The Turning Point**: Maybe it's the third time this week you've searched your
 Slack history for that AWS command. Maybe it's realizing you have five different
-note files with overlapping but inconsistent information. Maybe it's watching a
+note files with overlapping but inconsistent information. Maybe it's having a
 new teammate ask you how to do something and realizing you can't quickly point
 them to an answer. There's a moment when scattered knowledge becomes obviously
 unsustainable. That's when you need a system.
