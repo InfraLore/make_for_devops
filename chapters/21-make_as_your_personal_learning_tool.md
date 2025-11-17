@@ -15,7 +15,7 @@ you need it again—but you've forgotten it.
 
 You're working with Docker. Was it `docker system prune` or `docker prune
 system`? Does `-a` remove all images or just unused ones? You found the answer
-last month, but now you're Googling again.
+last month, but now you're searching again.
 
 You're using the AWS CLI. That command to list all S3 buckets with their
 sizes—you know you've written it before. It had some `jq` magic to format the
@@ -29,27 +29,58 @@ base—executable, searchable, and always current.
 
 ## The One-Liner Problem
 
+There's something demoralizing about searching for the same command for the
+fifth time. You start to wonder: am I actually learning anything? Why can't I
+retain this? The answer isn't that you're bad at learning—it's that human memory
+wasn't designed to remember exact command syntax. We're good at concepts,
+patterns, relationships. We're terrible at arbitrary flags and parameter orders.
+The constant searching isn't a personal failing—it's a tool problem.
+
 Modern DevOps involves dozens of specialized tools, each with hundreds of
 commands, each command with dozens of flags. The learning curve isn't a
 curve—it's a cliff.
 
 Consider what you need to know:
 
-**Kubernetes**: `kubectl` has over 50 subcommands. Getting logs from a crashed pod requires knowing about `--previous`. Debugging network issues means understanding `kubectl exec`, port-forwarding, and pod DNS resolution. You learn these through painful experience, one incident at a time.
+**Kubernetes**: `kubectl` has over 50 subcommands. Getting logs from a crashed
+pod requires knowing about `--previous`. Debugging network issues means
+understanding `kubectl exec`, port-forwarding, and pod DNS resolution. You learn
+these through painful experience, one incident at a time.
 
-**Docker**: Building images, managing containers, cleaning up volumes, inspecting networks, debugging networking, security scanning. Each operation has its own syntax, its own flags, its own gotchas.
+**Docker**: Building images, managing containers, cleaning up volumes,
+inspecting networks, debugging networking, security scanning. Each operation has
+its own syntax, its own flags, its own gotchas.
 
-**Git**: Beyond basic commits, there's rebasing, cherry-picking, bisecting, reflog archaeology, submodule management. The commands you need once a month but can never quite remember.
+**Git**: Beyond basic commits, there's rebasing, cherry-picking, bisecting,
+reflog archaeology, submodule management. The commands you need once a month but
+can never quite remember.
 
-**Cloud CLIs**: AWS CLI has thousands of commands. Each one returns JSON you need to parse with `jq`. The command to find unused security groups involves three AWS API calls and complex filtering.
+**Cloud CLIs**: AWS CLI has thousands of commands. Each one returns JSON you
+need to parse with `jq`. The command to find unused security groups involves
+three AWS API calls and complex filtering.
 
-**Infrastructure as Code**: Terraform commands, Ansible playbooks, Helm charts. Each tool has its own way of doing things, its own debugging approach, its own "why isn't this working?" investigation pattern.
+**Infrastructure as Code**: Terraform commands, Ansible playbooks, Helm charts.
+Each tool has its own way of doing things, its own debugging approach, its own
+"why isn't this working?" investigation pattern.
 
-You learn these tools gradually. You encounter a problem, search Stack Overflow, find a solution, solve the problem. Two weeks later, you encounter the same problem and can't remember the solution. The cycle repeats.
+You learn these tools gradually. You encounter a problem, search Stack Overflow,
+find a solution, solve the problem. Two weeks later, you encounter the same
+problem and can't remember the solution. The cycle repeats.
 
-**The traditional approach**: Keep notes. Maybe a personal wiki. Or a notes app. Or bookmarked Stack Overflow answers. Or saved Slack messages. Or comments in your terminal history. The knowledge is scattered, inconsistent, and divorced from the actual work.
+**The traditional approach**: Keep notes. Maybe a personal wiki. Or a notes app.
+Or bookmarked Stack Overflow answers. Or saved Slack messages. Or comments in
+your terminal history. The knowledge is scattered, inconsistent, and divorced
+from the actual work.
 
-**The Make approach**: When you learn something, add it to your Makefile. The knowledge lives where you need it, in executable form.
+**The Make approach**: When you learn something, add it to your Makefile. The
+knowledge lives where you need it, in executable form.
+
+**The Turning Point**: Maybe it's the third time this week you've searched your
+Slack history for that AWS command. Maybe it's realizing you have five different
+note files with overlapping but inconsistent information. Maybe it's watching a
+new teammate ask you how to do something and realizing you can't quickly point
+them to an answer. There's a moment when scattered knowledge becomes obviously
+unsustainable. That's when you need a system.
 
 ## Your Personal Runbook
 
@@ -422,7 +453,7 @@ your accumulated expertise generates personalized, relevant help.
 
 The real power emerges over time. Each command you capture:
 
-- Saves you 2-5 minutes of Googling next time
+- Saves you 2-5 minutes of searching next time
 - Makes that knowledge available to teammates
 - Builds toward a comprehensive personal reference
 - Compounds with every addition
@@ -436,82 +467,132 @@ the problems you face, and the way you think.
 
 ## Practical Patterns
 
-### The Personal `.make` Directory
+### Start Every Project with a Makefile
 
-Keep your personal commands in a dedicated file:
+Here's a practice worth adopting: **right after `git init`, create a Makefile**.
 
 ```bash
-# ~/.make/personal.mk
-# Your personal command collection
+mkdir new-project
+cd new-project
+git init
+touch Makefile
+```
 
-k8s-contexts:
+Even if you don't know what commands you'll need yet, create the file. Start
+with just a help target:
+
+```makefile
+.DEFAULT_GOAL := help
+
+help: ## Show available commands
+	@echo "Project: new-project"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+```
+
+Now as you work on the project, every command you discover gets captured immediately:
+
+**Day 1**: You figure out how to run the development server:
+```makefile
+dev: ## Start development server
+	python -m http.server 8000
+```
+
+**Day 3**: You learn how to run tests:
+```makefile
+test: ## Run test suite
+	pytest tests/
+```
+
+**Week 2**: You discover the right Docker build command after trial and error:
+```makefile
+build: ## Build Docker image
+	docker build -t new-project:latest .
+```
+
+**Month 1**: You've accumulated a comprehensive project runbook:
+```makefile
+help: ## Show available commands
+dev: ## Start development server
+test: ## Run test suite
+lint: ## Check code style
+build: ## Build Docker image
+deploy-staging: ## Deploy to staging
+logs: ## Tail production logs
+db-migrate: ## Run database migrations
+```
+
+The Makefile grows naturally as the project grows. Every "how do I...?" question
+gets answered once, captured, and becomes permanently available.
+
+**Why this matters**: Projects accumulate complexity. Commands that were obvious
+in week one become forgotten by month three. New team members join and need to
+learn the workflows. The Makefile you start on day one becomes the project's
+living documentation—always current because it's executable, always discoverable
+because it's right there in the repository root.
+
+Make it a habit: `git init`, then `touch Makefile`. Your future self (and your
+teammates) will thank you.
+
+\begin{calloutbox}{Automate Makefile creation}
+Keep a Makefile template handy to speed this up. Add a shell function to your \texttt{.bashrc} or \texttt{.zshrc}:
+\begin{lstlisting}[language=bash]
+make-init() {
+cat > Makefile << 'EOF'
+.DEFAULT_GOAL := help
+help: ## Show available commands
+@grep -E '^[a-zA-Z_-]+:.?## .$$' $(MAKEFILE_LIST) | 
+awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
+EOF
+echo "Created Makefile with help target"
+}
+\end{lstlisting}
+Now \texttt{make-init} gives you a working starting point in any new project. Or keep a \texttt{\textasciitilde/templates/Makefile.template} you can copy. The goal is to reduce friction---make creating a Makefile as automatic as running \texttt{git init}.
+\end{callout}
+
+### A Personal Learning Repository
+
+For commands that span multiple projects—general Kubernetes debugging, Docker
+cleanup, Git operations—consider creating a dedicated learning repository:
+
+```bash
+mkdir ~/devops-runbook
+cd ~/devops-runbook
+git init
+touch Makefile
+```
+
+This becomes your personal command reference:
+
+```makefile
+.DEFAULT_GOAL := help
+
+help: ## Show available commands
+	@echo "Personal DevOps Runbook"
+	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$' $(MAKEFILE_LIST) | \
+		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $1, $2}'
+
+k8s-contexts: ## List Kubernetes contexts
 	kubectl config get-contexts
 
-docker-clean:
+docker-clean: ## Clean up Docker system
 	docker system prune -af
+
+git-undo-commit: ## Undo last commit, keep changes
+	git reset --soft HEAD~1
 ```
 
-Then add a shell alias to make it easy to use:
+When you learn a useful command while working on any project, add it to your
+runbook. Over time, you build a comprehensive personal reference that you can:
 
-```bash
-# In your ~/.bashrc or ~/.zshrc
-alias pmake='make -f ~/.make/personal.mk'
-```
+- Reference anytime: `cd ~/devops-runbook && make k8s-contexts`
+- Share with others: push it to GitHub
+- Evolve continuously: it grows with your knowledge
 
-Now from anywhere: `pmake k8s-contexts`, `pmake docker-clean`.
-
-Your personal commands are always available, separate from project-specific
-Makefiles. As you learn new commands, add them to `~/.make/personal.mk`. Over
-time, you build a comprehensive personal runbook that follows you across all
-your projects.
-
-However, you should consider moving your learning into a dedicated project
-space—this gives you significant advantages: you train your muscle memory to
-remember to type `make` instead of `pmake`, and you have a project you can share
-directly with others using GitHub or some other code sharing platform. Create a
-repository like devops-runbook with just a Makefile, and work there instead of
-~/.make/personal.mk.
-
-**For project-specific learning**: You can also include your personal commands
-in project Makefiles:
-
-```makefile
-# Project Makefile
--include ~/.make/personal.mk
-
-dev:
-	docker-compose up
-```
-
-Now `make k8s-contexts` works in the project directory alongside
-project-specific targets.
-
-**For team learning**: Consider creating a team runbook alongside your personal
-one:
-
-```makefile
-# In the project repository: .make/team-runbook.mk
-# Useful commands anyone on the team might need
-
-k8s-production-pods: ## List production pods
-	kubectl --context production get pods -n $(APP_NAME)
-
-debug-production-logs: ## Get recent production logs
-	kubectl --context production logs \
-		-n $(APP_NAME) -l app=$(APP_NAME) --tail=100
-```
-
-Include it in the project Makefile:
-
-```makefile
--include .make/team-runbook.mk
-```
-
-The team runbook captures commands that are useful across the team but don't
-belong in the main workflow. It's a place to document "how do I check production
-logs?" or "how do I debug this service?" without cluttering the primary
-Makefile. Team members add commands as they learn them, building shared
-knowledge over time.
+This keeps project Makefiles focused on project-specific workflows while giving
+you a place to capture general DevOps knowledge.
 
 ### Command Templates
 
@@ -541,6 +622,105 @@ k8s-debug-dns: ## Debug DNS resolution in pod
 ```
 
 Future you will appreciate the context.
+
+### Developing the Capture Habit
+
+Capturing commands sounds simple, but there's an art to it. Here are the
+micro-practices that make it work:
+
+**Capture immediately**: When you finally get a command working—especially after
+trial and error—add it to your Makefile right then. Not "I'll add it later." Not
+"let me just finish this task first." Immediately. The context is fresh, you
+remember why you needed it, and you won't lose the solution.
+
+**Capture the working version**, not the first attempt: Don't add the command
+that almost worked. Add the one that actually solved the problem. If you spent
+20 minutes trying different flag combinations, the Makefile gets the final,
+working version. Kinda/sorta works is OK though... as long as you're close, and
+don't want to lose your progress. (See below, "Start broad, refine later" for
+more on this.)
+
+**Add context in comments**: Future you won't remember why this command matters.
+Add a comment:
+
+```makefile
+k8s-fix-pending-pod: ## Force delete stuck pod
+	# Use when pod stuck in Terminating state
+	# Learned during incident 2024-03-15
+	@echo "Pod name:"
+	@read pod; \
+	kubectl delete pod $$pod --force --grace-period=0
+```
+
+**Name targets for the problem, not the solution**: Don't call it
+`kubectl-force-delete`. Call it `k8s-fix-pending-pod`. The name should describe
+_when you'd use it_, not _what it does_.
+
+**Start broad, refine later**: Your first capture might be rough:
+
+```makefile
+aws-thing: ## Something with S3
+	aws s3 ls | grep prod
+```
+
+That's fine. Come back later and improve it:
+
+```makefile
+aws-list-prod-buckets: ## List production S3 buckets
+	@aws s3 ls | grep prod | awk '{print $3}'
+```
+
+Don't let perfectionism prevent capturing. Rough notes are better than no notes.
+
+**Group related commands**: As your Makefile grows, use prefixes consistently:
+
+- ` k8s-*` for Kubernetes
+- `docker-*` for Docker
+- `git-*` for Git
+- `aws-*` for AWS
+
+This makes commands discoverable via tab completion and keeps related operations
+together.
+
+**Refactor when it gets messy**: After 3 months, you might have 50 targets. Some
+will be obsolete. Some will have better versions you learned later. Some will
+have confusing names. That's normal. Schedule periodic cleanup:
+
+```
+review-makefile: ## Review targets for cleanup
+	@echo "Targets to review:"
+	@echo "- Anything you haven't used in 3 months?"
+	@echo "- Duplicate or redundant targets?"
+	@echo "- Better names for confusing targets?"
+	@echo "- Missing documentation?"
+```
+
+**Know when to graduate to a script**: If a target becomes more than 10 lines,
+consider moving it to a script:
+
+```makefile
+# Before: Too complex for a Makefile
+k8s-full-diagnostic:
+	@kubectl get pods -A
+	@kubectl get nodes
+	@kubectl top pods
+	# ... 15 more lines ...
+
+# After: Delegate to script
+k8s-full-diagnostic: ## Run complete cluster diagnostic
+	@./scripts/k8s-diagnostic.sh
+```
+
+The Makefile remains the discoverable interface, but complexity moves to proper
+scripts.
+
+**Trust the process**: In the first week, adding commands to your Makefile feels
+like extra work. In the second week, you start using commands you captured last
+week. By the third week, you're saving more time than you're spending. By month
+three, you can't imagine working without it.
+
+The habit feels unnatural at first. That's normal. Stick with it for a month.
+The compounding returns will convince you.
 
 ## The Meta-Benefit
 
