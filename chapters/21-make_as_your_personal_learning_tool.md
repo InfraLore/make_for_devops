@@ -541,22 +541,24 @@ because it's right there in the repository root.
 Make it a habit: `git init`, then `touch Makefile`. Your future self (and your
 teammates) will thank you.
 
-\begin{calloutbox}[Automate Makefile creation]
-Keep a Makefile template handy to speed this up. Add a shell function to your \texttt{.bashrc} or \texttt{.zshrc}:
-
-\begin{verbatim}
+\pagebreak
+**Automate Makefile creation**: Keep a Makefile template handy to speed this up. 
+Add a shell function to your `.bashrc`:
+```bash
 make-init() {
-cat > Makefile << 'EOF'
+  cat > Makefile << 'EOF'
 .DEFAULT_GOAL := help
 help: ## Show available commands
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 EOF
-echo "Created Makefile with help target"
+# important: closing EOF must be flush left with no spaces or tabs before it
+  echo "Created Makefile with help target"
 }
-\end{verbatim}
-
-Now \texttt{make-init} gives you a working starting point in any new project. Or keep a \texttt{\textasciitilde/templates/Makefile.template} you can copy. The goal is to reduce friction---make creating a Makefile as automatic as running \texttt{git init}.\end{calloutbox}
+```
+Now `make-init` gives you a working starting point in any new project. Or keep a
+`~/templates/Makefile.template` you can copy. The goal is to reduce
+friction—make creating a Makefile as automatic as running `git init`.
 
 ### A Personal Learning Repository
 
@@ -569,6 +571,17 @@ cd ~/devops-runbook
 git init
 touch Makefile
 ```
+\pagebreak
+Or, if you followed the template suggestion and have the `make-init` function 
+described above, do this:
+
+```bash
+mkdir ~/devops-runbook
+cd ~/devops-runbook
+git init
+make-init
+```
+
 
 This becomes your personal command reference:
 
@@ -640,12 +653,12 @@ trial and error—add it to your Makefile right then. Not "I'll add it later." N
 "let me just finish this task first." Immediately. The context is fresh, you
 remember why you needed it, and you won't lose the solution.
 
-**Capture the working version**, not the first attempt: Don't add the command
-that almost worked. Add the one that actually solved the problem. If you spent
-20 minutes trying different flag combinations, the Makefile gets the final,
-working version. Kinda/sorta works is OK though... as long as you're close, and
-don't want to lose your progress. (See below, "Start broad, refine later" for
-more on this.)
+**Capture working code**, not the very first attempt: Add code that
+either solved the problem, or at least got you _closer_ to solving the problem.
+If you spent 20 minutes trying different flag combinations, the Makefile gets
+the code that works. Kinda/sorta works is OK though... as long as you're
+close, and don't want to lose your progress. (See below, "Start broad, refine
+later" for more on this.)
 
 **Add context in comments**: Future you won't remember why this command matters.
 Add a comment:
