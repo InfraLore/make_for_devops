@@ -1,10 +1,8 @@
 ---
 title: "Make Cheat Sheet"
-numbersections: false
-geometry: "margin=0.4in, top=0.5in, bottom=0.4in"
-fontsize: 6pt
 mainfont: Merriweather 24pt
 monofont: JetBrainsMono Nerd Font Mono
+headingfont: Lato-Regular
 ---
 
 # Basics
