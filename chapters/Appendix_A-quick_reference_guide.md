@@ -18,6 +18,8 @@ target: prerequisites
 - Each command runs in its own shell unless you use line continuation
 - Prerequisites are separated by spaces
 
+\pagebreak
+
 ### Phony Targets
 
 ```makefile
@@ -79,6 +81,8 @@ deploy:
 build: file1.txt file2.txt
 	cat $^ > $@
 ```
+
+\pagebreak
 
 ### Functions
 
@@ -159,6 +163,7 @@ test: ## Run all tests
 deploy: ## Deploy to staging
 	./scripts/deploy.sh staging
 ```
+\pagebreak
 
 ### Categorized Help with ##@ Section Headers
 
@@ -225,6 +230,8 @@ help: ## Show help with colors
 			printf "  $(GREEN)%-15s$(RESET) %s\n", $$1, $$2 \
 		}' $(MAKEFILE_LIST)
 ```
+
+\pagebreak
 
 ### Interactive Help
 
@@ -296,6 +303,8 @@ dangerous-operation:
 	@echo "Proceeding with deletion..."
 ```
 
+\pagebreak
+
 ### Multi-line Commands
 
 ```makefile
@@ -320,6 +329,8 @@ quiet-command:
 	@echo "Done"
 ```
 
+\pagebreak
+
 ### Environment Detection
 
 ```makefile
@@ -342,6 +353,8 @@ endif
 # Detect if running in container
 IN_CONTAINER := $(shell test -f /.dockerenv && echo 1 || echo 0)
 ```
+
+\pagebreak
 
 ### Error Handling
 
@@ -417,6 +430,8 @@ deploy:
 	uglifyjs $< -o $@ --source-map $@.map
 ```
 
+\pagebreak
+
 ## Debugging Techniques
 
 ### Dry Run
@@ -475,6 +490,8 @@ make --debug=b target
 # Print database (all variables and rules)
 make -p
 ```
+
+\pagebreak
 
 ## Advanced Techniques
 
@@ -568,6 +585,7 @@ NAMESPACE ?= $(ENVIRONMENT)
 # Override via environment or command line
 # make deploy ENVIRONMENT=prod REPLICAS=10
 ```
+\pagebreak
 
 ## Command-Line Usage
 
@@ -641,6 +659,8 @@ target:
 	command
 ```
 
+\pagebreak
+
 **"No rule to make target"**
 
 ```makefile
@@ -671,6 +691,7 @@ deploy:
 	VERSION=1.2.3; \
 	echo $$VERSION
 ```
+\pagebreak
 
 **Target not running**
 
@@ -720,6 +741,7 @@ check:
 build: .make-cache/deps-installed
 	npm run build
 ```
+\pagebreak
 
 ### Avoiding Redundant Work
 
@@ -746,6 +768,7 @@ test-unit test-integration test-e2e:
 # But prevent parallelizing dangerous operations
 .NOTPARALLEL: deploy clean
 ```
+\pagebreak
 
 ## Best Practices Checklist
 
@@ -765,12 +788,14 @@ test-unit test-integration test-e2e:
 - Use `make -j` for parallelizable operations
 - Version control your Makefile
 
-## Quick Start Template
+\pagebreak
+
+## Quick Start Template (with categorized help)
 
 ```makefile
 # Project Makefile
 .DEFAULT_GOAL := help
-.PHONY: help setup test build clean
+.PHONY: help
 
 # Configuration
 PROJECT_NAME := myproject
@@ -784,36 +809,6 @@ help: ## Show this help
 	$$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n",
 	substr($$0, 5) } ' $(MAKEFILE_LIST)
 
-setup: ## Set up development environment
-	@echo "Setting up $(PROJECT_NAME)..."
-	# Add setup commands
-	@echo "Setup complete"
-
-dev: ## Start development environment
-	@echo "Starting development..."
-	# Add dev server command
-
-test: ## Run tests
-	@echo "Running tests..."
-	# Add test command
-
-##@ Build & Deploy
-
-build: ## Build project
-	@echo "Building $(PROJECT_NAME) $(VERSION)..."
-	# Add build command
-
-clean: ## Clean build artifacts
-	@echo "Cleaning..."
-	# Add clean command
-
-##@ Utilities
-
-lint: ## Run linting
-	# Add linting command
-
-format: ## Format code
-	# Add formatting command
 ```
 
 This reference guide covers the most common Make patterns and techniques used throughout the book. Keep it handy as you build and maintain your Makefiles!

@@ -399,6 +399,8 @@ html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html ## Generate HTML format
 
 pdf:	validate check-pdf-prereqs $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Generate PDF format
 
+cheat:	validate $(BUILD)/cheat-sheet.pdf ## Generate cheat sheet
+
 docx:	validate $(BUILD)/docx/$(OUTPUT_FILENAME).docx ## Generate DOCX format
 
 $(BUILD)/epub/$(OUTPUT_FILENAME).epub:	$(EPUB_DEPENDENCIES) $(TMP_METADATA)
@@ -425,3 +427,8 @@ $(BUILD)/docx/$(OUTPUT_FILENAME).docx:	$(DOCX_DEPENDENCIES)
 	$(MKDIR_CMD) $(BUILD)/docx
 	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(DOCX_ARGS) -o $@
 	$(ECHO_BUILT)
+
+$(BUILD)/cheat-sheet.pdf:	$(PDF_DEPENDENCIES)
+	$(ECHO_BUILDING)
+	$(MKDIR_CMD) $(BUILD)
+	pandoc --no-highlight parts/cheat-sheet.md -o build/cheat-sheet.pdf --template=templates/cheat-sheet.latex --pdf-engine=xelatex
