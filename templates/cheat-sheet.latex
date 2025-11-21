@@ -16,6 +16,9 @@
   \usepackage{unicode-math}
   \defaultfontfeatures{Scale=MatchLowercase}
   \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+$if(mainfont)$
+  \setmainfont[$for(mainfontoptions)$mainfontoptions$sep$,$endfor$]{$mainfont$}
+$endif$
 $if(monofont)$
   \setmonofont[$for(monofontoptions)$monofontoptions$sep$,$endfor$]{$monofont$}
 $endif$
@@ -124,6 +127,7 @@ $if(title)$
 $endif$
 
 \begin{multicols}{4}
+\scriptsize
 
 $body$
 
