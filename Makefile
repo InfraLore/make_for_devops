@@ -141,7 +141,7 @@ endef
 .PHONY: all book clean epub html pdf docx txt \
 	validate check-overflow check-long-lines \
 	sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs \
-	diagrams lint lint-markdown lint-markdown-strict lint-vale lint-vale-strict lint-fix \
+	diagrams lint lint-markdown lint-markdown-strict vale-suggest vale-error lint-fix \
 	stale-chapters
 
 all:	book ## Build all formats (epub, html, pdf, docx)
@@ -443,14 +443,14 @@ stale-chapters: ## Check for chapters without a BIG EDIT
 		done
 	@echo "--- Check Complete ---"
 
-vale-suggest:
+vale-suggest: ## Seek suggestions from Vale prose linting
 	@echo "🔍 Seeking Suggestions from Vale prose linting..."
 	@echo "Checking chapters directory..."
 	vale --minAlertLevel=suggestion ${CHAPTER_DIR} || true
 	@echo "🔍 Also asking Vale for suggestions for markdown files in root..."
 	vale --minAlertLevel=suggestion *.md || true
 
-vale-error:
+vale-error: ## Look for errors detected by Vale prose linting
 	@echo "🔍 Looking for errors detected Vale prose linting..."
 	@echo "Checking chapters directory..."
 	vale --minAlertLevel=error ${CHAPTER_DIR} || true
