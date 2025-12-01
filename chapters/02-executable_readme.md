@@ -9,7 +9,7 @@ out of date, impossibly vague, or completely missing. The instructions reference
 commands that no longer exist, environment variables that were renamed months
 ago, or dependencies that have evolved beyond recognition. After thirty minutes
 of archaeological detective work, you either give up or cobble together a
-working setup through trial and error.
+working setup by fumbling toward a solution.
 
 This scenario plays out thousands of times daily across engineering teams
 worldwide, and it represents a fundamental failure of traditional documentation
@@ -92,12 +92,12 @@ make deploy   # Deploy to staging
 Run `make help` to see all available commands.
 ````
 
-Notice what's happened here. The README is now incredibly simple—it doesn't try
-to document complex processes, it just points to executable commands. The
-Makefile contains the actual implementation of each workflow, with built-in
-validation, error handling, and helpful output. On the next page, I'll show you
-the Makefile to which this README refers. It's not a working Makefile, you'll
-have to read on for working examples.
+Notice what's happened here. The README is now straightforward and direct—it
+doesn't try to document complex processes, it just points to executable
+commands. The Makefile contains the actual implementation of each workflow, with
+built-in validation, error handling, and helpful output. On the next page, I'll
+show you the Makefile to which this README refers. It's not a working Makefile,
+you'll have to read on for working examples.
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -150,12 +150,12 @@ The key to successful Executable READMEs lies in designing Make targets that are
 like an API designer: your targets are the public interface to your project's
 capabilities.
 
-### The Principle of Obvious Intent
+### The Principle of Clear Intent
 
-Every target name should clearly communicate what it does:
+Every target name should tell you what it does:
 
 ```makefile
-# Good: Intent is immediately clear
+# Good: Intent is communicated effectively
 setup         # Set up the project
 test          # Run tests
 deploy        # Deploy the application
@@ -226,7 +226,7 @@ setup:
 ## The Anatomy of a Discoverable Makefile
 
 A well-designed Executable README Makefile follows a predictable structure that
-makes it easy for newcomers to understand and use (see next page):
+supports discovery and use (see next page):
 
 ```makefile
 #################### MyApp Development Workflow ###########################
@@ -332,7 +332,7 @@ deploy: ## Deploy to staging
 
 ### Interactive Help
 
-You can create help systems that go beyond simple command listing:
+You can create help systems that go beyond bare-bones command listing:
 
 ```makefile
 help-interactive: ##   Interactive help system
