@@ -27,6 +27,14 @@ TMP_METADATA = $(BUILD)/tmp-metadata.yml
 OVERFLOW_LIMIT ?= 87
 LONG_LINE_LIMIT ?= 95
 
+# Define the time threshold (e.g., files not edited in the last 180 days)
+STALE_DAYS ?= 60
+
+# Define the minimum total lines changed (additions + deletions) for a "big edit"
+MIN_LINES_CHANGED ?= 50
+
+# Define the directory where your chapter files live
+CHAPTER_DIR ?= chapters
 
 # Chapters content organized by parts
 PART_1 = parts/part-1.md chapters/01-why_make.md chapters/02-executable_readme.md chapters/03-make_fundamentals.md
@@ -381,6 +389,50 @@ lint-fix: ## Auto-fix markdown issues where possible
 
 lint: lint-markdown check-overflow check-long-lines ## Run all linting checks
 	@echo "✅ All linting completed"
+
+stale-chapters: ## Check for chapters without a BIG EDIT
+	@echo "--- 🕵️ Checking for chapters without a BIG EDIT (>$(MIN_LINES_CHANGED) lines changed) in the last $(STALE_DAYS) days ---"
+	@find $(CHAPTER_DIR) -type f \
+		-name "*.md" -o -name "*.tex" \
+		| while read chapter_file; do \
+			BIG_EDIT_FOUND="false"; \
+
+			# Get the most recent commit details (SHA and Subject) within the STALE_DAYS window
+			# Using --format="%H|%s" to get SHA and Subject separated by |
+			last_commit_info=$$(git log -1 --since="$(STALE_DAYS) days ago" --format="%H|%s" -- "$$chapter_file"); \
+
+			LAST_COMMIT_MSG="No recent commit found (over $(STALE_DAYS) days ago)"; \
+
+			if [ -n "$$last_commit_info" ]; then \
+				# Extract SHA and Message from the info
+				last_sha=$$(echo "$$last_commit_info" | cut -d '|' -f 1); \
+				LAST_COMMIT_MSG=$$(echo "$$last_commit_info" | cut -d '|' -f 2); \
+
+				# 1. Get all commit SHAs for the file in the last STALE_DAYS
+				commits=$$(git log --since="$(STALE_DAYS) days ago" --format="%H" -- "$$chapter_file"); \
+
+				# 2. Iterate through each recent commit and check its size
+				for commit_sha in $$commits; do \
+					# 3. Use 'git show' to get the diffstat for the specific commit and file
+					lines_changed=$$(git show --numstat --format=format: $$commit_sha -- "$$chapter_file" \
+						| awk '{ adds += $$1; dels += $$2 } END { print adds + dels }'); \
+
+					# 4. Check if the total lines changed meet the "big edit" threshold
+					if [ "$$lines_changed" -ge "$(MIN_LINES_CHANGED)" ]; then \
+						BIG_EDIT_FOUND="true"; \
+						break; \
+					fi; \
+				done; \
+			fi; \
+
+			# 5. Report chapters where NO big edit was found
+			if [ "$$BIG_EDIT_FOUND" = "false" ]; then \
+				echo "🍞🤮 $$chapter_file"; \
+				echo "   - Last Commit: $$LAST_COMMIT_MSG"; \
+				echo
+			fi; \
+		done
+	@echo "--- Check Complete ---"
 
 ####################################################################################################
 # File builders
