@@ -550,6 +550,54 @@
           "store_path": "/nix/store/cihfic5gy35r8s329xi0jraj7hvlwplj-xelatex-dev-62145"
         }
       }
+    },
+    "vale@latest": {
+      "last_modified": "2025-11-23T21:50:36Z",
+      "resolved": "github:NixOS/nixpkgs/ee09932cedcef15aaf476f9343d1dea2cb77e261#vale",
+      "source": "devbox-search",
+      "version": "3.13.0",
+      "systems": {
+        "aarch64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/95p8cbbg6fq4z5fd4anb05yq25mbpgra-vale-3.13.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/95p8cbbg6fq4z5fd4anb05yq25mbpgra-vale-3.13.0"
+        },
+        "aarch64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/1caza3h7w1fgb4sb2ahhplah92d8ab7c-vale-3.13.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/1caza3h7w1fgb4sb2ahhplah92d8ab7c-vale-3.13.0"
+        },
+        "x86_64-darwin": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/ra9714xbnl4dbh4bvr2x4nx4nq68q2sw-vale-3.13.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/ra9714xbnl4dbh4bvr2x4nx4nq68q2sw-vale-3.13.0"
+        },
+        "x86_64-linux": {
+          "outputs": [
+            {
+              "name": "out",
+              "path": "/nix/store/h9lzqxvg8dza0rcq9r9p2hv3ixri4cp9-vale-3.13.0",
+              "default": true
+            }
+          ],
+          "store_path": "/nix/store/h9lzqxvg8dza0rcq9r9p2hv3ixri4cp9-vale-3.13.0"
+        }
+      }
     }
   }
 }

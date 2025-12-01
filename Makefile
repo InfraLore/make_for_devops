@@ -89,6 +89,7 @@ DOCX_ARGS = --standalone --reference-doc templates/docx.docx
 EPUB_ARGS = --template templates/epub.html --epub-cover-image $(COVER_IMAGE)
 HTML_ARGS = --template templates/html.html --standalone --to html5
 PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex --no-highlight --quiet
+TXT_ARGS = --to plain --wrap=auto --preserve-tabs --standalone
 
 # Per-format file dependencies
 
@@ -97,6 +98,7 @@ DOCX_DEPENDENCIES = $(BASE_DEPENDENCIES)
 EPUB_DEPENDENCIES = $(BASE_DEPENDENCIES)
 HTML_DEPENDENCIES = $(BASE_DEPENDENCIES)
 PDF_DEPENDENCIES = $(BASE_DEPENDENCIES)
+TXT_DEPENDENCIES = $(BASE_DEPENDENCIES)
 
 # Detected Operating System
 
@@ -136,7 +138,11 @@ endef
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx validate check-overflow check-long-lines sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs diagrams lint lint-markdown lint-markdown-strict lint-fix
+.PHONY: all book clean epub html pdf docx txt \
+	validate check-overflow check-long-lines \
+	sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs \
+	diagrams lint lint-markdown lint-markdown-strict lint-vale lint-vale-strict lint-fix \
+	stale-chapters
 
 all:	book ## Build all formats (epub, html, pdf, docx)
 
@@ -248,7 +254,7 @@ blank_pages_report: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Generate a report of 
 
 diagrams: $(PNG_FILES) ## Generate PNG diagrams from all .mmd files
 
-# Pa		ern rule to convert .mmd files to .png files
+# Pattern rule to convert .mmd files to .png files
 images/%.png: images/%.mmd
 	@echo "Generating diagram: $@..."
 	@if command -v mmdc >/dev/null 2>&1; then \
@@ -322,22 +328,25 @@ stats: ## Show book statistics
 	echo "";
 
 help:  ## Show this help message
-	@echo "📖 Make for DevOps - Build System"
-	@echo "=================================="
+	@printf "\033[1m📖 Make for DevOps - Build System\033[0m\n"
+	@printf "\033[1m==================================\033[0m\n"
 	@echo ""
-	@echo "Available targets:"
+	@printf "\033[1mAvailable targets:\033[0m\n"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*##"; printf ""} /^[a-zA-Z_-]+:.*##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
 	@echo ""
-	@echo "Configuration:"
+	@printf "\033[1mConfiguration:\033[0m\n"
+	@echo ""
 	@echo "  OVERFLOW_LIMIT=$(OVERFLOW_LIMIT)     # Line length limit for code blocks"
 	@echo "  LONG_LINE_LIMIT=$(LONG_LINE_LIMIT)    # Very long line limit"
 	@echo
 	@echo "  PUBLISH_PATH=$(PUBLISH_PATH)"
 	@echo ""
 
+
+
 toc: ## Generate the Table of Contents from source files
-	@echo "## 5. Detailed Table of Contents"
+	@echo "## Detailed Table of Contents"
 	@# Process each part
 	@for part_num in 1 2 3 4 5; do \
 		part_file="parts/part-$$part_num.md"; \
@@ -434,6 +443,22 @@ stale-chapters: ## Check for chapters without a BIG EDIT
 		done
 	@echo "--- Check Complete ---"
 
+vale-suggest:
+	@echo "🔍 Seeking Suggestions from Vale prose linting..."
+	@echo "Checking chapters directory..."
+	vale --minAlertLevel=suggestion ${CHAPTER_DIR} || true
+	@echo "🔍 Also asking Vale for suggestions for markdown files in root..."
+	vale --minAlertLevel=suggestion *.md || true
+
+vale-error:
+	@echo "🔍 Looking for errors detected Vale prose linting..."
+	@echo "Checking chapters directory..."
+	vale --minAlertLevel=error ${CHAPTER_DIR} || true
+	@echo "🔍 Also asking Vale for errors in markdown files in root..."
+	vale --minAlertLevel=error *.md || true
+
+
+
 ####################################################################################################
 # File builders
 ####################################################################################################
@@ -454,6 +479,8 @@ pdf:	validate check-pdf-prereqs $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Generate 
 cheat:	validate $(BUILD)/cheat-sheet.pdf ## Generate cheat sheet
 
 docx:	validate $(BUILD)/docx/$(OUTPUT_FILENAME).docx ## Generate DOCX format
+
+txt:	validate $(BUILD)/txt/$(OUTPUT_FILENAME).txt ## Generate plain text format
 
 $(BUILD)/epub/$(OUTPUT_FILENAME).epub:	$(EPUB_DEPENDENCIES) $(TMP_METADATA)
 	$(ECHO_BUILDING)
@@ -478,6 +505,12 @@ $(BUILD)/docx/$(OUTPUT_FILENAME).docx:	$(DOCX_DEPENDENCIES)
 	$(ECHO_BUILDING)
 	$(MKDIR_CMD) $(BUILD)/docx
 	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(DOCX_ARGS) -o $@
+	$(ECHO_BUILT)
+
+$(BUILD)/txt/$(OUTPUT_FILENAME).txt:	$(TXT_DEPENDENCIES)
+	$(ECHO_BUILDING)
+	$(MKDIR_CMD) $(BUILD)/txt
+	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(TXT_ARGS) -o $@
 	$(ECHO_BUILT)
 
 $(BUILD)/cheat-sheet.pdf:	$(PDF_DEPENDENCIES)

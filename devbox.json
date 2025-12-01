@@ -9,7 +9,8 @@
     "python310Packages.pip@latest",
     "poppler_utils@latest",
     "python@latest",
-    "pv@latest"
+    "pv@latest",
+    "vale@latest"
   ],
   "env": {
     "VENV_DIR": ".venv"
@@ -24,7 +25,8 @@
       "else",
       "  . \"$VENV_DIR/bin/activate\";",
       "  pip install -qqq -r requirements.txt || true;",
-      "fi"
+      "fi",
+      "vale sync >/dev/null 2>&1 || true"
     ],
     "scripts": {
       "test": [
@@ -37,6 +39,7 @@
         "command -v xelatex >/dev/null && echo '✅ xelatex available' || (echo '❌ xelatex missing' && exit 1)",
         "command -v python >/dev/null && echo '✅ python available' || (echo '❌ python missing' && exit 1)",
         "command -v pdfinfo >/dev/null && echo '✅ pdfinfo available' || (echo '❌ pdfinfo missing' && exit 1)",
+        "command -v vale >/dev/null && echo '✅ vale available' || (echo '❌ vale missing' && exit 1)",
         "echo ''",
         "echo '🐍 Testing Python environment...'",
         "python --version",
