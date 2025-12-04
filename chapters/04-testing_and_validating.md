@@ -15,13 +15,13 @@ colleague tries to use it because they have a different version of kubectl, or
 they're running on Windows, or a recent configuration change introduced a subtle
 dependency.
 
-Here's the pragmatic truth about Makefile testing: **most Makefiles need very
+Here's the pragmatic truth about Makefile testing: **most Makefiles only need
 light testing, and comprehensive test suites are usually over-engineering.**
 This chapter will teach you how to catch real problems with minimal effort, not
 how to build elaborate testing infrastructure.
 
 Before diving into any testing frameworks, remember that you can catch most
-Makefile issues with just a few simple checks:
+Makefile issues with just a few checks:
 
 1. **Dry run everything**: `make -n target` shows you exactly what would
    execute without actually doing it
@@ -29,7 +29,7 @@ Makefile issues with just a few simple checks:
 3. **Check for typos**: `make nonexistent-target` should give a clear error,
    not silent failure
 \newpage
-4. **Validate variables**: Add simple checks like `@test -n "$(REQUIRED_VAR)"
+4. **Validate variables**: Add checks like `@test -n "$(REQUIRED_VAR)"
    || (echo "REQUIRED_VAR not set" && exit 1)`
 5. **Use .PHONY**: Declare your action targets as `.PHONY: build test deploy clean`
 
@@ -65,7 +65,7 @@ actually adds value:
 
 **Skip sophisticated testing when:**
 - You're the only one using the Makefile
-- The Makefile is under 100 lines and simple
+- The Makefile is under 100 lines and 
 - `make -n` catches your issues
 - Targets have no complex logic or dependencies
 - You haven't actually encountered bugs
@@ -214,7 +214,7 @@ not unit issues (single target broken).
 \textbf{Low-value tests:}
 \begin{itemize}
 \item Testing individual echo statements
-\item Exhaustive mocking of simple targets
+\item Exhaustive mocking of targets
 \item Testing Make's built-in features
 \item Perfect code coverage
 \end{itemize}
@@ -341,7 +341,7 @@ test-docs: ## Verify documentation is complete
 
 ### Performance Testing
 
-For very large Makefiles:
+For large Makefiles:
 
 ```makefile
 test-performance:
@@ -402,7 +402,7 @@ Testing Makefiles effectively means being pragmatic about what you test and why:
 3. **Focus on integration** - Test that targets run in the right order with
    correct variables
 
-4. **Keep it simple** - Most Makefiles need 5-10 tests total, not comprehensive
+4. **Avoid the rabbit hole** - Most Makefiles need 5-10 tests total, not comprehensive
    suites
 
 5. **Scale testing to team size** - Solo projects need minimal testing; large
@@ -411,9 +411,9 @@ Testing Makefiles effectively means being pragmatic about what you test and why:
 6. **Use linting selectively** - Checkmake is valuable for teams, overkill for
    individuals
 
-7. **Integrate gradually** - Start with `test-quick`, add more only when needed
+7. **Integrate gradually** - Start with `test-quick`, add more tests only when needed
 
-8. **Make testing easy** - If tests are painful to run, they won't get run
+8. **Minimize effort** - If tests are painful to run, they won't get run
 
 The investment in testing should match the criticality and complexity of your
 Makefile. A 50-line personal Makefile might need just `make -n` validation,
