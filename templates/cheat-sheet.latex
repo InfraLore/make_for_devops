@@ -30,6 +30,27 @@ $endif$
   ]{Lato}
 \fi
 
+% Color (needed for listings commentstyle)
+\usepackage{xcolor}
+
+% italicize comments
+\usepackage{listings}
+\lstset{
+  language=make,
+  basicstyle=\ttfamily\scriptsize,
+  commentstyle=\itshape\color{gray},  % Italic gray comments
+  breaklines=true,
+  keepspaces=true,
+  columns=flexible,
+  showstringspaces=false,
+  % Tight spacing options
+  aboveskip=1pt,
+  belowskip=1pt,
+  lineskip=-1pt,
+  xleftmargin=0pt,
+  framexleftmargin=0pt
+}
+
 % Landscape and 4 columns
 \usepackage{geometry}
 \geometry{paper=letterpaper, landscape, margin=0.4in, columnsep=0.25in}
@@ -47,8 +68,7 @@ $endif$
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{3pt plus 1pt minus 1pt}
 
-% Color and hyperref
-\usepackage{xcolor}
+% Hyperref
 \usepackage{hyperref}
 \hypersetup{
   hidelinks,
@@ -73,18 +93,18 @@ $endif$
 \usepackage{titlesec}
 
 \titleformat{\section}[block]
-  {\LatoFont\footnotesize\bfseries\color{black!80}\centering}
+  {\LatoFont\small\bfseries\color{black!80}}
   {}
   {0pt}
   {}
-  [\vspace{1pt}\rule{\linewidth}{0.3pt}]
 
-\titlespacing*{\section}{0pt}{8pt plus 2pt minus 2pt}{3pt plus 1pt minus 1pt}
+\titlespacing*{\section}{0pt}{4pt plus 1pt minus 1pt}{2pt plus 1pt minus 1pt}
 
 \titleformat{\subsection}
   {\LatoFont\footnotesize\bfseries\color{black!70}}
   {\thesubsection}{0.5em}{}
-\titlespacing*{\subsection}{0pt}{6pt plus 1pt minus 1pt}{2pt plus 1pt minus 1pt}
+\titlespacing*{\subsection}{0pt}{3pt plus 1pt minus 1pt}{1pt plus 1pt minus 1pt}
+
 
 % Compact title
 \makeatletter
@@ -92,7 +112,7 @@ $endif$
   \begin{center}
     \vspace{-1em}
     {\LatoFont\normalsize\bfseries \@title\par}
-    \vspace{0.5em}
+    \vspace{-1em}
   \end{center}
 }
 \makeatother
@@ -111,6 +131,9 @@ $endif$
 % Compact lists helper
 \providecommand{\tightlist}{%
   \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+% Define passthrough for inline code with listings
+\newcommand{\passthrough}[1]{#1}
 
 $if(title)$
 \title{$title$}

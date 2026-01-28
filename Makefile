@@ -516,4 +516,4 @@ $(BUILD)/txt/$(OUTPUT_FILENAME).txt:	$(TXT_DEPENDENCIES)
 $(BUILD)/cheat-sheet.pdf:	$(PDF_DEPENDENCIES)
 	$(ECHO_BUILDING)
 	$(MKDIR_CMD) $(BUILD)
-	pandoc --no-highlight parts/cheat-sheet.md -o build/cheat-sheet.pdf --template=templates/cheat-sheet.latex --pdf-engine=xelatex
+	pandoc --listings parts/cheat-sheet.md -o build/cheat-sheet.pdf --template=templates/cheat-sheet.latex --pdf-engine=xelatex

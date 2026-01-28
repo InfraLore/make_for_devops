@@ -13,12 +13,12 @@ target: prerequisites
 
 ## Variables
 ```makefile
-VAR := immediate    # Simple expansion
-VAR = deferred      # Recursive
-VAR ?= default      # Conditional
-VAR += append       # Append
-$(VAR) ${VAR}       # Expand
-$$VAR               # Shell var (literal $)
+VAR := immediate  # Simple expansion
+VAR = deferred    # Recursive
+VAR ?= default    # Conditional
+VAR += append     # Append
+$(VAR) ${VAR}     # Expand
+$$VAR             # Shell var (literal $)
 ```
 
 ## Automatic Variables
@@ -151,7 +151,7 @@ quiet:
 	@echo "Visible"
 	@npm install --silent
 ```
-
+\columnbreak
 ## Error Handling
 ```makefile
 # Ignore errors (-)
@@ -208,7 +208,7 @@ deploy-all: $(DEPLOY)
 ```makefile
 include common.mk
 include config/*.mk
--include optional.mk  # No error if missing
+-include optional.mk # allow missing
 ```
 
 # Debugging
@@ -259,12 +259,12 @@ make clean build test
 make deploy VERSION=1.2.3 ENV=prod
 
 # Flags
-make -n deploy         # Dry run
-make -i test           # Ignore errors
-make -k test           # Keep going
-make -j4 test          # Parallel (4 jobs)
-make -C subdir target  # Change dir
-make -f Custom.mk      # Different file
+make -n deploy        # Dry run
+make -i test          # Ignore errors
+make -k test          # Keep going
+make -j4 test         # Parallel
+make -C subdir target # Change dir
+make -f Custom.mk     # Different file
 
 # Environment
 ENVIRONMENT=prod make deploy
@@ -310,16 +310,3 @@ b: a
 
 # Check with: make -p
 ```
-# Best Practices
-
-- Use `.DEFAULT_GOAL := help`
-- Mark non-file targets as `.PHONY`
-- Use `##` for self-documenting help
-- Prefix internal targets with `_`
-- Validate prerequisites before executing
-- Confirm destructive operations
-- Use `:=` for immediate, `?=` for defaults
-- Suppress output with `@` unless debugging
-- Test with `make -n` first
-- Keep lines under 75 characters
-- Version control your Makefile
