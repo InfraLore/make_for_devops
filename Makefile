@@ -63,7 +63,7 @@ CONTENT = awk 'FNR==1 && NR!=1 {print "\n\n"}{print}' $(CHAPTERS)
 CONTENT_FILTERS = tee # Use this to add sed filters or other piped commands
 
 # Path to publish (can be overridden)
-PUBLISH_PATH ?= /Users/hpottinger/Library/Mobile Documents/com~apple~CloudDocs
+PUBLISH_PATH ?= publish
 
 # Debugging
 
