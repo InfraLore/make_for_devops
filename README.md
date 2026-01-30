@@ -73,6 +73,20 @@ If you don’t use Devbox, see below for manual setup instructions.
 
 ---
 
+## Environment Variables with direnv
+
+This project supports [direnv](https://direnv.net/) for automatic environment variable management.
+
+**Setup:**
+
+1. Install direnv: [https://direnv.net/docs/installation.html](https://direnv.net/docs/installation.html)
+2. Copy the example file:
+   ```sh
+   cp .envrc-example .envrc
+   
+
+---
+
 ## Usage & Build
 
 **Requirements:**
