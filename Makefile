@@ -131,6 +131,7 @@ define PROGRESS_BAR
 		fi; \
 		sleep 3; \
 	done; \
+	wait $$PID; \
 	printf "\r$(1): ✅          \n"
 endef
 
