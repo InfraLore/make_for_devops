@@ -7,8 +7,8 @@ lang: en-US
 mainlang: english
 otherlang: english
 tags: [pandoc, book, my-book, etc]
-mainfont: Merriweather 24pt
-monofont: JetBrainsMono Nerd Font Mono
+mainfont: Merriweather Regular
+monofont: DejaVu Sans Mono
 sansfont: Lato
 fontsize: 10pt
 documentclass: book
