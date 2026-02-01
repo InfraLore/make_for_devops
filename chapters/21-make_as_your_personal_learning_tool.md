@@ -553,6 +553,7 @@ help: ## Show available commands
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-20s %s\n", $$1, $$2}'
 EOF
 # important: closing EOF must be flush left with no spaces or tabs before it
+# note: the @grep and awk lines above must start with TAB characters, not spaces
   echo "Created Makefile with help target"
 }
 ```
