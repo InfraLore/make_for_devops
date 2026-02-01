@@ -1,0 +1,17 @@
+# .envrc - direnv configuration for make-for-devops
+#
+# This file is loaded automatically by direnv when you enter the project directory.
+# See https://direnv.net/ for installation and setup.
+#
+# Setup:
+#   1. Copy this file to .envrc: cp .envrc-example .envrc
+#   2. Edit .envrc with your local values
+#   3. Allow direnv to load it: direnv allow
+#
+# Note: .envrc is gitignored to keep local configuration and secrets out of version control.
+#       Only .envrc-example is committed.
+#
+# -----------------------------------------------------------------------------
+
+# Your environment variables below:
+export PUBLISH_PATH=publish
