@@ -44,8 +44,9 @@ PART_4 = parts/part-4.md chapters/13-make_for_infrastructure_provisioning.md cha
 PART_5 = parts/part-5.md chapters/18-scaling_make_across_teams_and_projects.md chapters/19-troubleshooting_and_debugging_make_workflows.md chapters/20-the_future_of_make_in_devops.md chapters/21-make_as_your_personal_learning_tool.md
 
 APPENDICES = chapters/Appendix_A-quick_reference_guide.md chapters/Appendix_B-migration_strategies.md chapters/Appendix_C-prompt_templates.md
+FRONTMATTER = parts/frontmatter.md chapters/Foreword.md parts/mainmatter.md
 
-CHAPTERS = $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) $(APPENDICES)
+CHAPTERS = $(FRONTMATTER) $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) $(APPENDICES)
 
 TOC = --toc --toc-depth 2
 METADATA_ARGS = --metadata-file $(METADATA) --metadata-file $(TMP_METADATA)

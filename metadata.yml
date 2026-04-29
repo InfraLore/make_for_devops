@@ -19,6 +19,7 @@ linkReferences: true
 geometry: twoside
 logo: images/cover.png
 header-includes:
+  - \providecommand{\pandocbounded}[1]{#1}
   - \widowpenalty=10000
   - \clubpenalty=10000
   - \usepackage{setspace}
