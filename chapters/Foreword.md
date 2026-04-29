@@ -9,7 +9,7 @@ steep, lore-driven affair, the kind of thing where you needed a senior engineer
 looking over your shoulder for most of a day. I wanted to show off what Vagrant
 could do, and hopefully find some collaborators to build something better.
 
-What I didn't expect was John H. Robinson IV.
+What I didn't expect was John H. Robinson, IV.
 
 John sat down and proceeded to ad-lib an entire development environment on the
 spot. He called a Make target. Then another. Vagrant spun up whatever he
@@ -52,5 +52,6 @@ I learned a lot editing it. I hope you learn a lot reading it.
 
 --Hardy
 
-[^vagrant]: https://github.com/jhriv/vagrant-as-infrastructure
-[^cookbook]: https://github.com/hardyoyo/RodmanPottingerCookbook
+[^vagrant]: <https://github.com/jhriv/vagrant-as-infrastructure>
+
+[^cookbook]: <https://github.com/hardyoyo/RodmanPottingerCookbook>
