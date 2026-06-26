@@ -33,7 +33,6 @@ FILES = [
     "chapters/Appendix_A-quick_reference_guide.md",
     "chapters/Appendix_B-migration_strategies.md",
     "chapters/Appendix_C-prompt_templates.md",
-    "parts/cheat-sheet.md",
 ]
 
 EXCLUDE_LINES = {
