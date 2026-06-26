@@ -99,9 +99,9 @@ As service meshes become standard, Make workflows adapt:
 mesh-deploy: ## Deploy with progressive traffic shifting
 	@$(MAKE) deploy-canary TRAFFIC=10
 	@sleep 300
-	@$(MAKE) mesh-check-health && \
-		$(MAKE) mesh-shift-traffic TRAFFIC=100 || \
-		$(MAKE) mesh-rollback
+	@$(MAKE) mesh-check-health \
+	&& $(MAKE) mesh-shift-traffic TRAFFIC=100 \
+	|| $(MAKE) mesh-rollback
 ```
 
 ### Platform Engineering and Internal Developer Platforms
@@ -277,8 +277,8 @@ cost-estimate: ## Estimate deployment costs
 	@infracost breakdown --path terraform/ > cost.json
 	@monthly=$$(jq -r '.totalMonthlyCost' cost.json)
 	@echo "Estimated monthly: \$$$$monthly"
-	@[ "$$(echo "$$monthly > 10000" | bc)" -eq 0 ] || \
-		(echo "High cost! Approve? [y/N]" && read ans && [ "$$ans" = "y" ])
+	@[ "$$(echo "$$monthly > 10000" | bc)" -eq 0 ] \
+	|| (echo "High cost! Approve? [y/N]" && read ans && [ "$$ans" = "y" ])
 ```
 
 ## Security Evolution

@@ -209,8 +209,8 @@ ENVIRONMENT ?= development
 deploy:
 ifeq ($(ENVIRONMENT),production)
 	@echo "Production deployment requires approval"
-	@read -p "Deploy to production? [yes/NO]: " ans && \
-	  [ "$$ans" = "yes" ]
+	@read -p "Deploy to production? [yes/NO]: " ans \
+	&& [ "$$ans" = "yes" ]
 endif
 	kubectl apply -f k8s/$(ENVIRONMENT)/
 
@@ -370,8 +370,8 @@ deploy: test build | check-cluster
 	kubectl apply -f k8s/
 
 check-cluster:
-	@kubectl cluster-info > /dev/null || \
-	  (echo "Cannot connect to cluster" && exit 1)
+	@kubectl cluster-info > /dev/null \
+	|| (echo "Cannot connect to cluster" && exit 1)
 ```
 
 The `|` creates an order-only prerequisite. `check-cluster` runs before
@@ -440,8 +440,8 @@ clean:
 
 # Always run cleanup, even on failure (notice the || "or")
 deploy:
-	@kubectl apply -f k8s/ || \
-	  (kubectl rollout undo deployment/myapp && exit 1)
+	@kubectl apply -f k8s/ \
+	|| (kubectl rollout undo deployment/myapp && exit 1)
 
 # Multi-line with error handling - all steps must succeed
 deploy-verified:
@@ -491,16 +491,16 @@ deploy: check-env check-cluster test build
 	kubectl apply -f k8s/
 
 check-env:
-	@test -n "$(VERSION)" || \
-	  (echo "VERSION not set" && exit 1)
-	@test "$(VERSION)" != "dirty" || \
-	  (echo "Cannot deploy uncommitted changes" && exit 1)
+	@test -n "$(VERSION)" \
+	|| (echo "VERSION not set" && exit 1)
+	@test "$(VERSION)" != "dirty" \
+	|| (echo "Cannot deploy uncommitted changes" && exit 1)
 
 check-cluster:
-	@kubectl cluster-info > /dev/null || \
-	  (echo "Cannot reach cluster" && exit 1)
-	@kubectl get namespace $(NAMESPACE) > /dev/null 2>&1 || \
-	  (echo "Namespace $(NAMESPACE) does not exist" && exit 1)
+	@kubectl cluster-info > /dev/null \
+	|| (echo "Cannot reach cluster" && exit 1)
+	@kubectl get namespace $(NAMESPACE) > /dev/null 2>&1 \
+	|| (echo "Namespace $(NAMESPACE) does not exist" && exit 1)
 ```
 
 These validation targets catch problems early with clear error messages.
@@ -618,8 +618,8 @@ deploy: test build check-cluster ## Deploy application (safe: tests then builds)
 	kubectl set image deployment/$(APP_NAME) app=$(APP_NAME):$(VERSION)
 
 check-cluster:
-	@kubectl cluster-info > /dev/null || \
-	  (echo "Cannot connect to cluster" && exit 1)
+	@kubectl cluster-info > /dev/null \
+	|| (echo "Cannot connect to cluster" && exit 1)
 ```
 
 This demonstrates:

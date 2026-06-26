@@ -525,13 +525,13 @@ REQUIRED_VARS := AWS_REGION CLUSTER_NAME APP_VERSION
 deploy-%: ## Deploy to specified environment
 	echo "Deploying to $* environment"
 	$(foreach var,$(REQUIRED_VARS),\
-		test -n "$($(var))" || \
-		(echo "Error: $(var) not set" && exit 1);)
+		test -n "$($(var))" \
+		|| (echo "Error: $(var) not set" && exit 1);)
 	./scripts/configure-$*.sh
 	./scripts/deploy.sh $*
-	./scripts/health-check.sh $* || \
-		(echo "Deployment unhealthy, rolling back" && \
-		 ./scripts/rollback.sh $* && exit 1)
+	./scripts/health-check.sh $* \
+	|| (echo "Deployment unhealthy, rolling back" \
+	&& ./scripts/rollback.sh $* && exit 1)
 ```
 
 Strict mode ensures:
@@ -1309,8 +1309,8 @@ CONFIG_DIR := configs
 # Deploy with environment-specific config
 deploy-%: ## Deploy to environment with its configuration
 	@echo "Loading configuration for $* environment..."
-	@[ -f $(CONFIG_DIR)/$*.yaml ] || \
-		(echo "Missing config: $(CONFIG_DIR)/$*.yaml" && exit 1)
+	@[ -f $(CONFIG_DIR)/$*.yaml ] \
+	|| (echo "Missing config: $(CONFIG_DIR)/$*.yaml" && exit 1)
 	@./scripts/validate-config.sh $(CONFIG_DIR)/$*.yaml
 	@WORKFLOW=$$(./scripts/get-workflow-type.sh $(CONFIG_DIR)/$*.yaml); \
 	./scripts/deploy-$$WORKFLOW.sh $(CONFIG_DIR)/$*.yaml $*
@@ -1534,11 +1534,11 @@ Complex operations benefit from centralized error handling:
 # Function for safe deployment steps
 define safe_deploy
 	@echo "==> Deploying $(1) to $(2)"
-	@./scripts/health-check.sh $(2) || \
-		(echo "Environment $(2) unhealthy, aborting" && exit 1)
-	@./scripts/deploy.sh $(1) $(2) || \
-		(echo "Deployment failed, rolling back" && \
-		 ./scripts/rollback.sh $(1) $(2) && exit 1)
+	@./scripts/health-check.sh $(2) \
+	|| (echo "Environment $(2) unhealthy, aborting" && exit 1)
+	@./scripts/deploy.sh $(1) $(2) \
+	|| (echo "Deployment failed, rolling back" \
+	&& ./scripts/rollback.sh $(1) $(2) && exit 1)
 	@./scripts/verify-deployment.sh $(1) $(2)
 	@echo "✓ $(1) deployed successfully to $(2)"
 endef
@@ -1567,8 +1567,8 @@ define service_lifecycle
 	@./scripts/pre-deploy-hooks.sh $(1)
 	@./scripts/deploy-service.sh $(1) $(2)
 	@./scripts/post-deploy-hooks.sh $(1)
-	@./scripts/health-check.sh $(1) $(2) || \
-		(echo "Health check failed" && exit 1)
+	@./scripts/health-check.sh $(1) $(2) \
+	|| (echo "Health check failed" && exit 1)
 endef
 
 # Teams use the framework consistently

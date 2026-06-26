@@ -548,10 +548,10 @@ PATTERN FOR ENVIRONMENT VARIABLE SECRETS:
 
 ```makefile
 check-secrets: ## Verify required secrets are set
-	@test -n "$$DATABASE_PASSWORD" || \
-		(echo "ERROR: Set DATABASE_PASSWORD environment variable" && exit 1)
-	@test -n "$$API_KEY" || \
-		(echo "ERROR: Set API_KEY environment variable" && exit 1)
+	@test -n "$$DATABASE_PASSWORD" \
+	|| (echo "ERROR: Set DATABASE_PASSWORD environment variable" && exit 1)
+	@test -n "$$API_KEY" \
+	|| (echo "ERROR: Set API_KEY environment variable" && exit 1)
 	@echo "✓ Required secrets are set"
 
 # Use secrets without exposing them

@@ -111,12 +111,12 @@ deploy: ## Deploy to prod
 ## Validation
 ```makefile
 _check-docker:
-	@command -v docker >/dev/null || \
-	  (echo "docker required" && exit 1)
+	@command -v docker >/dev/null \
+	|| (echo "docker required" && exit 1)
 
 _check-version:
-	@test -n "$(VERSION)" || \
-	  (echo "VERSION not set" && exit 1)
+	@test -n "$(VERSION)" \
+	|| (echo "VERSION not set" && exit 1)
 
 deploy: _check-docker _check-version
 	docker push $(IMAGE):$(VERSION)
@@ -126,8 +126,8 @@ deploy: _check-docker _check-version
 ```makefile
 deploy-prod:
 	@echo "Deploy to PRODUCTION?"
-	@echo -n "Type 'yes': " && read ans && \
-	  [ "$$ans" = "yes" ]
+	@echo -n "Type 'yes': " && read ans \
+	&& [ "$$ans" = "yes" ]
 	@$(MAKE) _deploy ENV=prod
 ```
 
@@ -142,9 +142,9 @@ build:
 
 # Same shell (semicolons)
 deploy:
-	cd app && \
-	npm install && \
-	npm run build
+	cd app \
+	&& npm install \
+	&& npm run build
 
 # Suppress output
 quiet:
@@ -164,8 +164,8 @@ optional:
 
 # Custom error message
 deploy:
-	@./deploy.sh || \
-	  (echo "Failed. Check: make logs" \
+	@./deploy.sh \
+	|| (echo "Failed. Check: make logs" \
 	   && exit 1)
 ```
 
