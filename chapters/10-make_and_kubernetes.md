@@ -17,7 +17,7 @@ deploy`, `make status`, or `make rollback`. The Makefile becomes both the
 documentation and the implementation of your Kubernetes deployment strategy.
 
 This chapter demonstrates how to create maintainable, reliable Kubernetes
-workflows using Make. We'll explore patterns for manifest generation,
+workflows using Make. We’ll explore patterns for manifest generation,
 environment-specific deployments, health checks, and Helm chart management.
 
 \newpage
@@ -45,7 +45,7 @@ and verification steps. Different engineers follow different procedures.
 Documentation drifts.
 
 \newpage
-Here's the discovery-based approach:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+Here’s the discovery-based approach:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -215,7 +215,7 @@ helm-status: ## Show Helm status
 	@./scripts/helm-status.sh $(ENVIRONMENT)
 ```
 
-Helm operations follow the same discovery pattern. Running `make helm` shows what's available.
+Helm operations follow the same discovery pattern. Running `make helm` shows what’s available.
 
 \newpage
 
@@ -396,16 +396,16 @@ Make transforms Kubernetes operations from scattered commands into discoverable 
 4. **Composability**: Complex workflows from simple targets
 5. **Teachability**: New team members learn by discovering
 
-The goal isn't to hide Kubernetes complexity—it's to make it discoverable.
+The goal isn’t to hide Kubernetes complexity—it’s to make it discoverable.
 Engineers can see available operations, understand environment-specific
 behaviors, and follow guided workflows.
 
 Most importantly, Kubernetes operations become team knowledge rather than
-individual expertise. That complex deployment procedure? It's `make deploy`. The
-multi-step rollback process? It's `make rollback`. The workflow is captured,
+individual expertise. That complex deployment procedure? It’s `make deploy`. The
+multi-step rollback process? It’s `make rollback`. The workflow is captured,
 discoverable, and improvable by anyone on the team.
 
 The pattern is consistent across all infrastructure: create discovery menus,
 extract complexity to scripts, provide clear interfaces, suggest next steps.
-Whether it's Docker, Kubernetes, Terraform, or any other tool, the discovery
+Whether it’s Docker, Kubernetes, Terraform, or any other tool, the discovery
 approach makes workflows accessible to everyone.

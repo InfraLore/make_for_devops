@@ -15,9 +15,9 @@ engineer. The on-call engineer gets paged at 2 AM and needs to remember (or
 frantically search Confluence for) the correct sequence of commands to restore a
 failed database. The monthly cost review reveals mystery resources no one
 remembers creating. The staging environment slowly drifts away from production
-until they're fundamentally different systems.
+until they’re fundamentally different systems.
 
-Make's discovery patterns solve these problems by making reliability workflows
+Make’s discovery patterns solve these problems by making reliability workflows
 as discoverable as provisioning workflows. When something breaks, `make
 emergency` shows you what to do. When costs spike, `make cleanup` reveals what
 can be safely removed. When you wonder if infrastructure is healthy, `make
@@ -25,24 +25,24 @@ validate-all` tells you.
 
 ## The Infrastructure Reliability Challenge
 
-Infrastructure reliability isn't about a single big event—it's about dozens of
-small, regular tasks that keep systems healthy. Each of these tasks has a "right
-way" to do it, but that knowledge often exists only in senior engineers' minds.
+Infrastructure reliability isn’t about a single big event—it’s about dozens of
+small, regular tasks that keep systems healthy. Each of these tasks has a “right
+way“ to do it, but that knowledge often exists only in senior engineers’ minds.
 
 Consider a typical week in infrastructure operations:
 
-**Monday**: "We should test our disaster recovery procedures. How do we do that
-again?"
+**Monday**: “We should test our disaster recovery procedures. How do we do that
+again?“
 
-**Tuesday**: "Staging feels slow. How do we validate the infrastructure
-configuration?"
+**Tuesday**: “Staging feels slow. How do we validate the infrastructure
+configuration?“
 
-**Wednesday**: "We got an alert about disk space. What's safe to clean up?"
+**Wednesday**: “We got an alert about disk space. What’s safe to clean up?”
 
-**Thursday**: "Cost report shows $2000 in mystery charges. How do we track down
-what's running?"
+**Thursday**: “Cost report shows $2000 in mystery charges. How do we track down
+what’s running?“
 
-**Friday**: "We need to rotate database credentials. What's the procedure?"
+**Friday**: “We need to rotate database credentials. What’s the procedure?”
 
 Each of these has a solution, probably documented somewhere. But finding and
 following that documentation takes time, and each engineer might do it slightly
@@ -51,7 +51,7 @@ documentation rarely keeps pace.
 
 ## Discovering Infrastructure Health
 
-The first reliability pattern is making health checks discoverable:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+The first reliability pattern is making health checks discoverable:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := health
@@ -91,7 +91,7 @@ validate-all: ## Comprehensive infrastructure validation
 	@echo "All validations passed"
 ```
 
-Now when someone wonders "Is our infrastructure healthy?", they run `make
+Now when someone wonders “Is our infrastructure healthy?”, they run `make
 health` and get an immediate overview. If they need more detail, the output
 tells them: `make validate-all`.
 
@@ -134,7 +134,7 @@ test-dr: ## Test disaster recovery procedures
 	@./scripts/test-disaster-recovery.sh $(ENVIRONMENT)
 ```
 
-The `test` target without arguments becomes a menu that teaches what's testable.
+The `test` target without arguments becomes a menu that teaches what’s testable.
 Each test target is self-contained and can run independently.
 
 ## Discovering Disaster Recovery
@@ -257,7 +257,7 @@ cleanup-safe: ## Clean up safe-to-delete resources
 	@echo "Estimated monthly savings: [calculated amount]"
 ```
 
-When the monthly cost report arrives, `make costs` shows what's available. `make
+When the monthly cost report arrives, `make costs` shows what’s available. `make
 find-waste` identifies problems. `make cleanup-safe` fixes them.
 
 ## Discovering Maintenance Windows
@@ -381,7 +381,7 @@ automation should do.
 
 ## Real-World Reliability Discovery Story
 
-A platform team maintained a 30-page "Infrastructure Operations Runbook" with
+A platform team maintained a 30-page “Infrastructure Operations Runbook” with
 sections like:
 
 ```markdown
@@ -457,7 +457,7 @@ Recovery complete!
 Results:
 
 - Mean time to recovery decreased from 90 minutes to 20 minutes
-- Runbook reduced to: "Run `make recover`"
+- Runbook reduced to: “Run `make recover`”
 - Procedures tested monthly (automated)
 - Junior engineers handled incidents confidently
 
@@ -477,18 +477,18 @@ Infrastructure reliability becomes discoverable through Make by:
    runnable
 5. **Built-in verification**: Recovery procedures include validation steps
 
-The pattern transforms reliability from "remember the procedure" to "ask Make
-what to do." This works especially well for reliability because:
+The pattern transforms reliability from “remember the procedure” to “ask Make
+what to do.“ This works especially well for reliability because:
 
-- These tasks are infrequent (you don't remember the steps)
-- They're often urgent (no time to search documentation)
+- These tasks are infrequent (you don’t remember the steps)
+- They’re often urgent (no time to search documentation)
 - They need to be correct (mistakes have consequences)
 - They change as infrastructure evolves (documentation drifts)
 
 By making reliability workflows discoverable, Make ensures that critical
 procedures are always accessible, always current, and always guide engineers
-toward successful outcomes—whether it's 2 PM or 2 AM.
+toward successful outcomes—whether it’s 2 PM or 2 AM.
 
-In the next chapter, we'll extend these patterns to monitoring and metrics,
+In the next chapter, we’ll extend these patterns to monitoring and metrics,
 exploring how Make can orchestrate observability workflows that keep your
 systems transparent and understandable.

@@ -4,14 +4,14 @@ This appendix provides step-by-step guides for migrating existing workflows to
 Make-based approaches. Each strategy addresses a common starting point and
 provides a gradual, low-risk path to adoption.
 
-The central theme: **Make doesn't replace your tools—it makes them
+The central theme: **Make doesn’t replace your tools—it makes them
 discoverable.** And in making them discoverable, you often improve them too.
 
 ## General Migration Principles
 
-**Make Orchestrates, Doesn't Replace**: Your existing scripts, tools, and
+**Make Orchestrates, Doesn’t Replace**: Your existing scripts, tools, and
 processes stay. Make provides a discoverable interface to them. But as you build
-that interface, you'll naturally improve the underlying scripts.
+that interface, you’ll naturally improve the underlying scripts.
 
 **Start Small**: Begin with high-value, low-risk targets (like `help`, `test`,
 `build`).
@@ -26,13 +26,13 @@ add oil.
 Validate they produce identical results before switching.
 
 **Document Through Doing**: Each Make target becomes executable documentation.
-If someone asks "how do I deploy?", the answer is `make deploy`.
+If someone asks “how do I deploy?”, the answer is `make deploy`.
 
-**Improve as You Wrap**: When you add a Make target for a script, you'll notice
+**Improve as You Wrap**: When you add a Make target for a script, you’ll notice
 missing features (like verbose flags or better error messages). Fix them in the
 script, not in Make.
 
-**Get Feedback Early**: Involve the team from day one. They'll tell you which
+**Get Feedback Early**: Involve the team from day one. They’ll tell you which
 workflows matter most.
 
 ---
@@ -51,7 +51,7 @@ contributing immediately.
 
 ### Current State: The 10-Step README
 
-Here's what developers face today:
+Here’s what developers face today:
 
 ```markdown
 ## Setup
@@ -69,11 +69,11 @@ Here's what developers face today:
 
 **The problem**: New developers spend 30-60 minutes on setup. They miss steps,
 run them out of order, or use wrong versions. Senior developers answer the same
-"how do I set this up?" questions monthly.
+“how do I set this up?” questions monthly.
 
 ### Step 1: Create a Help Target
 
-Start with the most valuable target of all—showing what's available:
+Start with the most valuable target of all—showing what’s available:
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -87,7 +87,7 @@ help: ## Show available commands
 searches the Makefile for any line matching the pattern `target: ## description`
 and formats it nicely.
 
-**Why it matters**: Developers can type `make` and immediately see what's
+**Why it matters**: Developers can type `make` and immediately see what’s
 possible. No digging through README files or asking in Slack.
 
 Try it now - even with just this one target, running `make` shows:
@@ -101,7 +101,7 @@ help output.
 
 ### Step 2: Create Prerequisites Check
 
-Start your setup target by checking what's already installed:
+Start your setup target by checking what’s already installed:
 
 ```makefile
 setup: ## Set up development environment (run once)
@@ -116,11 +116,11 @@ setup: ## Set up development environment (run once)
 - `@echo` prints a message (the `@` prevents Make from also printing the command itself)
 - `command -v node` checks if `node` is in your PATH
 - `>/dev/null` throws away the output (we only care if it succeeds or fails)
-- `||` means "or" - if the previous command failed, run the next part
+- `||` means “or” - if the previous command failed, run the next part
 - `exit 1` stops the entire target immediately
 
 **Why check prerequisites first**: Fail fast with a clear message. Better to see
-"Node.js required" immediately than to get cryptic errors 3 steps later when
+“Node.js required” immediately than to get cryptic errors 3 steps later when
 `npm install` fails.
 
 Now add checks for the other prerequisites:
@@ -162,11 +162,11 @@ setup: ## Set up development environment (run once)
 	@echo "✓ Dependencies installed"
 ```
 
-**About those flags**: The `--silent` and `--quiet` flags reduce noise. You'll
-still see errors if something fails - these just hide the routine "installing
-package X..." messages.
+**About those flags**: The `--silent` and `--quiet` flags reduce noise. You’ll
+still see errors if something fails - these just hide the routine “installing
+package X...“ messages.
 
-**Learning moment**: If npm or pip didn't have these flags, this would be
+**Learning moment**: If npm or pip didn’t have these flags, this would be
 harder. When wrapping tools with Make, you discover which flags you need. This
 often drives improvements to the underlying tools.
 
@@ -201,12 +201,12 @@ setup: ## Set up development environment (run once)
 	@echo "Setup complete! Edit .env, then run 'make dev'"
 ```
 
-**The idempotency check**: `[ ! -f .env ]` tests "if .env file does NOT exist".
-This means running `make setup` twice is safe - it won't overwrite your
+**The idempotency check**: `[ ! -f .env ]` tests “if .env file does NOT exist”.
+This means running `make setup` twice is safe - it won’t overwrite your
 configured `.env` file.
 
 **Why the backslashes**: The `\` at the end of lines inside the `if` statement
-tells Make "this command continues on the next line." Without them, Make would
+tells Make “this command continues on the next line.” Without them, Make would
 try to run each line as a separate shell command.
 
 **Current payoff**: Steps 1-6 of the original README are now `make setup`. One
@@ -229,8 +229,8 @@ dev: ## Start development environment
 	@echo "✓ Database starting"
 ```
 
-**What's that `|| true` doing?**: If the container already exists, `docker run`
-will fail. The `|| true` means "or just succeed anyway." We check if it's
+**What’s that `|| true` doing?**: If the container already exists, `docker run`
+will fail. The `|| true` means “or just succeed anyway.” We check if it’s
 actually running next.
 
 Now check if the database is actually ready:
@@ -254,7 +254,7 @@ dev: ## Start development environment
 
 **The retry loop**: Try `pg_isready` up to 5 times, sleeping 1 second between
 attempts. This handles the common problem where the container starts but
-Postgres isn't accepting connections yet.
+Postgres isn’t accepting connections yet.
 
 **Better approach**: You might notice this is clumsy. A better solution: create
 a `scripts/wait-for-db.sh` script that does proper health checking with better
@@ -289,7 +289,7 @@ dev: ## Start development environment
 **The `--no-input` flag**: Prevents Django from asking for confirmation. In an
 automated workflow, you want non-interactive commands.
 
-**Script improvement opportunity**: If `manage.py migrate` doesn't have a
+**Script improvement opportunity**: If `manage.py migrate` doesn’t have a
 `--quiet` flag, this is your signal to add one. Make targets should have clean
 output - verbose details only when things fail.
 
@@ -326,7 +326,7 @@ dev: ## Start development environment
 
 **Process management explained**:
 
-- `trap 'kill %1 %2' INT` sets up a handler for Ctrl+C (INT signal)
+- `trap ‘kill %1 %2’ INT` sets up a handler for Ctrl+C (INT signal)
 - `python app.py &` starts the API in the background (`&` means background)
 - `npm start &` starts the frontend in the background
 - `wait` waits for both background processes
@@ -368,13 +368,13 @@ steps are now *validated*, *idempotent*, and *discoverable*.
 
 ### What You'll Notice Next
 
-After your team uses this for a week, you'll hear:
+After your team uses this for a week, you’ll hear:
 
-- "Can we add `make clean` to reset everything?"
-- "The database logs are noisy, can we suppress them?"
-- "I want to run just the frontend, not the whole stack"
+- “Can we add `make clean` to reset everything?”
+- “The database logs are noisy, can we suppress them?”
+- “I want to run just the frontend, not the whole stack”
 
-These requests drive your next targets. Don't predict what people will want -
+These requests drive your next targets. Don’t predict what people will want -
 let usage guide you.
 
 ---
@@ -388,9 +388,9 @@ well but require team lore to use.
 while improving the scripts themselves.
 
 **Why This Matters**: Scripts in `scripts/` are invisible until someone tells
-you about them. You don't know they exist, what they do, or when to use them.
-Make solves discoverability. But as you wrap scripts, you'll discover missing
-features—and that's when you improve the scripts.
+you about them. You don’t know they exist, what they do, or when to use them.
+Make solves discoverability. But as you wrap scripts, you’ll discover missing
+features—and that’s when you improve the scripts.
 
 ### Current State: The Hidden Scripts
 
@@ -424,7 +424,7 @@ when tests fail, you get a wall of output. You want a quiet mode for CI and a
 verbose mode for debugging.
 
 **This is the insight**: You needed a `--quiet` and `--verbose` flag, but the
-script doesn't have them. Time to improve the script.
+script doesn’t have them. Time to improve the script.
 
 Edit `scripts/run-tests.sh`:
 
@@ -466,7 +466,7 @@ test-quiet: ## Run tests (minimal output)
 	@./scripts/run-tests.sh --quiet
 ```
 
-**What improved**: The script gained flexibility it didn't have before. Make
+**What improved**: The script gained flexibility it didn’t have before. Make
 exposed the need. The script now works better both in Make *and* standalone.
 
 ### Step 2: Wrap Scripts That Need Validation
@@ -481,7 +481,7 @@ deploy: ## Deploy to environment (ENVIRONMENT=dev|staging|prod)
 Run this without an environment: `make deploy`
 
 You get a confusing error from deep inside the script. The problem: the script
-expects an argument but doesn't validate it at the top.
+expects an argument but doesn’t validate it at the top.
 
 **Improve the script first**. Edit `scripts/deploy.sh`:
 
@@ -515,7 +515,7 @@ echo "Deploying to $ENVIRONMENT..."
 - Early validation with clear error messages
 - The script is now safer whether called from Make or manually
 
-Now the Make target can trust the script's validation:
+Now the Make target can trust the script’s validation:
 
 ```makefile
 deploy: ## Deploy to environment (ENVIRONMENT=dev|staging|prod)
@@ -529,8 +529,8 @@ script directly, it still works correctly.
 
 ### Step 3: Add Debug Support
 
-While testing deployments, you want to see what's happening. But the script
-doesn't have a debug mode.
+While testing deployments, you want to see what’s happening. But the script
+doesn’t have a debug mode.
 
 **Add it to the script**. Edit `scripts/deploy.sh`:
 
@@ -618,7 +618,7 @@ _confirm-deploy:
 
 - Tests must pass before deployment
 - Production deployments require explicit confirmation
-- Helper targets use `_` prefix so they don't clutter `make help`
+- Helper targets use `_` prefix so they don’t clutter `make help`
 
 **Script improvement opportunity**: Maybe the deploy script should support a
 `--skip-tests` flag for emergencies. Or a `--confirm` flag that prompts for
@@ -659,7 +659,7 @@ simple, Make handles orchestration.
 4. Both Make users and script users benefited
 5. Repeated as usage revealed more needs
 
-**The key insight**: Make doesn't just wrap scripts—it reveals their gaps. When
+**The key insight**: Make doesn’t just wrap scripts—it reveals their gaps. When
 you add `make test-verbose`, you discover the test script needs a verbose flag.
 When you add `make deploy`, you discover it needs better validation. Fix these
 in the scripts, and everyone benefits.
@@ -669,7 +669,7 @@ in the scripts, and everyone benefits.
 ## Migration 3: From CI/CD Platform Config to Local Reproducibility
 
 **Starting Point**: CI/CD logic embedded in `.gitlab-ci.yml` or
-`.github/workflows/` that works in CI but can't be tested locally.
+`.github/workflows/` that works in CI but can’t be tested locally.
 
 **Goal**: CI/CD files that call Make targets, making workflows locally reproducible.
 
@@ -679,7 +679,7 @@ workflows locally testable saves hours per week and builds confidence.
 
 ### Current State: Logic Locked in CI
 
-Here's typical GitHub Actions config:
+Here’s typical GitHub Actions config:
 
 ```yaml
 # .github/workflows/deploy.yml
@@ -699,8 +699,8 @@ jobs:
           docker push myapp:latest
 ```
 
-**The problem**: These commands only exist in the CI config. You can't run "what
-CI runs" locally. When CI fails, you're debugging blind.
+**The problem**: These commands only exist in the CI config. You can’t run “what
+CI runs“ locally. When CI fails, you’re debugging blind.
 
 ### Step 1: Extract Just the Build Step
 
@@ -716,7 +716,7 @@ build: ## Build Docker image
 	@echo "✓ Built $(IMAGE)"
 ```
 
-**What's happening**:
+**What’s happening**:
 
 - `VERSION ?=` sets a default value that can be overridden
 - `git rev-parse --short HEAD` gets the current commit hash
@@ -807,7 +807,7 @@ test: ## Run tests in container
 - CI builds always use `--no-cache` (reproducible, no stale layers)
 - CI tests generate JUnit XML (for test reporting dashboards)
 - Local builds use cache (fast iteration)
-- Local tests skip XML generation (you don't need it)
+- Local tests skip XML generation (you don’t need it)
 
 **The pattern**: The CI environment variable is set automatically by GitHub
 Actions, GitLab CI, etc. Make detects it and adjusts.
@@ -889,11 +889,11 @@ benefit both CI and local development.
 different command patterns and argument styles.
 
 **Goal**: Consistent Make interface across all tools, with improvements to the
-tools' usage patterns.
+tools’ usage patterns.
 
-**Why This Matters**: Developers shouldn't need to remember that Terraform uses
+**Why This Matters**: Developers shouldn’t need to remember that Terraform uses
 `-var-file`, Helm uses `-f`, and kubectl uses `--filename`. A consistent
-interface reduces cognitive load. And as you build that interface, you'll
+interface reduces cognitive load. And as you build that interface, you’ll
 improve how you use these tools.
 
 ### Current State: Tool Chaos
@@ -930,7 +930,7 @@ make infra-plan                    # Uses dev
 make infra-plan ENVIRONMENT=staging
 ```
 
-**Problem discovered**: When the plan fails, you want to see detailed output. But Terraform's default verbosity isn't always enough.
+**Problem discovered**: When the plan fails, you want to see detailed output. But Terraform’s default verbosity isn’t always enough.
 
 **Check what Terraform offers**:
 
@@ -950,8 +950,8 @@ infra-plan-debug: ## Plan with debug output
 	@cd terraform && TF_LOG=DEBUG terraform plan -var-file=$(ENVIRONMENT).tfvars
 ```
 
-**What improved**: You discovered Terraform's debug mode and made it easily
-accessible. Now when plans fail, `make infra-plan-debug` shows what's happening.
+**What improved**: You discovered Terraform’s debug mode and made it easily
+accessible. Now when plans fail, `make infra-plan-debug` shows what’s happening.
 
 ### Step 2: Add Apply with Safety
 

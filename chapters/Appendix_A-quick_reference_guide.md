@@ -36,7 +36,7 @@ deploy:
 ```
 
 **Use `.PHONY` when:**
-- Target name doesn't represent a file
+- Target name doesn’t represent a file
 - Target should always run regardless of file timestamps
 - Target name might conflict with a file/directory name
 
@@ -647,7 +647,7 @@ make deploy ENVIRONMENT=production
 
 ### Common Errors
 
-**"missing separator"**
+**“missing separator”**
 
 ```makefile
 # Wrong: spaces instead of tab
@@ -661,7 +661,7 @@ target:
 
 \pagebreak
 
-**"No rule to make target"**
+**“No rule to make target”**
 
 ```makefile
 # Check spelling and dependencies

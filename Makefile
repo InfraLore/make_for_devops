@@ -22,6 +22,7 @@ MAKEFILE = Makefile
 OUTPUT_FILENAME = MakeForDevops
 METADATA = metadata.yml
 TMP_METADATA = $(BUILD)/tmp-metadata.yml
+VERSION = 1.0.0-dev
 
 # Line length limits for code blocks
 OVERFLOW_LIMIT ?= 87
@@ -144,7 +145,7 @@ endef
 	validate check-overflow check-long-lines \
 	sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs \
 	diagrams lint lint-markdown lint-markdown-strict vale-suggest vale-error lint-fix \
-	stale-chapters
+	stale-chapters typographic-fixes typographic-fixes-check check-widows install-fonts
 
 all:	book ## Build all formats (epub, html, pdf, docx)
 
@@ -459,9 +460,17 @@ vale-error: ## Look for errors detected by Vale prose linting
 	@echo "🔍 Also asking Vale for errors in markdown files in root..."
 	vale --minAlertLevel=error *.md || true
 
+typographic-fixes: ## Convert straight quotes to curly and dashes to em dashes in chapters
+	python3 scripts/typographic-fixes.py
 
+typographic-fixes-check: ## Check for straight quotes/dashes without modifying files
+	python3 scripts/typographic-fixes.py --check
 
-####################################################################################################
+check-widows: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Check PDF for widows (run 'make pdf' first)
+	python3 scripts/check-widows.py
+
+install-fonts: ## Verify required fonts; install Merriweather if missing
+	python3 scripts/install-fonts.py
 # File builders
 ####################################################################################################
 
@@ -471,8 +480,10 @@ $(TMP_METADATA):
 	echo "git_url: $(shell git config --get remote.origin.url | \
 		sed -E 's#git@([^:]+):#\1/#; s#\.git$$##')" >> $(TMP_METADATA)
 	echo "git_date: $(shell git log -1 --format=%cd --date=short)" >> $(TMP_METADATA)
+	echo "date: $(shell git log -1 --format=%cd --date=short)" >> $(TMP_METADATA)
+	echo "version: $(VERSION)" >> $(TMP_METADATA)
 
-epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format (warning, not functional)
+epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format
 
 html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html ## Generate HTML format
 

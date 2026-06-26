@@ -2,13 +2,13 @@
 
 \chaptersubtitle{Bridging local and remote workflows with consistent, discoverable automation.}
 
-The most frustrating phrase in software development is "it works on my machine." This problem becomes exponentially worse in CI/CD pipelines, where developers push code that works perfectly locally, only to watch it fail mysteriously in the pipeline. Different environments, different tool versions, different configurations—the variables multiply until debugging becomes archaeological work.
+The most frustrating phrase in software development is “it works on my machine.” This problem becomes exponentially worse in CI/CD pipelines, where developers push code that works perfectly locally, only to watch it fail mysteriously in the pipeline. Different environments, different tool versions, different configurations—the variables multiply until debugging becomes archaeological work.
 
-The root cause isn't technical—it's consistency. When local development uses different commands, flags, and processes than CI/CD pipelines, you're maintaining two separate systems that inevitably drift apart. Traditional approaches compound this problem by creating separate scripts for each environment, making the consistency gap even wider.
+The root cause isn’t technical—it’s consistency. When local development uses different commands, flags, and processes than CI/CD pipelines, you’re maintaining two separate systems that inevitably drift apart. Traditional approaches compound this problem by creating separate scripts for each environment, making the consistency gap even wider.
 
-Make provides an elegant solution to the local-remote consistency problem. When your CI/CD pipeline uses the exact same Make commands as local development, debugging becomes trivial and onboarding new developers becomes instant. No more "it works in CI but not locally" mysteries, no more maintaining separate automation for different environments.
+Make provides an elegant solution to the local-remote consistency problem. When your CI/CD pipeline uses the exact same Make commands as local development, debugging becomes trivial and onboarding new developers becomes instant. No more “it works in CI but not locally” mysteries, no more maintaining separate automation for different environments.
 
-This chapter establishes the foundational patterns for CI/CD integration with Make. We'll explore the core design principles and create pipeline-friendly targets that work identically everywhere.
+This chapter establishes the foundational patterns for CI/CD integration with Make. We’ll explore the core design principles and create pipeline-friendly targets that work identically everywhere.
 
 \begin{calloutbox}[Make Your CI/CD Commands Identical to Local Development]
 Use the exact same Make commands locally and in CI/CD pipelines:
@@ -73,7 +73,7 @@ The magic happens inside the targets, which adapt automatically to the environme
 
 ### Pattern 1: Same Targets Everywhere
 
-The foundational pattern is identical target names:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+The foundational pattern is identical target names:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -204,7 +204,7 @@ Security becomes part of the standard workflow, not an afterthought.
 
 ## Practical Example: Pipeline-Friendly Targets
 
-Here's a complete, minimal example demonstrating all patterns:
+Here’s a complete, minimal example demonstrating all patterns:
 
 ```makefile
 # Configuration
@@ -329,8 +329,8 @@ Make transforms CI/CD from environment-specific scripts into consistent workflow
 4. **Fast Feedback**: Quick local validation, thorough CI validation
 5. **Security Integration**: Security scanning built into workflow
 
-These patterns eliminate the "works on my machine" problem by ensuring local development and CI/CD pipelines use identical commands. When something fails in CI, you can reproduce it locally by running the same Make command. When onboarding new developers, they discover the workflow through `make help` and immediately understand how to contribute.
+These patterns eliminate the “works on my machine” problem by ensuring local development and CI/CD pipelines use identical commands. When something fails in CI, you can reproduce it locally by running the same Make command. When onboarding new developers, they discover the workflow through `make help` and immediately understand how to contribute.
 
-The goal isn't to replace CI/CD tools—it's to provide a consistent interface layer that makes those tools more discoverable, reliable, and maintainable. Your CI/CD platform becomes an execution engine for Make targets, not a collection of platform-specific scripts that need separate maintenance.
+The goal isn’t to replace CI/CD tools—it’s to provide a consistent interface layer that makes those tools more discoverable, reliable, and maintainable. Your CI/CD platform becomes an execution engine for Make targets, not a collection of platform-specific scripts that need separate maintenance.
 
-In the next chapter, we'll build on these foundations with advanced optimization strategies, caching techniques, and platform-specific integrations for larger organizations.
+In the next chapter, we’ll build on these foundations with advanced optimization strategies, caching techniques, and platform-specific integrations for larger organizations.

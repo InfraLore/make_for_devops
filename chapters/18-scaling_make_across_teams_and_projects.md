@@ -2,9 +2,9 @@
 
 \chaptersubtitle{Building organization-wide standards that preserve team autonomy while enabling consistency and shared learning.}
 
-Your company now has fifteen development teams, each with their own services, repositories, and workflows. The good news: each team has adopted Make-based workflows and loves the discoverability. The bad news: you now have fifteen different ways to run tests, deploy services, check logs, and handle incidents. New engineers rotating between teams face a steep learning curve. Cross-team collaboration requires learning each team's unique conventions.
+Your company now has fifteen development teams, each with their own services, repositories, and workflows. The good news: each team has adopted Make-based workflows and loves the discoverability. The bad news: you now have fifteen different ways to run tests, deploy services, check logs, and handle incidents. New engineers rotating between teams face a steep learning curve. Cross-team collaboration requires learning each team’s unique conventions.
 
-The backend team uses `make deploy-prod` while the frontend team uses `make production-deploy`. One team's `make test` runs only unit tests; another's runs the full suite including slow integration tests. Each Makefile represents one team's accumulated wisdom, but that wisdom doesn't spread.
+The backend team uses `make deploy-prod` while the frontend team uses `make production-deploy`. One team’s `make test` runs only unit tests; another’s runs the full suite including slow integration tests. Each Makefile represents one team’s accumulated wisdom, but that wisdom doesn’t spread.
 
 You face a classic scaling problem: how do you maintain consistency across teams without destroying the autonomy that made Make adoption successful? How do you share patterns without mandating one-size-fits-all solutions?
 
@@ -12,7 +12,7 @@ This chapter explores how to scale Make-based workflows across organizations—c
 
 ## The Antipattern: Centralized Enforcement
 
-Before we discuss what works, let's look at what doesn't: the centralized enforcement approach:
+Before we discuss what works, let’s look at what doesn’t: the centralized enforcement approach:
 
 ```makefile
 # DON'T DO THIS: Mandated corporate Makefile
@@ -26,7 +26,7 @@ include /corporate/makefiles/standard.mk
 This fails because:
 
 - **One size fits all assumption**: A Python microservice and a React frontend need different workflows
-- **Prevents experimentation**: Teams can't try new tools or optimize for their needs
+- **Prevents experimentation**: Teams can’t try new tools or optimize for their needs
 - **Creates bottlenecks**: Every change requires platform team approval
 - **Breeds resentment**: Teams resent being told exactly how to work
 - **Encourages workarounds**: Teams route around restrictions with ad-hoc scripts
@@ -35,7 +35,7 @@ The right approach balances consistency with autonomy through shared libraries, 
 
 ## The Pattern: Shared Libraries with Local Flexibility
 
-Provide shared, reusable components while letting teams compose and customize:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+Provide shared, reusable components while letting teams compose and customize:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 # Team's project Makefile - they own this
@@ -90,7 +90,7 @@ docker-scan: ## Scan for vulnerabilities
 	@./scripts/docker-scan.sh
 ```
 
-Running `make docker` shows what's available from the shared library. Each shared target is independently useful.
+Running `make docker` shows what’s available from the shared library. Each shared target is independently useful.
 
 ## Establishing Organization-Wide Conventions
 
@@ -232,7 +232,7 @@ include node_modules/@company/make-libs/docker.mk
 
 Familiar workflow, version management.
 
-Choose based on your organization's existing workflow.
+Choose based on your organization’s existing workflow.
 
 ## Versioning and Evolution
 
@@ -348,7 +348,7 @@ Phase 5: Incident runbooks
 
 ### Office Hours
 
-Regular "Make Office Hours" for teams to ask questions. Slack channel for async help.
+Regular “Make Office Hours” for teams to ask questions. Slack channel for async help.
 
 ## Governance Without Bureaucracy
 
@@ -380,10 +380,10 @@ Scaling Make across an organization requires balancing consistency with autonomy
 4. **Versioning** allows gradual evolution
 5. **Flexibility** matters more than uniformity
 
-The goal isn't perfect standardization—it's creating a culture where teams learn from each other, share successful patterns, and continuously improve while maintaining ownership.
+The goal isn’t perfect standardization—it’s creating a culture where teams learn from each other, share successful patterns, and continuously improve while maintaining ownership.
 
-Most importantly, scaling Make preserves what made it successful: discoverability, executable documentation, and the ability to capture team knowledge in a form that benefits everyone. When done right, organization-wide Make adoption doesn't feel like a mandate—it feels like discovering a better way to work.
+Most importantly, scaling Make preserves what made it successful: discoverability, executable documentation, and the ability to capture team knowledge in a form that benefits everyone. When done right, organization-wide Make adoption doesn’t feel like a mandate—it feels like discovering a better way to work.
 
-The pattern is consistent: provide shared building blocks, establish discoverable conventions, let teams compose their own workflows. Standards emerge from shared practice, not central decree. Teams learn from each other's Makefiles, adopt patterns that work, and ignore patterns that don't. Knowledge spreads through discovery and proven value, not through policy documents.
+The pattern is consistent: provide shared building blocks, establish discoverable conventions, let teams compose their own workflows. Standards emerge from shared practice, not central decree. Teams learn from each other’s Makefiles, adopt patterns that work, and ignore patterns that don’t. Knowledge spreads through discovery and proven value, not through policy documents.
 
-In the final chapter, we'll explore troubleshooting and debugging Make workflows, equipping you with the skills to diagnose issues, optimize performance, and help others succeed with Make-based workflows.
+In the final chapter, we’ll explore troubleshooting and debugging Make workflows, equipping you with the skills to diagnose issues, optimize performance, and help others succeed with Make-based workflows.

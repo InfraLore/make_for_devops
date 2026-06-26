@@ -3,7 +3,7 @@
 \chaptersubtitle{A primer on Make syntax, focusing on the features most relevant
 to DevOps workflows rather than traditional compilation.}
 
-If you've encountered Make before, it was probably in the context of compiling C
+If you’ve encountered Make before, it was probably in the context of compiling C
 or C++ code. You might have run `make install` on a Linux system or struggled
 through a university computer science course where Makefiles seemed like an
 arcane ritual of tabs and cryptic syntax. This chapter will help you forget
@@ -24,7 +24,7 @@ concepts you already understand: commands, dependencies, and variables.
 
 Every Makefile is built around a simple concept: **targets**. In the compilation
 world, targets are usually files you want to create. In DevOps, targets
-represent **actions you want to perform**. Let's start with the most basic
+represent **actions you want to perform**. Let’s start with the most basic
 example:
 
 ```makefile
@@ -33,21 +33,21 @@ test:
 ```
 
 This defines a target called `test` that runs a single command. When you run
-`make test`, Make executes `pytest tests/`. Simple, right? But there's already
+`make test`, Make executes `pytest tests/`. Simple, right? But there’s already
 more happening here than meets the eye.
 
-First, notice the **tab character** before the `pytest` command. This isn't
+First, notice the **tab character** before the `pytest` command. This isn’t
 optional—Make requires commands to be indented with a literal tab character, not
-spaces. This is one of Make's most notorious quirks. Configure your editor to
-insert tabs for Makefiles automatically. Don't fight this—accept it and move on.
-Every modern editor can handle this, and once configured, you'll never think
-about it again. If you get an error like `*** missing separator`, you've used
+spaces. This is one of Make’s most notorious quirks. Configure your editor to
+insert tabs for Makefiles automatically. Don’t fight this—accept it and move on.
+Every modern editor can handle this, and once configured, you’ll never think
+about it again. If you get an error like `*** missing separator`, you’ve used
 spaces instead of tabs.
 
-Second, Make is doing something subtle but powerful: it's providing a
+Second, Make is doing something subtle but powerful: it’s providing a
 **standardized interface** to your infrastructure. Instead of team members
 needing to remember `pytest tests/`, they just run `make test`. This might seem
-trivial, but it's the foundation of discoverability.
+trivial, but it’s the foundation of discoverability.
 
 \newpage
 
@@ -79,9 +79,9 @@ first, then the build, then the push, and finally the deployment. If any step
 fails, the entire process stops. This creates a **reliable, repeatable
 deployment pipeline** that enforces good practices.
 
-This is the crucial insight: **the dependency chain enforces your team's
+This is the crucial insight: **the dependency chain enforces your team’s
 standards.** No one can accidentally deploy untested code because `make deploy`
-won't let them. The workflow itself encodes best practices.
+won’t let them. The workflow itself encodes best practices.
 
 Notice the `@` prefix on the echo commands—it suppresses Make from printing the
 command itself, showing only the output. This makes the workflow output cleaner
@@ -116,12 +116,12 @@ lint:
 ```
 
 Make is smart about dependencies. It will run `lint` first, then `build`. After
-`build` completes, both `test` and `push` can run (they don't depend on each
+`build` completes, both `test` and `push` can run (they don’t depend on each
 other). Finally, `deploy` runs after both complete.
 
 This declarative approach means you describe what depends on what, and Make
-figures out the optimal execution order. You're not writing imperative scripts
-with explicit sequencing—you're declaring relationships.
+figures out the optimal execution order. You’re not writing imperative scripts
+with explicit sequencing—you’re declaring relationships.
 
 \begin{calloutbox}[See Also: Chapter 7] For comprehensive coverage of modeling
 complex deployment dependencies, parallel execution strategies, and handling
@@ -151,18 +151,18 @@ deploy:
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG) -n $(NAMESPACE)
 ```
 
-The `?=` operator means "set this variable only if it's not already set,"
+The `?=` operator means “set this variable only if it’s not already set,”
 allowing users to override defaults:
 
 ```bash
 make deploy ENVIRONMENT=production VERSION=v1.2.3
 ```
 
-This is discoverable configuration—engineers can see what's configurable by
-reading the Makefile's variable definitions at the top.
+This is discoverable configuration—engineers can see what’s configurable by
+reading the Makefile’s variable definitions at the top.
 
 \begin{calloutbox}[Variables: Configuration, Not Logic] Variables should hold
-configuration (versions, names, URLs), not encode complex logic. If you're doing
+configuration (versions, names, URLs), not encode complex logic. If you’re doing
 string manipulation or computation in variables, that logic probably belongs in
 a script.
 
@@ -279,7 +279,7 @@ DevOps Workflows. \end{calloutbox}
 
 ### Phony Targets: The DevOps Default
 
-Most DevOps tasks should use **phony targets**—targets that don't correspond to
+Most DevOps tasks should use **phony targets**—targets that don’t correspond to
 actual files:
 
 ```makefile
@@ -341,7 +341,7 @@ deploy: test build k8s/deployment.yaml
 
 The pattern: use file targets as markers for expensive operations, then
 reference them from phony targets. This gives you both repeatability (phony) and
-efficiency (file-based caching). If you're actually generating files, though,
+efficiency (file-based caching). If you’re actually generating files, though,
 you really should be using file targets, because Make gives you a wealth of
 features you want to take advantage of.
 
@@ -349,7 +349,7 @@ features you want to take advantage of.
 dependencies when: \begin{itemize} \item The operation is expensive
 (multi-minute Docker builds) \item The inputs rarely change (Dockerfile,
 requirements.txt) \item Re-running unnecessarily wastes time or resources \item
-You're generating a file :-) \end{itemize}
+You’re generating a file :-) \end{itemize}
 
 Stick with phony targets when:
 \begin{itemize}
@@ -362,7 +362,7 @@ Stick with phony targets when:
 
 ### Order-Only Prerequisites
 
-Sometimes you need something to run first, but don't want to re-run if it
+Sometimes you need something to run first, but don’t want to re-run if it
 changes:
 
 ```makefile
@@ -375,9 +375,9 @@ check-cluster:
 ```
 
 The `|` creates an order-only prerequisite. `check-cluster` runs before
-`deploy`, but changes to the check script won't trigger re-deployment.
+`deploy`, but changes to the check script won’t trigger re-deployment.
 
-This is useful for validation checks that should run first but shouldn't cause
+This is useful for validation checks that should run first but shouldn’t cause
 the entire workflow to re-run when they change. Use sparingly—regular
 prerequisites are clearer in most cases.
 
@@ -455,7 +455,7 @@ deploy-verified:
 
 The `-` prefix ignores errors for that command. The `.IGNORE` directive ignores
 errors for the entire target. And borrowing a pattern from shell scripting,
-connecting commands with a double-pipe || "or" lets you ignore the success or
+connecting commands with a double-pipe || “or” lets you ignore the success or
 failure of the first command. And the safety net, the `set -e` in shell blocks
 makes the whole block fail on first error.
 
@@ -469,14 +469,14 @@ exist)
 \textbf{Bad use:} \texttt{-kubectl apply -f k8s/} (you want to know if
 deployment fails!)
 
-Using \texttt{.IGNORE} is almost always wrong—it hides real problems. If you're
+Using \texttt{.IGNORE} is almost always wrong—it hides real problems. If you’re
 tempted to use it, you probably need better error handling in your scripts.
 
 Default to failing fast and loud. Your future self will thank you when errors
 are caught immediately rather than silently ignored.
 
-For production-critical workflows, see Chapter 8's "Robust Shell Configuration
-and Error Handling" for advanced shell directives (.ONESHELL, .SHELLFLAGS) that
+For production-critical workflows, see Chapter 8’s “Robust Shell Configuration
+and Error Handling“ for advanced shell directives (.ONESHELL, .SHELLFLAGS) that
 provide systematic safety guarantees.
 \end{calloutbox}
 
@@ -540,7 +540,7 @@ Available targets:
 ```
 
 This pattern makes every Makefile self-documenting. New engineers run `make` and
-immediately see what's available.
+immediately see what’s available.
 
 \newpage
 
@@ -589,7 +589,7 @@ composite targets for complex workflows. \end{calloutbox}
 
 ## Putting It Together: Essential Patterns
 
-Here's a minimal example showing the core concepts with safe defaults:
+Here’s a minimal example showing the core concepts with safe defaults:
 
 ```makefile
 # Configuration
@@ -638,13 +638,13 @@ code. The workflow itself enforces good practices.
 
 ## Key Takeaways
 
-Make's syntax might seem intimidating at first, especially if you're coming from
+Make’s syntax might seem intimidating at first, especially if you’re coming from
 modern DevOps tools with YAML configurations or graphical interfaces. But this
 apparent complexity masks a powerful simplicity: Make provides a way to
 document, organize, and execute your DevOps workflows that is both
 human-readable and machine-executable.
 
-The fundamental concepts you've learned in this chapter form the foundation of
+The fundamental concepts you’ve learned in this chapter form the foundation of
 everything that follows:
 
 - **Targets and prerequisites** create self-documenting workflow graphs
@@ -654,8 +654,8 @@ everything that follows:
 - **Help systems** make capabilities discoverable
 - **Validation checks** catch problems early with clear messages
 
-Remember: the goal isn't to put all your logic in the Makefile. The goal is to
-create a **discoverable interface** that shows what's possible and enforces safe
+Remember: the goal isn’t to put all your logic in the Makefile. The goal is to
+create a **discoverable interface** that shows what’s possible and enforces safe
 workflows through dependencies.
 
 When designing Makefiles, favor safety and clarity over convenience:
@@ -664,9 +664,9 @@ When designing Makefiles, favor safety and clarity over convenience:
 - Use phony targets by default, file dependencies only for optimization
 - Keep conditionals simple or use separate targets instead
 - Fail fast and loud rather than hiding errors
-- Let the dependency chain enforce your team's standards
+- Let the dependency chain enforce your team’s standards
 
-In the next chapter, we'll explore testing and validating Makefiles to ensure
+In the next chapter, we’ll explore testing and validating Makefiles to ensure
 they remain reliable as your infrastructure evolves.
 
 ![Make Fundamentals Workflow](images/chapter3.png)

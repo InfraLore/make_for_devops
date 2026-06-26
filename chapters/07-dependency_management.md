@@ -3,7 +3,7 @@
 \chaptersubtitle{Leveraging Make's dependency system to ensure correct execution
 order and prevent common deployment pitfalls.}
 
-Make's dependency system is where the magic happens in DevOps workflows. While
+Make’s dependency system is where the magic happens in DevOps workflows. While
 other automation tools require you to explicitly script every step in sequence,
 Make lets you declare what depends on what, then automatically figures out the
 optimal execution order. This declarative approach transforms error-prone linear
@@ -11,8 +11,8 @@ scripts into robust, self-organizing workflows.
 
 Consider a typical deployment: build application, run tests, push image, update
 manifests, deploy to cluster. A traditional script runs every step regardless of
-whether it's necessary, fails catastrophically if any step breaks, and can't
-leverage parallelization. Make's dependency system solves these issues
+whether it’s necessary, fails catastrophically if any step breaks, and can’t
+leverage parallelization. Make’s dependency system solves these issues
 elegantly.
 
 \begin{calloutbox}[Start Simple: Basic Dependency Patterns]
@@ -59,7 +59,7 @@ deploy: validate-environment validate-secrets build test
 
 ### Real-World Pipeline Dependencies
 
-Model a complete deployment pipeline:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+Model a complete deployment pipeline:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 # Final deployment with all prerequisites
@@ -174,10 +174,10 @@ deploy: .image-pushed k8s-manifests
 
 ## Parallel Execution
 
-One of Make's most powerful features is automatic parallel execution—the ability
+One of Make’s most powerful features is automatic parallel execution—the ability
 to run independent targets simultaneously. When you have targets like `lint`,
 `security-scan`, and `type-check` that all depend on the same source files but
-don't depend on each other, they can run at the same time rather than
+don’t depend on each other, they can run at the same time rather than
 sequentially. This can dramatically reduce workflow execution time.
 
 However, **parallelism is not automatic**. This is a common misconception: Make
@@ -190,16 +190,16 @@ The candidates for parallel execution are targets that:
 
 - Share the same prerequisites (like both depending on `build`)
 - Have no dependencies on each other
-- Perform independent operations (one doesn't need the other's output)
+- Perform independent operations (one doesn’t need the other’s output)
 
 For example: `build-frontend: src/frontend` and `build-backend: src/backend` can
-run in parallel because they're building independent services. But
+run in parallel because they’re building independent services. But
 `deploy-frontend: build-frontend test-frontend` cannot run in parallel with
 `build-frontend` because it depends on the build completing first. This creates
 efficient workflows where independent builds happen simultaneously.
 
 \begin{calloutbox}[Parallelism: An Optimization You Discover, Not Design]
-Don't start by trying to design parallel execution into your Makefiles. Instead:
+Don’t start by trying to design parallel execution into your Makefiles. Instead:
 
 \begin{enumerate}
 \item Write targets with correct dependencies first
@@ -215,7 +215,7 @@ your dependencies are structured. Run \texttt{make -j4 deploy} to enable
 parallel execution with 4 jobs.
 
 \textbf{Make it part of your review process:} When reviewing Makefiles (yours or
-your team's), ask: "Can any of these targets run in parallel?" Look for targets
+your team’s), ask: “Can any of these targets run in parallel?” Look for targets
 with the same prerequisites but no dependencies on each other. These are natural
 parallelization opportunities.
 
@@ -329,9 +329,9 @@ deploy-all-envs: deploy-to-dev deploy-to-staging
 
 ## Using Parallelism Responsibly
 
-While Make's parallel execution can dramatically speed up workflows, not all
+While Make’s parallel execution can dramatically speed up workflows, not all
 parallelization opportunities should be taken. The technical ability to run
-tasks simultaneously doesn't mean it's operationally wise.
+tasks simultaneously doesn’t mean it’s operationally wise.
 
 ### When Parallelism Makes Sense
 
@@ -382,7 +382,7 @@ migrate-inventory: migrate-orders
 
 ### Quality Gates vs Speed
 
-The fundamental tension in DevOps automation is between speed and safety. Make's
+The fundamental tension in DevOps automation is between speed and safety. Make’s
 dependency system helps you be explicit about this trade-off:
 
 ```makefile
@@ -419,12 +419,12 @@ build-all: ## Build all services (parallel safe)
 
 The key principle: **parallelize for efficiency, sequence for safety**. When in
 doubt, choose the safer sequential approach. Your future self (and your team)
-will thank you when a bug doesn't make it to production because tests caught it
+will thank you when a bug doesn’t make it to production because tests caught it
 before the push completed.
 
 ## Key Takeaways
 
-Make's dependency system transforms workflows from brittle scripts into robust
+Make’s dependency system transforms workflows from brittle scripts into robust
 orchestration:
 
 1. **Declare Relationships**: Focus on what depends on what, not execution order
@@ -442,5 +442,5 @@ The power lies in the declarative approach: describe relationships, Make figures
 out optimal execution. This creates workflows that are more reliable, efficient,
 and maintainable than traditional scripts.
 
-In the next chapter, we'll explore Make's advanced features that enable even
+In the next chapter, we’ll explore Make’s advanced features that enable even
 more sophisticated automation while maintaining simplicity and discoverability.

@@ -1,14 +1,14 @@
 # Chapter 9: Make and Docker - Containerization Made Discoverable
 
 \chaptersubtitle{Creating transparent, repeatable container workflows that
-eliminate the "works on my machine" problem.}
+eliminate the “works on my machine” problem.}
 
 Docker transformed software deployment by packaging applications with their
-dependencies into portable containers. But Docker's power comes with complexity:
+dependencies into portable containers. But Docker’s power comes with complexity:
 multi-stage builds, registry management, image tagging strategies, development
 environment setup, and security scanning workflows. Teams often end up with
-scattered scripts, inconsistent commands, and the dreaded "I forgot how to build
-this" syndrome.
+scattered scripts, inconsistent commands, and the dreaded “I forgot how to build
+this“ syndrome.
 
 Make provides the perfect orchestration layer for Docker workflows. Instead of
 remembering complex `docker build` commands with multiple arguments,
@@ -17,7 +17,7 @@ can simply run `make build`, `make dev`, or `make deploy`. The Makefile becomes
 both the documentation and the implementation of your containerization strategy.
 
 This chapter demonstrates how to create discoverable, maintainable Docker
-workflows using Make. We'll explore patterns for development environments,
+workflows using Make. We’ll explore patterns for development environments,
 multi-stage builds, registry management, and local development with
 docker-compose.
 
@@ -28,21 +28,21 @@ docker-compose.
 Docker Compose, Lando, Tilt, Skaffold, and dozens of other tools provide
 sophisticated Docker orchestration. So why add Make to the stack?
 
-**Make isn't replacing these tools—it's providing the discoverable interface to
+**Make isn’t replacing these tools—it’s providing the discoverable interface to
 them.**
 
-And here's the thing: your team probably can't agree on which orchestration tool
-to use. Someone swears by Lando. Someone else thinks it's overcomplicated and
+And here’s the thing: your team probably can’t agree on which orchestration tool
+to use. Someone swears by Lando. Someone else thinks it’s overcomplicated and
 prefers plain Docker Compose. The frontend team wants Tilt for its live reload.
 The backend team just wants something that works.
 
-You've probably had the meeting. Maybe multiple meetings. Someone proposed
-standardizing on "the one true dev tool." It didn't go well. Everyone has strong
+You’ve probably had the meeting. Maybe multiple meetings. Someone proposed
+standardizing on “the one true dev tool.” It didn’t go well. Everyone has strong
 opinions based on their previous projects, their mental models, their laptop
 setup.
 
 Make lets you sidestep this argument—or at least defer it. Instead of forcing
-everyone to use the same underlying tool, Make provides a consistent interface:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+everyone to use the same underlying tool, Make provides a consistent interface:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 dev: ## Start development environment
@@ -64,24 +64,24 @@ dev-ready:
 
 \pagebreak
 Consider a typical project using Docker Compose. A new engineer arrives and
-asks: "How do I start this?" The answer is scattered:
+asks: “How do I start this?” The answer is scattered:
 
-- **README.md** might explain it (if it's current)
+- **README.md** might explain it (if it’s current)
 - **docker-compose.yml** contains configuration, not instructions
-- **.env.example** needs copying and editing (but where's that documented?)
-- **Slack history** has the real answers ("oh yeah, run migrations first")
-- **Team lore** fills in the gaps ("restart Redis if it acts weird")
+- **.env.example** needs copying and editing (but where’s that documented?)
+- **Slack history** has the real answers (“oh yeah, run migrations first”)
+- **Team lore** fills in the gaps (“restart Redis if it acts weird”)
 
-There's no single source of truth, no clear entry point. The engineer copies
+There’s no single source of truth, no clear entry point. The engineer copies
 commands from Slack, gets an error about missing `.env`, copies that file, gets
 an error about the database not being ready, waits a bit, runs migrations
-manually, and finally gets things working. Thirty minutes later, they've figured
+manually, and finally gets things working. Thirty minutes later, they’ve figured
 it out—but the next engineer will repeat the same process.
 
 Six months later, someone adds a new service that needs initialization. The
 README gets updated... eventually. Maybe. The Slack message explaining the new
-step gets lost in history. The initialization becomes team lore: "Oh yeah, you
-need to run the seed script after starting, otherwise the API returns 500s."
+step gets lost in history. The initialization becomes team lore: “Oh yeah, you
+need to run the seed script after starting, otherwise the API returns 500s.“
 Every new engineer discovers this the hard way.
 
 The problem compounds over time. Each addition to the development environment—a
@@ -89,9 +89,9 @@ new database, a cache layer, a message queue, a mock external service—adds
 another step that might or might not be documented, might or might not be in the
 right order, might or might not still be current.
 
-The problem isn't Docker Compose. The problem is that Docker Compose starts
-services but doesn't encode the full workflow: the preparation, the waiting, the
-post-startup steps, the initialization sequences, the "what do I do now?"
+The problem isn’t Docker Compose. The problem is that Docker Compose starts
+services but doesn’t encode the full workflow: the preparation, the waiting, the
+post-startup steps, the initialization sequences, the “what do I do now?”
 guidance. Docker Compose is configuration, not documentation. It describes what
 to run, not how to use it.
 
@@ -123,19 +123,19 @@ _wait-for-services:
 	@./scripts/wait-for-redis.sh
 ```
 
-**Make provides what orchestration tools don't:**
+**Make provides what orchestration tools don’t:**
 
-1. **Discoverability**: Docker Compose is powerful but doesn't tell you what to
-   do. `docker-compose up` doesn't explain that you need to copy `.env.example`
+1. **Discoverability**: Docker Compose is powerful but doesn’t tell you what to
+   do. `docker-compose up` doesn’t explain that you need to copy `.env.example`
    first, or run migrations, or wait for Postgres to be ready.
 
-2. **Workflow coordination**: Orchestration tools start services. They don't
-   capture the sequence: "copy config, start services, wait for readiness, run
-   migrations, show next steps."
+2. **Workflow coordination**: Orchestration tools start services. They don’t
+   capture the sequence: “copy config, start services, wait for readiness, run
+   migrations, show next steps.“
 
 3. **Progressive disclosure**: `make help` shows common tasks. `make dev`
-   handles the happy path. `make dev-reset` handles "my database is corrupted."
-   The complexity is there when you need it, hidden when you don't.
+   handles the happy path. `make dev-reset` handles “my database is corrupted.”
+   The complexity is there when you need it, hidden when you don’t.
 
 4. **Tool composition**: Your project might use Docker Compose for services, `go
    run` for the app during development, and `kubectl` for deployment. Make
@@ -145,7 +145,7 @@ _wait-for-services:
    Docker Desktop, some use Colima, some use Podman. Make abstracts over these
    choices while still allowing them.
 
-**The pattern**: Use specialized tools for what they're good at, use Make for
+**The pattern**: Use specialized tools for what they’re good at, use Make for
 discoverability and coordination.
 
 ```makefile
@@ -187,14 +187,14 @@ is literally all anyone needs, skip Make. But the moment you have:
 - Multiple ways to run locally (Compose, Lando, native)
 - Testing, building, or deployment workflows
 
-...then Make's discoverability layer starts providing real value.
+...then Make’s discoverability layer starts providing real value.
 
 **The test**: Can a new engineer run one command to get started? Can they
 discover what else is possible? Can they understand the workflow without reading
 documentation?
 
 If yes, you probably have Make (or something like it) providing that interface.
-If no, you're relying on documentation staying current and team lore.
+If no, you’re relying on documentation staying current and team lore.
 
 ## Discovering Docker Workflows
 
@@ -221,9 +221,9 @@ docker run --rm myapp:test pytest tests/
 
 Each command has multiple flags, arguments that need calculation, and
 dependencies on previous steps. Documentation drifts, engineers forget flags,
-and "works on my machine" persists.
+and “works on my machine” persists.
 
-Here's the discovery-based approach:
+Here’s the discovery-based approach:
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -255,7 +255,7 @@ push: ## Push to registry
 	@./scripts/docker-push.sh $(VERSION)
 ```
 
-Running `make help` shows what's available. Each command is discoverable, and
+Running `make help` shows what’s available. Each command is discoverable, and
 the complexity lives in scripts rather than being scattered across
 documentation.
 
@@ -468,7 +468,7 @@ ci-security: ## CI security phase
 ```
 
 The CI pipeline is discoverable and can be run locally. No surprises in CI that
-didn't happen locally.
+didn’t happen locally.
 
 \newpage
 
@@ -546,22 +546,22 @@ Make Docker workflows discoverable through:
 Make transforms Docker workflows from scattered commands into discoverable
 operations:
 
-1. **Discoverability**: `make help` reveals what's possible
+1. **Discoverability**: `make help` reveals what’s possible
 2. **Consistency**: Same commands work locally and in CI
 3. **Composability**: Build complex workflows from simple targets
 4. **Safety**: Security and testing built into standard workflows
 5. **Teachability**: New team members learn by discovering
 
-The goal isn't to hide Docker complexity—it's to make it discoverable. Engineers
+The goal isn’t to hide Docker complexity—it’s to make it discoverable. Engineers
 can see what operations are available, understand dependencies between
 operations, and follow suggested next steps. The workflow reveals itself through
 interaction.
 
 Most importantly, Docker workflows become team knowledge rather than individual
-expertise. That arcane `docker build` command with seven flags? It's now `make
-build`. The complex multi-service development setup? It's `make dev`. The
+expertise. That arcane `docker build` command with seven flags? It’s now `make
+build`. The complex multi-service development setup? It’s `make dev`. The
 workflow is captured, discoverable, and improvable by anyone on the team.
 
-In the next chapter, we'll apply these same discovery patterns to Kubernetes
+In the next chapter, we’ll apply these same discovery patterns to Kubernetes
 orchestration, creating workflows that tame the complexity of cloud-native
 deployments.

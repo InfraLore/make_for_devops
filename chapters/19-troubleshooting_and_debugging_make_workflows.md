@@ -3,9 +3,9 @@
 \chaptersubtitle{Mastering the tools and techniques to diagnose, fix, and
 optimize complex Make-based workflows.}
 
-You run `make deploy-staging` and it fails. But it's not a simple failure—you've
-already checked the obvious things. You've run `make -n` to see what commands
-would execute. You've verified your variables with `$(info ...)`. You've
+You run `make deploy-staging` and it fails. But it’s not a simple failure—you’ve
+already checked the obvious things. You’ve run `make -n` to see what commands
+would execute. You’ve verified your variables with `$(info ...)`. You’ve
 confirmed the target is declared `.PHONY`. The basics are correct, yet something
 deeper is wrong.
 
@@ -14,7 +14,7 @@ in an unexpected order despite explicit prerequisites. Maybe the workflow works
 on your machine but fails in CI. Maybe it worked yesterday and fails today with
 no obvious changes.
 
-These are the hard debugging problems—the ones that require understanding Make's
+These are the hard debugging problems—the ones that require understanding Make’s
 execution model at a deeper level, the ones that surface only in complex
 multi-service deployments, the ones that appear under load or in production.
 
@@ -24,20 +24,20 @@ challenging issues.
 \begin{calloutbox}[Prerequisites: Chapter 3] This chapter assumes you're
 comfortable with the debugging basics covered in Chapter 3: using \texttt{make
 -n} for dry runs, \texttt{make -p} to inspect variables, adding \texttt{@} for
-output control, and basic error handling patterns. If you're new to Make
-debugging, start with Chapter 3's "Debugging and Troubleshooting Makefile
-Execution" section before proceeding here. \end{calloutbox}
+output control, and basic error handling patterns. If you’re new to Make
+debugging, start with Chapter 3’s “Debugging and Troubleshooting Makefile
+Execution“ section before proceeding here. \end{calloutbox}
 
 \pagebreak
 
-![Make's Execution Model](images/chapter19.png)
+![Make’s Execution Model](images/chapter19.png)
 
 \pagebreak
 
 ## Understanding Make's Execution Model in Depth
 
 Most advanced Make debugging requires understanding what happens between when
-you press Enter and when commands execute. Make's execution has three distinct
+you press Enter and when commands execute. Make’s execution has three distinct
 phases, and problems can hide in any of them:
 
 ### 1. Parsing Phase
@@ -106,7 +106,7 @@ graph-deps: ## Generate dependency graph
 # Requires: apt-get install make2graph graphviz
 ```
 
-**Real-world example:** A deployment target wasn't running tests because an
+**Real-world example:** A deployment target wasn’t running tests because an
 intermediate target (`validate-manifests`) inadvertently created a file called
 `test`, causing Make to think tests were up to date:
 
@@ -242,7 +242,7 @@ docker-build: .docker-build.hash
 
 ## Performance Debugging
 
-Slow Makefiles kill productivity. Here's how to find and fix bottlenecks:
+Slow Makefiles kill productivity. Here’s how to find and fix bottlenecks:
 
 ### Profiling Make Execution
 
@@ -513,9 +513,9 @@ dependency ordering? Variable expansion? Shell behavior? Resource constraints?
 Once you identify the layer, the appropriate debugging technique becomes clear.
 
 Build debugging capabilities into your Makefiles from the start. The `debug`,
-`profile`, `incident-snapshot`, and `support-bundle` targets aren't
-overhead—they're essential infrastructure that pays for itself the first time
+`profile`, `incident-snapshot`, and `support-bundle` targets aren’t
+overhead—they’re essential infrastructure that pays for itself the first time
 something goes wrong at 2 AM.
 
 When your Makefile can diagnose its own problems and guide users toward
-solutions, you've created something that scales far beyond your own expertise.
+solutions, you’ve created something that scales far beyond your own expertise.

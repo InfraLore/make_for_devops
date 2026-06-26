@@ -4,7 +4,7 @@
 logical organization.}
 
 In traditional Make, targets represent files to be built. But in DevOps
-workflows, most targets don't create files—they perform actions like deploying
+workflows, most targets don’t create files—they perform actions like deploying
 services, running tests, or starting development environments. This is where
 **phony targets** become essential.
 
@@ -13,7 +13,7 @@ randomly. A well-organized Makefile is like a professional workshop where every
 tool has its place and common tasks are immediately accessible.
 
 The reality for most teams: **you need 5-10 clearly named targets organized in a
-way that matches how you think about your workflow.** That's the foundation.
+way that matches how you think about your workflow.** That’s the foundation.
 Everything else is refinement.
 
 \begin{calloutbox}[Start Simple: Five Targets Cover Most Workflows] Most
@@ -24,8 +24,8 @@ projects need these core targets to start:
 \item \textbf{build} - Build the application \item \textbf{deploy} - Deploy
 (with ENVIRONMENT variable for staging/prod) \end{enumerate}
 
-Add more targets when you have actual operations that don't fit these
-categories. Don't pre-emptively create targets for theoretical operations.
+Add more targets when you have actual operations that don’t fit these
+categories. Don’t pre-emptively create targets for theoretical operations.
 \end{calloutbox}
 
 ## Understanding Phony Targets
@@ -52,7 +52,7 @@ test:
 ```
 
 The problem: if someone creates a file named `deploy` or `test`, Make thinks the
-target is already built and won't run the commands. The `.PHONY` declaration
+target is already built and won’t run the commands. The `.PHONY` declaration
 fixes this:
 
 ```makefile
@@ -62,7 +62,7 @@ deploy:
 	kubectl apply -f k8s/
 ```
 
-**Declare all your action targets as phony.** It's a one-line insurance policy
+**Declare all your action targets as phony.** It’s a one-line insurance policy
 against weird bugs.
 
 \pagebreak
@@ -155,7 +155,7 @@ clean:    ## Clean up development environment
 help:     ## Show this help message
 ```
 
-This covers 80% of projects. Don't add complexity until you need it.
+This covers 80% of projects. Don’t add complexity until you need it.
 
 
 \pagebreak
@@ -221,7 +221,7 @@ infrastructure)
 \textbf{SRE team:} Group by frequency (daily ops, weekly tasks, emergency
 procedures)
 
-Don't organize by what sounds good in theory. Organize by what your team types
+Don’t organize by what sounds good in theory. Organize by what your team types
 most often. \end{calloutbox}
 
 \pagebreak
@@ -256,7 +256,7 @@ When you run `make deploy`, Make automatically runs: `build` → `test` and `pus
 - Safety checks (test before deploy)
 - Common workflows (deploy always needs build + test)
 
-**Don't use dependencies for:**
+**Don’t use dependencies for:**
 - Things that take a long time unnecessarily (full test suite before quick dev
   deploy)
 - Optional steps (not every build needs to push)
@@ -294,14 +294,14 @@ ship-it: build test push deploy ## Build, test, push, and deploy
 	@echo "✓ Shipped successfully"
 ```
 
-**Don't create composite targets for:**
+**Don’t create composite targets for:**
 - Sequences you rarely run
 - Steps that need human verification in between
 - Operations where you might want just part of the sequence
 
 ### Parallel Execution for Independent Tasks
 
-If tasks don't depend on each other, run them in parallel:
+If tasks don’t depend on each other, run them in parallel:
 
 ```makefile
 # These can run in parallel
@@ -359,14 +359,14 @@ Available commands:
 Only add advanced help systems when:
 
 - You have 25+ targets and `make help` is overwhelming
-- Team members frequently ask "what command do I use for X?"
-- You're onboarding people regularly
+- Team members frequently ask “what command do I use for X?”
+- You’re onboarding people regularly
 
 For most teams, the standard help pattern is sufficient.
 
 ## A Complete Practical Example
 
-Here's what most teams actually need:
+Here’s what most teams actually need:
 
 ```makefile
 # =============================================================================
@@ -415,11 +415,11 @@ build: ## Build Docker image
 	docker build -t $(IMAGE_TAG) .
 
 deploy: build test ## Deploy to environment (use ENVIRONMENT=staging/production)
-	@echo "Deploying to $(ENVIRONMENT)..."
+	@echo “Deploying to $(ENVIRONMENT)...”
 	docker push $(IMAGE_TAG)
 	kubectl apply -f k8s/$(ENVIRONMENT)/
 	kubectl set image deployment/$(APP_NAME) app=$(IMAGE_TAG)
-	@echo "✓ Deployed to $(ENVIRONMENT)"
+	@echo “✓ Deployed to $(ENVIRONMENT)”
 
 # =============================================================================
 # Additional Targets (add as needed)
@@ -429,7 +429,7 @@ deploy-staging: ## Deploy to staging
 	@$(MAKE) deploy ENVIRONMENT=staging
 
 deploy-prod: ## Deploy to production (requires confirmation)
-	@echo "⚠️  Deploy to PRODUCTION? [y/N]" && read ans && [ $$ans = y ]
+	@echo “⚠️  Deploy to PRODUCTION? [y/N]” && read ans && [ $$ans = y ]
 	@$(MAKE) deploy ENVIRONMENT=production
 
 logs: ## Show application logs
@@ -454,9 +454,9 @@ Add validation when it prevents actual problems:
 
 ```makefile
 validate: ## Validate configuration
-	@test -n "$(VERSION)" || (echo "VERSION required" && exit 1)
-	@test -n "$(ENVIRONMENT)" || (echo "ENVIRONMENT required" && exit 1)
-	@command -v kubectl >/dev/null || (echo "kubectl required" && exit 1)
+	@test -n “$(VERSION)” || (echo “VERSION required” && exit 1)
+	@test -n “$(ENVIRONMENT)” || (echo “ENVIRONMENT required” && exit 1)
+	@command -v kubectl >/dev/null || (echo “kubectl required” && exit 1)
 
 deploy: validate build test ## Deploy with validation
 	kubectl apply -f k8s/$(ENVIRONMENT)/
@@ -468,15 +468,15 @@ Require confirmation for operations that can't be easily undone:
 
 ```makefile
 deploy-prod: ## Deploy to production (requires confirmation)
-	@echo "⚠️  Deploy to PRODUCTION?"
-	@echo "Version: $(VERSION)"
-	@echo "Continue? [y/N]" && read ans && [ $$ans = y ]
+	@echo “⚠️  Deploy to PRODUCTION?”
+	@echo “Version: $(VERSION)”
+	@echo “Continue? [y/N]” && read ans && [ $$ans = y ]
 	@$(MAKE) deploy ENVIRONMENT=production
 
 clean-prod-data: ## Delete production data (DANGEROUS)
-	@echo "⚠️  This will DELETE PRODUCTION DATA"
-	@echo "Type 'DELETE PRODUCTION DATA' to confirm:"
-	@read ans && [ "$$ans" = "DELETE PRODUCTION DATA" ]
+	@echo “⚠️  This will DELETE PRODUCTION DATA”
+	@echo “Type ‘DELETE PRODUCTION DATA’ to confirm:”
+	@read ans && [ “$$ans” = “DELETE PRODUCTION DATA” ]
 	kubectl delete pvc --all -n production
 ```
 
@@ -486,13 +486,13 @@ Make it easy to see what's running:
 
 ```makefile
 status: ## Show deployment status
-	@echo "=== Containers ==="
+	@echo “=== Containers ===”
 	docker-compose ps
-	@echo ""
-	@echo "=== Kubernetes Pods ==="
+	@echo “”
+	@echo “=== Kubernetes Pods ===”
 	kubectl get pods -n $(ENVIRONMENT)
-	@echo ""
-	@echo "=== Recent Logs ==="
+	@echo “”
+	@echo “=== Recent Logs ===”
 	kubectl logs --tail=20 deployment/$(APP_NAME) -n $(ENVIRONMENT)
 ```
 
@@ -505,7 +505,7 @@ restart: ## Restart services quickly
 	docker-compose restart
 
 rebuild: clean build dev ## Full rebuild and restart
-	@echo "✓ Rebuilt and restarted"
+	@echo “✓ Rebuilt and restarted”
 ```
 
 ## When to Use Advanced Organization
@@ -541,7 +541,7 @@ sufficient.
 ### Target Not Found
 
 ```bash
-make: *** No rule to make target 'deploy-staging'. Stop.
+make: *** No rule to make target ‘deploy-staging’. Stop.
 ```
 
 Check: Is the target declared? Is there a typo?

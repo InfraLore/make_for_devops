@@ -2,17 +2,17 @@
 
 \chaptersubtitle{Orchestrating infrastructure-as-code workflows with consistency, safety, and team-wide discoverability.}
 
-The transition from application deployment to infrastructure provisioning represents one of the most critical—and often most chaotic—aspects of modern DevOps. While CI/CD pipelines have become relatively standardized for deploying applications, infrastructure provisioning workflows remain surprisingly ad-hoc across most organizations. Senior engineers keep complex Terraform commands in their shell history, CloudFormation deployments require consulting multiple wiki pages, and the question "how do I provision a new environment?" often yields different answers from different team members.
+The transition from application deployment to infrastructure provisioning represents one of the most critical—and often most chaotic—aspects of modern DevOps. While CI/CD pipelines have become relatively standardized for deploying applications, infrastructure provisioning workflows remain surprisingly ad-hoc across most organizations. Senior engineers keep complex Terraform commands in their shell history, CloudFormation deployments require consulting multiple wiki pages, and the question “how do I provision a new environment?” often yields different answers from different team members.
 
-This chaos isn't just an inconvenience—it's a significant risk. Infrastructure provisioning involves making changes to the very foundation of your systems. Yet these workflows are often the least documented, least standardized, and most dependent on team lore that lives only in senior engineers' minds.
+This chaos isn’t just an inconvenience—it’s a significant risk. Infrastructure provisioning involves making changes to the very foundation of your systems. Yet these workflows are often the least documented, least standardized, and most dependent on team lore that lives only in senior engineers’ minds.
 
 Make provides a powerful solution by creating a discoverable interface for infrastructure workflows. Instead of maintaining prose documentation that drifts out of sync, you create executable targets that encode both the workflow and its documentation in one place.
 
 ## The Infrastructure Provisioning Challenge
 
-Before diving into solutions, let's understand why infrastructure provisioning is particularly challenging.
+Before diving into solutions, let’s understand why infrastructure provisioning is particularly challenging.
 
-Consider what a typical Terraform workflow looks like when you ask a senior engineer "How do I deploy staging?":
+Consider what a typical Terraform workflow looks like when you ask a senior engineer “How do I deploy staging?”:
 
 ```bash
 # Um, first make sure you're on the right branch
@@ -48,7 +48,7 @@ a complex, multi-step prose description that will inevitably drift from reality.
 
 The challenge is compounded by:
 
-- **State management**: Terraform maintains state that's precious and fragile
+- **State management**: Terraform maintains state that’s precious and fragile
 - **Multi-environment complexity**: Each environment needs different
   configurations and safety levels
 - **Dependency ordering**: Some infrastructure must exist before other
@@ -62,7 +62,7 @@ The challenge is compounded by:
 Rather than trying to document every step and flag, Make lets you create a
 discoverable interface that reveals workflows as you need them.
 
-Here's how that same workflow becomes discoverable (see next page):\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+Here’s how that same workflow becomes discoverable (see next page):\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 .DEFAULT_GOAL := help
@@ -121,7 +121,7 @@ make init ENVIRONMENT=staging
 ```
 
 The workflow reveals itself progressively. Each target provides clear feedback
-about what's happening and what to do next. The complexity is hidden in scripts,
+about what’s happening and what to do next. The complexity is hidden in scripts,
 but the interface is simple and discoverable.
 
 ## Progressive Disclosure of Complexity
@@ -394,7 +394,7 @@ status-all-regions: ## Check status across regions
 	done
 ```
 
-The pattern is clear: Make handles the orchestration, showing what's happening
+The pattern is clear: Make handles the orchestration, showing what’s happening
 in each region while keeping the interface simple.
 
 ## Discovering Emergency Procedures
@@ -465,12 +465,12 @@ examples: ## Show common workflow examples
 
 ## Real-World Discovery Story
 
-Let's look at how discovery patterns work in practice.
+Let’s look at how discovery patterns work in practice.
 
 ### The Old Way: 50-Page Wiki
 
-The team maintained a comprehensive wiki titled "Infrastructure Provisioning
-Guide":
+The team maintained a comprehensive wiki titled “Infrastructure Provisioning
+Guide“:
 
 ```markdown
 # Deploying to Staging
@@ -525,7 +525,7 @@ Review plan above. To apply:
 ```
 
 Results after migration: onboarding time dropped from 2-3 days to 2-3 hours, the
-wiki reduced from 50 pages to "Run make help", and junior engineers were
+wiki reduced from 50 pages to “Run make help”, and junior engineers were
 deploying infrastructure safely within their first week.
 
 The key insight: **discovery replaces documentation**. Instead of maintaining
@@ -538,7 +538,7 @@ Infrastructure provisioning workflows become discoverable through Make by:
 
 1. **Progressive disclosure**: Simple interfaces that reveal complexity as needed
 2. **Self-documenting help**: Context-aware help that shows relevant commands
-3. **Clear prerequisites**: Targets that communicate what's needed before running
+3. **Clear prerequisites**: Targets that communicate what’s needed before running
 4. **Safe defaults**: Protection built into the workflow itself
 5. **Examples built in**: The Makefile teaches the workflow through use
 
@@ -551,6 +551,6 @@ actually work: trying things, reading error messages, following suggestions.
 Instead of fighting this pattern with static documentation, Make embraces it by
 making the documentation executable and responsive.
 
-In the next chapter, we'll extend these patterns to infrastructure
+In the next chapter, we’ll extend these patterns to infrastructure
 reliability—how Make can orchestrate testing, disaster recovery, and operational
 maintenance workflows that keep your infrastructure healthy.

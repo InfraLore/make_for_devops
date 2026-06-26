@@ -8,13 +8,13 @@ discoverable workflows that work identically in local development and CI/CD
 pipelines. You learned how to build pipeline-friendly targets and design for
 environment detection.
 
-But consistency alone isn't enough. Real-world CI/CD pipelines face additional
+But consistency alone isn’t enough. Real-world CI/CD pipelines face additional
 challenges: they must be **fast** (developers wait for feedback), **efficient**
 (CI minutes cost money), and **platform-aware** (each CI system has unique
 capabilities). They must handle caching intelligently, parallelize work
 effectively, and integrate with GitOps workflows.
 
-This chapter addresses these practical concerns. You'll learn optimization
+This chapter addresses these practical concerns. You’ll learn optimization
 strategies that dramatically reduce pipeline execution time, platform-specific
 integration patterns for popular CI/CD systems, and techniques for packaging
 artifacts and implementing GitOps workflows—all while maintaining the
@@ -22,7 +22,7 @@ consistency and discoverability that Make provides.
 
 ## The Performance Imperative
 
-Before diving into specific optimizations, let's understand why pipeline
+Before diving into specific optimizations, let’s understand why pipeline
 performance matters so much:
 
 **Developer Productivity**: A 10-minute pipeline means developers context-switch
@@ -52,8 +52,8 @@ fast**.
 
 ## Optimization Strategy 1: Layered Validation
 
-The most effective pipeline optimization is running only what's necessary. Not
-every commit requires full validation—implement a layered approach:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+The most effective pipeline optimization is running only what’s necessary. Not
+every commit requires full validation—implement a layered approach:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 # Progressive validation layers
@@ -92,7 +92,7 @@ This pattern provides crucial benefits:
 
 ## Optimization Strategy 2: Intelligent Parallelization
 
-Make's `-j` flag enables parallel execution, but effective parallelization
+Make’s `-j` flag enables parallel execution, but effective parallelization
 requires understanding what can run simultaneously:
 
 ```makefile
@@ -134,7 +134,7 @@ parallel jobs from interleaving, making logs readable.
 
 **Key considerations**:
 
-- Don't parallelize tasks that compete for the same resources (e.g., multiple
+- Don’t parallelize tasks that compete for the same resources (e.g., multiple
   database tests)
 - Respect CPU limits in CI environments
 - Use parallelization for independent tasks only
@@ -293,7 +293,7 @@ different platform-specific features. Where GitHub Actions focuses on log
 grouping, GitLab excels at **artifact management** and **integrated coverage
 reporting**.
 
-GitLab's artifact system allows you to preserve build outputs, test results, and
+GitLab’s artifact system allows you to preserve build outputs, test results, and
 coverage data between pipeline stages. The key is preparing these artifacts in
 the expected format. Similarly, GitLab can parse coverage percentages directly
 from job output and display them in merge requests—but you need to output
@@ -364,7 +364,7 @@ and when; Make defines how to run it**.
 This separation means you can test the full pipeline locally with `make ci-full`
 without needing a GitLab runner. When something fails in CI, you can reproduce
 it exactly on your machine. The platform-specific helpers (artifact preparation,
-cache paths) exist only to integrate with GitLab's features, not to change the
+cache paths) exist only to integrate with GitLab’s features, not to change the
 core workflow.
 
 ## Artifact Management: Build Once, Deploy Everywhere
@@ -391,20 +391,20 @@ What goes into an artifact? Not just the compiled binaries. Include
 configuration files, deployment scripts, Kubernetes manifests, database
 migrations—everything required to deploy and run the application. Version the
 artifact clearly, and generate checksums to verify integrity. When you deploy to
-production, you're deploying the exact bytes that were tested in staging, not a
-rebuild that "should" be identical.
+production, you’re deploying the exact bytes that were tested in staging, not a
+rebuild that “should” be identical.
 
 The benefits are substantial:
 - **Speed**: Building is slow (compilation, optimization, bundling). Deploying a
   pre-built artifact is fast.
-- **Consistency**: The same artifact in every environment eliminates "works on
-  my machine" and "works in staging" surprises.
+- **Consistency**: The same artifact in every environment eliminates “works on
+  my machine“ and ”works in staging“ surprises.
 - **Auditability**: Checksums prove nothing changed between build and
   deployment.
 - **Rollback**: Keep old artifacts around and rolling back means deploying a
   previous version, not rebuilding old code.
 
-Here's the pattern implemented in Make:
+Here’s the pattern implemented in Make:
 
 ```makefile
 # Artifact packaging
@@ -432,10 +432,10 @@ into a versioned tarball and generates a checksum. Upload this to your artifact
 repository (S3, Artifactory, GitHub Releases). When deploying, download the
 artifact, run `make artifacts-deploy`, and the verification step checks the
 checksum before extraction. If the checksum fails, deployment stops—you know
-something's wrong before broken code reaches your environment.
+something’s wrong before broken code reaches your environment.
 
 This pattern enables the pipeline optimization discussed earlier: build
-artifacts once in the expensive "build" stage, then quickly deploy to multiple
+artifacts once in the expensive “build” stage, then quickly deploy to multiple
 environments without rebuilding. A 10-minute build becomes a 30-second
 deployment.
 
@@ -461,7 +461,7 @@ This chapter covered practical CI/CD integration patterns:
 - Build once, deploy everywhere via artifact management and verification
 - Platform-aware output (log grouping, coverage reporting) while remaining portable
 
-**The Bottom Line**: Make's consistency enables speed. By standardizing
+**The Bottom Line**: Make’s consistency enables speed. By standardizing
 workflows in Make, you optimize once and benefit everywhere—in local
 development, CI pipelines, and production deployments. The result is faster
 feedback, lower costs, and more reliable deployments.
@@ -471,6 +471,6 @@ implementations. Your actual Makefiles will have more targets and more
 complexity, but they should follow these core principles: fast feedback through
 layers, intelligent caching, and platform-agnostic design.
 
-In the next chapter, we'll explore Make for infrastructure provisioning, showing
+In the next chapter, we’ll explore Make for infrastructure provisioning, showing
 how these CI/CD patterns extend to Terraform and other infrastructure-as-code
 tools.

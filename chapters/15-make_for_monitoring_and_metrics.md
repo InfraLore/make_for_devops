@@ -7,18 +7,18 @@ At 3 AM, your phone buzzes with an alert. The API response time has spiked to 2
 seconds. Half-awake, you need to check metrics, compare them to baseline, maybe
 adjust alert thresholds, and document what you find. You fumble through
 bookmarked Grafana URLs, try to remember the Prometheus query syntax, and
-eventually cobble together enough information to decide it's a false alarm
+eventually cobble together enough information to decide it’s a false alarm
 caused by a batch job.
 
-The next morning, a colleague asks: "How do I check if our database connection
-pool is healthy?" You realize that the ad-hoc investigation you did at 3 AM—the
+The next morning, a colleague asks: “How do I check if our database connection
+pool is healthy?“ You realize that the ad-hoc investigation you did at 3 AM—the
 queries you ran, the dashboards you checked, the metrics you compared—exists
 only in your browser history and fading memory.
 
 This scenario reveals a fundamental gap in how most teams handle observability.
 We invest heavily in monitoring infrastructure—Prometheus, Grafana, DataDog, New
 Relic—but the **workflows for interacting with that infrastructure** remain
-undocumented, scattered across wiki pages, or locked in senior engineers' minds.
+undocumented, scattered across wiki pages, or locked in senior engineers’ minds.
 
 ## The Observability Workflow Problem
 
@@ -33,14 +33,14 @@ Modern monitoring stacks are powerful but complex. A typical setup might include
 - Log aggregation systems
 
 Each tool has its own interface, query language, and configuration format.
-Common tasks like "check if the deployment improved performance" or "validate
-that our SLOs are being met" require coordinating multiple tools and remembering
+Common tasks like “check if the deployment improved performance” or “validate
+that our SLOs are being met“ require coordinating multiple tools and remembering
 specific queries or dashboard URLs.
 
 The knowledge gap manifests in several ways:
 
-**The Discovery Problem**: New team members don't know what metrics are
-available or how to access them. They don't know which Grafana dashboards to
+**The Discovery Problem**: New team members don’t know what metrics are
+available or how to access them. They don’t know which Grafana dashboards to
 check for different scenarios or what Prometheus queries reveal the health of
 each service.
 
@@ -50,7 +50,7 @@ rates and error rates, a third examines database query times. Without a shared
 workflow, investigations lack consistency.
 
 **The Documentation Problem**: Wiki pages describe what metrics exist but not
-how to use them operationally. They show example queries but don't explain when
+how to use them operationally. They show example queries but don’t explain when
 to run them or how to interpret the results.
 
 **The Integration Problem**: Monitoring is often treated as separate from
@@ -74,7 +74,7 @@ make compare-performance  # Compare current vs baseline
 make metrics-help         # Learn what's available
 ```
 
-Let's start with a basic pattern for making metrics discoverable:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+Let’s start with a basic pattern for making metrics discoverable:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 .PHONY: metrics-help metrics-api metrics-db metrics-cache
@@ -119,8 +119,8 @@ focused, actionable information.
 
 One challenge with monitoring tools is that queries often lack context. A
 Prometheus query like `rate(http_requests_total[5m])` tells you the request
-rate, but not what that number means operationally—what's normal, what's
-concerning, or what to do if it's outside expected ranges.
+rate, but not what that number means operationally—what’s normal, what’s
+concerning, or what to do if it’s outside expected ranges.
 
 Make targets can embed this operational context:
 
@@ -158,7 +158,7 @@ metrics-api-detailed: ## Detailed API health check with context
 
 Now when an engineer runs `make metrics-api-detailed`, they get not just raw
 numbers but interpreted results with operational context. The target tells them
-what's normal, what's concerning, and what to do next.
+what’s normal, what’s concerning, and what to do next.
 
 ## Monitoring Stack Deployment as Discoverable Workflow
 
@@ -457,7 +457,7 @@ regressions immediately visible.
 
 ## Real-World Example: Monitoring Stack Setup
 
-Let's look at a complete example that ties these concepts together—setting up
+Let’s look at a complete example that ties these concepts together—setting up
 monitoring for a microservices application:
 
 ```makefile
@@ -583,7 +583,7 @@ critical problems:
 1. **Discoverability**: New team members can run `make monitoring-help` to learn
    what monitoring capabilities exist
 2. **Consistency**: Everyone uses the same queries and checks the same metrics
-3. **Context**: Metrics include operational context about what's normal and what
+3. **Context**: Metrics include operational context about what’s normal and what
    to do when things are abnormal
 4. **Integration**: Monitoring becomes part of the standard development
    workflow, not a separate concern
@@ -597,6 +597,6 @@ The key is designing monitoring workflows that are:
 - **Composable**: Complex checks built from simple, focused targets
 - **Integrated**: Monitoring naturally flows into development and deployment
 
-In the next chapter, we'll explore how Make brings the same discoverability
+In the next chapter, we’ll explore how Make brings the same discoverability
 benefits to logging and incident response, completing the observability picture
 with structured approaches to debugging and emergency response.

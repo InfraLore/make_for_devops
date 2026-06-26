@@ -2,11 +2,11 @@
 
 \chaptersubtitle{Transforming chaos into discoverable, executable runbooks that capture team expertise and accelerate incident resolution.}
 
-The post-mortem document tells a familiar story: "At 14:37 UTC, users began experiencing login failures. The on-call engineer investigated logs but initially checked the wrong service. After 15 minutes, they realized the authentication service was failing. They found the relevant logs, identified a database connection issue, but struggled to locate the correct restart procedure. A senior engineer was pulled into the incident. Total time to resolution: 47 minutes."
+The post-mortem document tells a familiar story: “At 14:37 UTC, users began experiencing login failures. The on-call engineer investigated logs but initially checked the wrong service. After 15 minutes, they realized the authentication service was failing. They found the relevant logs, identified a database connection issue, but struggled to locate the correct restart procedure. A senior engineer was pulled into the incident. Total time to resolution: 47 minutes.”
 
-The post-mortem asks: "Why did it take 15 minutes to find the right logs? Why didn't the on-call engineer know the restart procedure?" The uncomfortable answer: the knowledge existed, but wasn't discoverable when needed.
+The post-mortem asks: “Why did it take 15 minutes to find the right logs? Why didn’t the on-call engineer know the restart procedure?” The uncomfortable answer: the knowledge existed, but wasn’t discoverable when needed.
 
-When services are failing and users are impacted, engineers don't read documentation. They need to **act**. They need commands to run, not procedures to follow. They need discovery, not search.
+When services are failing and users are impacted, engineers don’t read documentation. They need to **act**. They need commands to run, not procedures to follow. They need discovery, not search.
 
 Make offers a solution: **encode your incident response procedures as executable runbooks**. Instead of documentation that describes what to do, create targets that do it directly, with built-in context and validation.
 
@@ -22,7 +22,7 @@ The costs:
 
 **Knowledge Concentration**: Critical response knowledge concentrates in a few senior engineers who become bottlenecks.
 
-**Training Friction**: New team members can't practice incident response safely.
+**Training Friction**: New team members can’t practice incident response safely.
 
 **Lost Lessons**: Hard-won insights from past incidents fade from memory.
 
@@ -30,7 +30,7 @@ Make-based incident runbooks address these by making incident response procedure
 
 ## Discovering Incident Response
 
-Here's the traditional documentation approach:
+Here’s the traditional documentation approach:
 
 ```markdown
 # Database Connection Pool Exhaustion Response
@@ -51,9 +51,9 @@ Here's the traditional documentation approach:
 3. Monitor recovery
 ```
 
-This requires you to remember complex commands, doesn't validate context, and doesn't protect you from dangerous operations.
+This requires you to remember complex commands, doesn’t validate context, and doesn’t protect you from dangerous operations.
 
-Here's the discovery-based approach:\footnote{Script delegation pattern---see Chapter 21 for how this aids learning.}
+Here’s the discovery-based approach:\footnote{Script delegation pattern — see Chapter 21 for how this aids learning.}
 
 ```makefile
 .PHONY: incident-help incident-db-pool
@@ -180,7 +180,7 @@ logs-tail: ## Tail live logs
 	@./scripts/tail-logs.sh
 ```
 
-Running `make logs` shows what's available. Each command provides clear, focused output and suggests next steps.
+Running `make logs` shows what’s available. Each command provides clear, focused output and suggests next steps.
 
 ## Integrating Alerts with Runbooks
 
@@ -224,7 +224,7 @@ incident-restart-workers: ## Restart worker processes
 	@echo "Monitor: make watch-queue-depth"
 ```
 
-That expertise is now available to everyone, including the engineer who created it when they're on-call six months later.
+That expertise is now available to everyone, including the engineer who created it when they’re on-call six months later.
 
 ## Safe Practice Environments
 
@@ -341,10 +341,10 @@ Make-based incident response transforms how teams handle production issues:
 5. **Learning**: Runbooks teach the system while solving problems
 6. **Evolution**: Easy to update based on new insights
 
-The goal isn't to automate away judgment—incidents often require creative problem-solving. Instead, runbooks handle routine parts (finding logs, checking health, executing common fixes) so engineers can focus on novel aspects.
+The goal isn’t to automate away judgment—incidents often require creative problem-solving. Instead, runbooks handle routine parts (finding logs, checking health, executing common fixes) so engineers can focus on novel aspects.
 
-Most importantly, these runbooks capture team knowledge in executable form. That 2 AM incident response expertise that used to live only in senior engineers' heads now lives in version-controlled Make targets that anyone can execute, learn from, and improve.
+Most importantly, these runbooks capture team knowledge in executable form. That 2 AM incident response expertise that used to live only in senior engineers’ heads now lives in version-controlled Make targets that anyone can execute, learn from, and improve.
 
-The pattern is consistent: start with `make incident-help` or `make logs`, discover what's available, follow the breadcrumbs. Each target provides clear output and suggests next steps. The workflow reveals itself through interaction, not through reading 23-page Google Docs at 2 AM.
+The pattern is consistent: start with `make incident-help` or `make logs`, discover what’s available, follow the breadcrumbs. Each target provides clear output and suggests next steps. The workflow reveals itself through interaction, not through reading 23-page Google Docs at 2 AM.
 
-In the next chapter, we'll explore how to apply similar patterns to security and compliance workflows, where discoverability and consistent execution are even more critical.
+In the next chapter, we’ll explore how to apply similar patterns to security and compliance workflows, where discoverability and consistent execution are even more critical.

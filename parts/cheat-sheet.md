@@ -1,5 +1,5 @@
 ---
-title: "Make Cheat Sheet"
+title: “Make Cheat Sheet”
 mainfont: Merriweather 24pt
 monofont: JetBrainsMono Nerd Font Mono
 headingfont: Lato-Regular
@@ -274,10 +274,10 @@ export ENV=prod; make deploy
 
 # Common Errors
 
-**"missing separator"**
+**“missing separator”**
 → Use TAB, not spaces
 
-**"No rule to make target"**
+**“No rule to make target”**
 → Check spelling/dependencies
 
 **Variables not expanding**

@@ -10,7 +10,7 @@ This appendix provides prompt templates for working with AI coding assistants to
 4. **Iterate if needed** - Use follow-up prompts to refine the result
 5. **Test thoroughly** - AI-generated Makefiles should be tested just like any code
 
-Remember: You're responsible for the final Makefile. AI generates, you validate and approve.
+Remember: You’re responsible for the final Makefile. AI generates, you validate and approve.
 
 ---
 
@@ -165,7 +165,7 @@ OPTION A: Pattern Rules (for similar environments)
 When environments are mostly identical:
 ```makefile
 deploy-%: validate-% ## Deploy to specified environment
-	@echo "Deploying to $*..."
+	@echo “Deploying to $*...”
 	@./scripts/deploy.sh $* 
 
 validate-dev:
@@ -201,9 +201,9 @@ When you have 10+ variables per environment:
 -include config/$(ENVIRONMENT).mk
 
 show-config:
-	@echo "Environment: $(ENVIRONMENT)"
-	@echo "Registry: $(REGISTRY)"
-	@echo "Replicas: $(REPLICAS)"
+	@echo “Environment: $(ENVIRONMENT)”
+	@echo “Registry: $(REGISTRY)”
+	@echo “Replicas: $(REPLICAS)”
 ```
 
 REQUIREMENTS:
@@ -242,7 +242,7 @@ DOCKER ORCHESTRATION CONTEXT:
 - Services: [database, cache, app, etc.]
 - Environments: [dev, test, production]
 
-KEY PRINCIPLE: Make doesn't replace Docker tools, it provides the discoverable
+KEY PRINCIPLE: Make doesn’t replace Docker tools, it provides the discoverable
 interface to them. Make should:
 
 - Show what Docker operations are available (make docker or make help)
@@ -316,14 +316,14 @@ I need CI/CD pipeline support in my Makefile following these principles:
 CI/CD PHILOSOPHY:
 
 - Same commands should work locally and in CI
-- CI should just be "make ci" - everything else is implementation
+- CI should just be “make ci” - everything else is implementation
 - Local engineers should be able to run CI steps individually
-- No surprises in CI that can't be reproduced locally
+- No surprises in CI that can’t be reproduced locally
 
 CURRENT CI SETUP:
 
 - Platform: [GitHub Actions / GitLab CI / Jenkins / etc.]
-- Current approach: [describe or "starting fresh"]
+- Current approach: [describe or “starting fresh”]
 - Pain points: [different commands locally vs CI, hard to debug, etc.]
 
 DESIRED PATTERN:
@@ -374,7 +374,7 @@ REQUIREMENTS:
 - Full pipeline should be one command: make ci
 - Should work identically locally and in CI
 - Fast feedback - fail fast on errors
-- Clear output showing what's happening
+- Clear output showing what’s happening
 
 Generate Makefile code for CI/CD. Include:
 
@@ -435,7 +435,7 @@ validate-prod: validate-dev
 REQUIREMENTS:
 
 - Convert repetitive targets to pattern rules where appropriate
-- Keep exceptions as explicit targets (don't force everything into patterns)
+- Keep exceptions as explicit targets (don’t force everything into patterns)
 - Maintain or improve discoverability
 - Add validation appropriate to each use case
 - Include usage examples
@@ -445,7 +445,7 @@ QUESTIONS TO CONSIDER:
 - Are the targets truly identical except for one parameter?
 - Do any environments need special handling?
 - Would pattern rules make the Makefile clearer or more confusing?
-- Can new engineers still understand what's happening?
+- Can new engineers still understand what’s happening?
 
 Generate improved Makefile code using pattern rules. Explain:
 
@@ -467,7 +467,7 @@ FUNCTION PRINCIPLES FROM THE BOOK:
 - Use functions when multi-line command sequences repeat across 3+ targets
 - Functions accept parameters via $(1), $(2), etc.
 - Invoke with $(call function_name,arg1,arg2)
-- Don't overuse - single-line commands should use variables instead
+- Don’t overuse - single-line commands should use variables instead
 - Functions add indirection - only use when duplication pain exceeds learning curve
 
 EXAMPLE PATTERN:
@@ -609,14 +609,14 @@ Generate Makefile code for secret management. Include:
 ## Prompt 9: Making an Existing Makefile More Discoverable
 
 ```
-I have a working Makefile but new team members can't figure out how to use it.
+I have a working Makefile but new team members can’t figure out how to use it.
 
 CURRENT MAKEFILE:
 [Paste your Makefile here]
 
 DISCOVERABILITY PROBLEMS:
 
-- No help target - running "make" gives an error or does something unexpected
+- No help target - running “make” gives an error or does something unexpected
 - Targets have unclear names or no documentation
 - No guidance on what to do first or next
 - Complex targets with no explanation
@@ -628,7 +628,7 @@ DISCOVERABILITY PRINCIPLES TO APPLY:
 ```makefile
 .DEFAULT_GOAL := help
 ```
-Running plain "make" should show help, not error or do something unexpected.
+Running plain “make” should show help, not error or do something unexpected.
 
 2. HELP TARGET
 ```makefile
@@ -689,7 +689,7 @@ REQUIREMENTS:
 - Group related operations with menu targets
 - Add guidance for next steps
 - Use underscore prefix for internal targets
-- Keep existing functionality - don't break things
+- Keep existing functionality - don’t break things
 
 Generate an improved version focused on discoverability. Explain:
 

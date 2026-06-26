@@ -47,6 +47,12 @@ $endfor$
 $if(date)$
 <p class="date">$date$</p>
 $endif$
+$if(version)$
+<p class="version">Edition: $version$</p>
+$endif$
+$if(git_sha)$
+<p class="git">Build $git_date$ — commit <code>$git_sha$</code></p>
+$endif$
 </header>
 $endif$
 $if(toc)$

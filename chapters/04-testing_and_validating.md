@@ -3,19 +3,19 @@
 \chaptersubtitle{Practical strategies for catching real problems before they
 impact your team.}
 
-In the previous chapters, we've explored how Make can transform your DevOps
-workflows into discoverable, self-documenting systems. But there's a critical
-question we haven't yet addressed: **How do you ensure your Makefiles actually
+In the previous chapters, we’ve explored how Make can transform your DevOps
+workflows into discoverable, self-documenting systems. But there’s a critical
+question we haven’t yet addressed: **How do you ensure your Makefiles actually
 work correctly?**
 
 This might seem like an odd question at first. After all, if a Make target runs
 without errors, it works, right? Unfortunately, the reality is more complex.
 Your deployment Makefile might work perfectly on your laptop but fail when a
 colleague tries to use it because they have a different version of kubectl, or
-they're running on Windows, or a recent configuration change introduced a subtle
+they’re running on Windows, or a recent configuration change introduced a subtle
 dependency.
 
-Here's the pragmatic truth about Makefile testing: **most Makefiles only need
+Here’s the pragmatic truth about Makefile testing: **most Makefiles only need
 light testing, and comprehensive test suites are usually over-engineering.**
 This chapter will teach you how to catch real problems with minimal effort, not
 how to build elaborate testing infrastructure.
@@ -29,16 +29,16 @@ Makefile issues with just a few checks:
 3. **Check for typos**: `make nonexistent-target` should give a clear error,
    not silent failure
 \newpage
-4. **Validate variables**: Add checks like `@test -n "$(REQUIRED_VAR)"
+4. **Validate variables**: Add checks like `@test -n “$(REQUIRED_VAR)”
    || (echo "REQUIRED_VAR not set" && exit 1)`
 5. **Use .PHONY**: Declare your action targets as `.PHONY: build test deploy clean`
 
 These basic practices will prevent most common Makefile problems. Add more
-sophisticated testing only when you encounter actual issues that these don't
+sophisticated testing only when you encounter actual issues that these don’t
 catch.
 
 \begin{calloutbox}[Testing: Start with What Breaks, Not What Could Break] Don't
-write tests before you have problems. Testing should solve actual issues you've
+write tests before you have problems. Testing should solve actual issues you’ve
 encountered:
 
 \begin{itemize}
@@ -53,7 +53,7 @@ Write tests when something breaks, not preemptively. \end{calloutbox}
 
 ## When to Add Testing (and When Not To)
 
-Before we dive into testing techniques, let's be clear about when testing
+Before we dive into testing techniques, let’s be clear about when testing
 actually adds value:
 
 **Add testing when:**
@@ -61,20 +61,20 @@ actually adds value:
 - The Makefile orchestrates critical production deployments
 - New team members frequently need to use the workflows
 - The Makefile is over 200 lines
-- You've had actual bugs that caused real problems
+- You’ve had actual bugs that caused real problems
 
 **Skip sophisticated testing when:**
-- You're the only one using the Makefile
+- You’re the only one using the Makefile
 - The Makefile is under 100 lines and 
 - `make -n` catches your issues
 - Targets have no complex logic or dependencies
-- You haven't actually encountered bugs
+- You haven’t actually encountered bugs
 
 \newpage
 
 ## Quick Validation with Make's Dry Run
 
-Make's `--dry-run` (or `-n`) flag is the single most valuable testing tool you
+Make’s `--dry-run` (or `-n`) flag is the single most valuable testing tool you
 have. It shows you exactly what Make will execute without actually running
 commands.
 
@@ -108,7 +108,7 @@ test-build-deps:
 ## Static Analysis with Checkmake
 
 **Checkmake** (https://github.com/checkmake/checkmake) is a linting tool for
-Makefiles. It's useful for teams but often overkill for individual projects.
+Makefiles. It’s useful for teams but often overkill for individual projects.
 
 \begin{calloutbox}[Linting: Useful for Teams, Overkill for Individuals]
 \textbf{Use checkmake when:}
@@ -128,7 +128,7 @@ Makefiles. It's useful for teams but often overkill for individual projects.
 \end{itemize}
 
 Linting adds value when it prevents team confusion. For personal projects or
-small teams, it's usually unnecessary overhead. \end{calloutbox}
+small teams, it’s usually unnecessary overhead. \end{calloutbox}
 
 ### Quick Checkmake Setup
 
@@ -146,17 +146,17 @@ lint: ## Validate Makefile style
 ```
 
 Checkmake catches issues like missing `.PHONY` declarations, inconsistent tabs,
-and undefined variables. Don't make it a blocker unless these issues are causing
+and undefined variables. Don’t make it a blocker unless these issues are causing
 real problems.
 
 ## Testing Patterns That Actually Matter
 
-Most Makefile bugs fall into a few categories. Here's how to catch them
+Most Makefile bugs fall into a few categories. Here’s how to catch them
 efficiently:
 
 ### 1. Variable Validation
 
-Variables are the most common source of bugs. Test them when they've caused
+Variables are the most common source of bugs. Test them when they’ve caused
 actual problems:
 
 ```makefile
@@ -224,7 +224,7 @@ testing for truly critical workflows. \end{calloutbox}
 
 ## A Practical Test Suite
 
-Here's a minimal but effective test suite that covers what actually breaks:
+Here’s a minimal but effective test suite that covers what actually breaks:
 
 ```makefile
 .PHONY: test test-quick test-critical
@@ -300,12 +300,12 @@ test:makefile:
       - Makefile
 ```
 
-Don't add CI testing until you've had a problem that it would have caught.
+Don’t add CI testing until you’ve had a problem that it would have caught.
 
 ## Advanced Testing (When You Need It)
 
 The following techniques are valuable for large, critical Makefiles (300+ lines,
-production deployments, 5+ team members). For most Makefiles, they're overkill.
+production deployments, 5+ team members). For most Makefiles, they’re overkill.
 
 ### Regression Testing
 
@@ -371,7 +371,7 @@ install-hooks:
 
 ## Troubleshooting Common Issues
 
-When tests fail, here's how to debug:
+When tests fail, here’s how to debug:
 
 ```makefile
 # Show exactly what Make will do
@@ -413,17 +413,17 @@ Testing Makefiles effectively means being pragmatic about what you test and why:
 
 7. **Integrate gradually** - Start with `test-quick`, add more tests only when needed
 
-8. **Minimize effort** - If tests are painful to run, they won't get run
+8. **Minimize effort** - If tests are painful to run, they won’t get run
 
 The investment in testing should match the criticality and complexity of your
 Makefile. A 50-line personal Makefile might need just `make -n` validation,
 while a 500-line production deployment Makefile serving 20 developers deserves
 comprehensive testing.
 
-The goal isn't perfect test coverage—it's catching real problems before they
-impact your team's productivity.
+The goal isn’t perfect test coverage—it’s catching real problems before they
+impact your team’s productivity.
 
-In the next chapter, we'll explore how to use Make's variable system to create
+In the next chapter, we’ll explore how to use Make’s variable system to create
 flexible, environment-aware workflows that adapt to different deployment
-scenarios while maintaining the reliability we've built through targeted
+scenarios while maintaining the reliability we’ve built through targeted
 testing.

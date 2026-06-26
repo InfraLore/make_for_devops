@@ -2,13 +2,13 @@
 
 \chaptersubtitle{Making security scanners discoverable, compliance checks repeatable, and audit trails automatic.}
 
-Your company just landed a major enterprise client, but there's a catch: they require SOC 2 Type II compliance, quarterly security audits, and evidence that you're running vulnerability scans before every deployment. The security team sends you a 47-page compliance checklist. You need to prove that you scan container images, rotate secrets monthly, validate TLS certificates, check for exposed credentials, maintain audit logs, and document all configuration changes.
+Your company just landed a major enterprise client, but there’s a catch: they require SOC 2 Type II compliance, quarterly security audits, and evidence that you’re running vulnerability scans before every deployment. The security team sends you a 47-page compliance checklist. You need to prove that you scan container images, rotate secrets monthly, validate TLS certificates, check for exposed credentials, maintain audit logs, and document all configuration changes.
 
-You look at your deployment pipeline. It works—containers build, tests pass, deployments succeed. But security scanning? That's a manual step someone runs "when they remember." Secret rotation happens "sometime" using a process that's different for each service. Audit logs exist somewhere, but nobody's sure how to query them.
+You look at your deployment pipeline. It works—containers build, tests pass, deployments succeed. But security scanning? That’s a manual step someone runs “when they remember.” Secret rotation happens “sometime” using a process that’s different for each service. Audit logs exist somewhere, but nobody’s sure how to query them.
 
-The security team's recommendation: "Add security scanning tools to your pipeline." This sounds simple until you discover there are dozens of tools—Trivy, Snyk, Grype for containers; TruffleHog, git-secrets for credential scanning; tfsec, Checkov for infrastructure; gosec, bandit, semgrep for code. Each has different installation procedures, configuration files, output formats, and failure criteria.
+The security team’s recommendation: “Add security scanning tools to your pipeline.” This sounds simple until you discover there are dozens of tools—Trivy, Snyk, Grype for containers; TruffleHog, git-secrets for credential scanning; tfsec, Checkov for infrastructure; gosec, bandit, semgrep for code. Each has different installation procedures, configuration files, output formats, and failure criteria.
 
-This is where most teams make a critical mistake: they add the tools but don't make them **discoverable or repeatable**. Security scanning becomes something that "happens in CI" but nobody knows how to run locally, interpret results, or fix issues.
+This is where most teams make a critical mistake: they add the tools but don’t make them **discoverable or repeatable**. Security scanning becomes something that “happens in CI” but nobody knows how to run locally, interpret results, or fix issues.
 
 Make offers a better approach: **security and compliance as discoverable workflows**.
 
@@ -23,7 +23,7 @@ See: https://ci.company.com/build/12847/security-scan
 
 They click the link, see a wall of JSON output, and now what? Which vulnerabilities are critical? How do they fix them? Can they test the fix locally?
 
-Here's the discovery-based approach:
+Here’s the discovery-based approach:
 
 ```makefile
 .PHONY: security-check security-scan-containers security-scan-code
@@ -128,7 +128,7 @@ Notice the pattern: each area has a menu that reveals available commands, and ea
 
 ## Secret Rotation as Discoverable Workflow
 
-Security isn't just scanning—it's operational practices like secret rotation:
+Security isn’t just scanning—it’s operational practices like secret rotation:
 
 ```makefile
 security-rotate: ## Show secret rotation workflows
@@ -328,10 +328,10 @@ Make-based security and compliance workflows transform these critical responsibi
 4. **Evidence**: Automated collection of compliance evidence
 5. **Integration**: Security becomes part of normal workflow
 
-The goal isn't to replace security teams or automate away human judgment. Instead, Make workflows make security tools accessible to everyone, capture best practices as executable procedures, and generate continuous evidence of compliance.
+The goal isn’t to replace security teams or automate away human judgment. Instead, Make workflows make security tools accessible to everyone, capture best practices as executable procedures, and generate continuous evidence of compliance.
 
-Most importantly, these workflows transform security from a blocker into a teacher. When a security scan fails, developers don't just see "scan failed"—they see what failed, why it matters, how to fix it, and how to verify the fix. Security knowledge becomes discoverable team knowledge, captured in version-controlled Make targets that anyone can run, learn from, and improve.
+Most importantly, these workflows transform security from a blocker into a teacher. When a security scan fails, developers don’t just see “scan failed”—they see what failed, why it matters, how to fix it, and how to verify the fix. Security knowledge becomes discoverable team knowledge, captured in version-controlled Make targets that anyone can run, learn from, and improve.
 
-The pattern is consistent: start with `make security` to see what's available, discover deeper commands as needed, follow the breadcrumbs toward resolution. Security becomes part of the discovery journey rather than a mysterious gate that sometimes blocks your work.
+The pattern is consistent: start with `make security` to see what’s available, discover deeper commands as needed, follow the breadcrumbs toward resolution. Security becomes part of the discovery journey rather than a mysterious gate that sometimes blocks your work.
 
-In the next chapter, we'll explore how to scale these patterns across entire organizations, creating shared Make libraries and standards that work across diverse teams and projects.
+In the next chapter, we’ll explore how to scale these patterns across entire organizations, creating shared Make libraries and standards that work across diverse teams and projects.
