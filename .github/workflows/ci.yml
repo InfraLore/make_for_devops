@@ -18,5 +18,5 @@ jobs:
       - name: Install dependencies
         run: pip install pymarkdownlnt
 
-      - name: Run make lint
-        run: make lint
+      - name: Run make lint-markdown-strict
+        run: make lint-markdown-strict
