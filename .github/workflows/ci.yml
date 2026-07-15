@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: danteev/texlive:latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+
+      - name: Install tools
+        run: pip install --break-system-packages pymarkdown
+
+      - name: Validate
+        run: make validate
+
+      - name: Lint
+        run: make lint
+
+      - name: Build PDF
+        run: make pdf
+
+      - name: Build EPUB
+        run: make epub
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: book-builds
+          path: |
+            build/pdf/MakeForDevops.pdf
+            build/epub/MakeForDevops.epub
+
+  vale:
+    runs-on: ubuntu-latest
+    container:
+      image: danteev/texlive:latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Vale
+        run: |
+          curl -sL https://github.com/errata-ai/vale/releases/download/v3.9.1/vale_3.9.1_Linux_64-bit.tar.gz | tar xz -C /usr/local/bin vale
+
+      - name: Vale (informational)
+        continue-on-error: true
+        run: make vale-error
