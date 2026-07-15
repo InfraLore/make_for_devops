@@ -31,10 +31,15 @@ jobs:
       - name: Build PDF
         run: make pdf
 
+      - name: Build EPUB
+        run: make epub
+
       - uses: actions/upload-artifact@v7
         with:
-          name: book-pdf
-          path: build/pdf/MakeForDevops.pdf
+          name: book-builds
+          path: |
+            build/pdf/MakeForDevops.pdf
+            build/epub/MakeForDevops.epub
 
   vale:
     runs-on: ubuntu-latest
