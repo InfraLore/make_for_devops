@@ -270,10 +270,10 @@ Start with the simplest approach. Most teams never need external systems.
 ```makefile
 # Check that secrets are provided
 check-secrets:
-	@test -n "$$DATABASE_PASSWORD" || \
-		(echo "Set DATABASE_PASSWORD environment variable" && exit 1)
-	@test -n "$$API_KEY" || \
-		(echo "Set API_KEY environment variable" && exit 1)
+	@test -n "$$DATABASE_PASSWORD" \
+	|| (echo "Set DATABASE_PASSWORD environment variable" && exit 1)
+	@test -n "$$API_KEY" \
+	|| (echo "Set API_KEY environment variable" && exit 1)
 
 # Use them without exposing in logs
 deploy: check-secrets
@@ -315,8 +315,8 @@ Validate without exposing values:
 
 ```makefile
 validate-secrets:
-	@test $${#DATABASE_PASSWORD} -ge 8 || \
-		(echo "DATABASE_PASSWORD too short" && exit 1)
+	@test $${#DATABASE_PASSWORD} -ge 8 \
+	|| (echo "DATABASE_PASSWORD too short" && exit 1)
 	@echo "✓ Secrets validated"
 ```
 
@@ -341,8 +341,8 @@ validate-config: ## Validate configuration
 
 	# Has production deployed with 1 replica? Add this:
 	@if [ "$(ENVIRONMENT)" = "production" ]; then \
-		test "$(REPLICAS)" -gt 1 || \
-			(echo "Production needs REPLICAS > 1" && exit 1); \
+		test "$(REPLICAS)" -gt 1 \
+		|| (echo "Production needs REPLICAS > 1" && exit 1); \
 	fi
 
 	@echo "✓ Configuration valid"
@@ -541,8 +541,8 @@ debug-config: ## Debug configuration values
 	@echo "Git branch: $(shell git rev-parse --abbrev-ref HEAD)"
 	@echo ""
 	@echo "=== Environment Variables ==="
-	@echo "DATABASE_PASSWORD: $$(test -n "$$DATABASE_PASSWORD" && echo "SET" || \
-	  echo "NOT SET")"
+	@echo "DATABASE_PASSWORD: $$(test -n "$$DATABASE_PASSWORD" && echo "SET" \
+	|| echo "NOT SET")"
 	@echo "API_KEY: $$(test -n "$$API_KEY" && echo "SET" || echo "NOT SET")"
 ```
 

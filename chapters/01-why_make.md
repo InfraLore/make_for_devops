@@ -642,6 +642,11 @@ core pattern that makes all of this possible. You'll learn how to transform your
 static documentation into living, breathing, always-current workflow interfaces
 that your team will actually use and maintain.
 
+\begin{calloutbox}[Make Cheat Sheet] A standalone printable PDF cheat sheet
+covering Make syntax, common patterns, debugging tips, and more is available at
+\url{https://github.com/InfraLore/make\_cheat\_sheet}. Keep it at your desk as
+you work through the examples in this book. \end{calloutbox}
+
 \begin{calloutbox}[A Note on Examples and Script Delegation] Throughout this
 book, you'll notice that many Makefile examples delegate to scripts like
 \texttt{./scripts/deploy.sh} or \texttt{./scripts/validate-config.sh}. This

@@ -144,8 +144,8 @@ As you debug production issues, you learn more complex commands:
 k8s-debug-pod: ## Debug a specific pod (logs, describe, events)
 	@echo "Pod name:"
 	@read pod; \
-	kubectl logs $pod --tail=50 && \
-	kubectl describe pod $pod
+	kubectl logs $pod --tail=50 \
+	&& kubectl describe pod $pod
 
 k8s-pod-shell: ## Get shell in pod
 	@echo "Pod name:"
@@ -289,8 +289,8 @@ Simple commands, barely worth capturing. But you're building the habit.
 k8s-debug-pod: ## Debug pod with logs and describe
 	@echo "Pod:"
 	@read pod; \
-	kubectl logs $$pod && \
-	kubectl describe pod $$pod
+	kubectl logs $$pod \
+	&& kubectl describe pod $$pod
 
 docker-clean: ## Clean up Docker
 	docker system prune -f

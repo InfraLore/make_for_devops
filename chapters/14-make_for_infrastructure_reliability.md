@@ -161,8 +161,8 @@ recover-database: ## Recover database from backup
 	@echo ""
 	@./scripts/list-backups.sh $(ENVIRONMENT) database
 	@echo ""
-	@echo -n "Backup to restore (or 'latest'): " && read backup && \
-		./scripts/recover-database.sh $(ENVIRONMENT) $$backup
+	@echo -n "Backup to restore (or 'latest'): " && read backup \
+	&& ./scripts/recover-database.sh $(ENVIRONMENT) $$backup
 	@echo ""
 	@echo "Next: make verify-database"
 
@@ -284,8 +284,8 @@ maint-updates: ## Apply system updates
 	@echo ""
 	@./scripts/check-update-impact.sh $(ENVIRONMENT)
 	@echo ""
-	@echo -n "Proceed with updates? [y/N] " && read ans && \
-		[ $${ans:-N} = y ]
+	@echo -n "Proceed with updates? [y/N] " && read ans \
+	&& [ $${ans:-N} = y ]
 	@./scripts/apply-updates.sh $(ENVIRONMENT)
 
 maint-rotate-creds: ## Rotate credentials

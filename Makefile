@@ -43,7 +43,7 @@ PART_3 = parts/part-3.md chapters/09-make_and_docker.md chapters/10-make_and_kub
 PART_4 = parts/part-4.md chapters/13-make_for_infrastructure_provisioning.md chapters/14-make_for_infrastructure_reliability.md chapters/15-make_for_monitoring_and_metrics.md chapters/16-make_for_logging_and_incident_response.md chapters/17-security_and_compliance_workflows.md
 PART_5 = parts/part-5.md chapters/18-scaling_make_across_teams_and_projects.md chapters/19-troubleshooting_and_debugging_make_workflows.md chapters/20-the_future_of_make_in_devops.md chapters/21-make_as_your_personal_learning_tool.md
 
-APPENDICES = chapters/Appendix_A-quick_reference_guide.md chapters/Appendix_B-migration_strategies.md chapters/Appendix_C-prompt_templates.md
+APPENDICES = chapters/Appendix_A-quick_reference_guide.md chapters/Appendix_B-migration_strategies.md chapters/Appendix_C-prompt_templates.md chapters/Appendix_D-resources.md
 FRONTMATTER = parts/frontmatter.md chapters/Foreword.md parts/mainmatter.md
 
 CHAPTERS = $(FRONTMATTER) $(PART_1) $(PART_2) $(PART_3) $(PART_4) $(PART_5) $(APPENDICES)
@@ -148,7 +148,7 @@ endef
 	typographic-fixes typographic-fixes-check \
 	sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs \
 	diagrams lint lint-markdown lint-markdown-strict vale-suggest vale-error lint-fix \
-	stale-chapters
+	stale-chapters cheat
 
 all:	book ## Build all formats (epub, html, pdf, docx)
 
@@ -528,7 +528,10 @@ html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html ## Generate HTML format
 
 pdf:	validate check-pdf-prereqs $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Generate PDF format
 
-cheat:	validate $(BUILD)/cheat-sheet.pdf ## Generate cheat sheet
+cheat:	## Point to standalone cheat sheet project
+	@echo "The cheat sheet has moved to its own project:"
+	@echo "  https://github.com/InfraLore/make_cheat_sheet"
+	@echo "Clone it and run 'make build' to generate the PDF."
 
 docx:	validate $(BUILD)/docx/$(OUTPUT_FILENAME).docx ## Generate DOCX format
 
@@ -565,7 +568,4 @@ $(BUILD)/txt/$(OUTPUT_FILENAME).txt:	$(TXT_DEPENDENCIES)
 	$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(TXT_ARGS) -o $@
 	$(ECHO_BUILT)
 
-$(BUILD)/cheat-sheet.pdf:	$(PDF_DEPENDENCIES)
-	$(ECHO_BUILDING)
-	$(MKDIR_CMD) $(BUILD)
-	pandoc --listings parts/cheat-sheet.md -o build/cheat-sheet.pdf --template=templates/cheat-sheet.latex --pdf-engine=xelatex -V monofont="DejaVu Sans Mono"
+

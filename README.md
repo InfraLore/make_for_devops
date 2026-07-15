@@ -102,6 +102,9 @@ make html   # Build HTML (in build/html/)
 make epub   # Build EPUB (in build/epub/)
 ```
 
+A standalone printable Make cheat sheet PDF is available at
+[github.com/InfraLore/make_cheat_sheet](https://github.com/InfraLore/make_cheat_sheet).
+
 See the original [template README](https://github.com/wikiti/pandoc-book-template) for advanced topics—this repo adds many book-specific tweaks.
 
 ---

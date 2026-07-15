@@ -106,8 +106,8 @@ Start your setup target by checking what's already installed:
 ```makefile
 setup: ## Set up development environment (run once)
 	@echo "Checking prerequisites..."
-	@command -v node >/dev/null || \
-		(echo "❌ Node.js required. Install from nodejs.org" && exit 1)
+	@command -v node >/dev/null \
+	|| (echo "❌ Node.js required. Install from nodejs.org" && exit 1)
 	@echo "✓ Node.js found"
 ```
 
@@ -128,12 +128,12 @@ Now add checks for the other prerequisites:
 ```makefile
 setup: ## Set up development environment (run once)
 	@echo "Checking prerequisites..."
-	@command -v node >/dev/null || \
-		(echo "❌ Node.js required. Install from nodejs.org" && exit 1)
-	@command -v python3 >/dev/null || \
-		(echo "❌ Python 3 required" && exit 1)
-	@command -v docker >/dev/null || \
-		(echo "❌ Docker required" && exit 1)
+	@command -v node >/dev/null \
+	|| (echo "❌ Node.js required. Install from nodejs.org" && exit 1)
+	@command -v python3 >/dev/null \
+	|| (echo "❌ Python 3 required" && exit 1)
+	@command -v docker >/dev/null \
+	|| (echo "❌ Docker required" && exit 1)
 	@echo "✓ All prerequisites found"
 ```
 
@@ -148,12 +148,12 @@ Now install the dependencies:
 ```makefile
 setup: ## Set up development environment (run once)
 	@echo "Checking prerequisites..."
-	@command -v node >/dev/null || \
-		(echo "❌ Node.js required. Install from nodejs.org" && exit 1)
-	@command -v python3 >/dev/null || \
-		(echo "❌ Python 3 required" && exit 1)
-	@command -v docker >/dev/null || \
-		(echo "❌ Docker required" && exit 1)
+	@command -v node >/dev/null \
+	|| (echo "❌ Node.js required. Install from nodejs.org" && exit 1)
+	@command -v python3 >/dev/null \
+	|| (echo "❌ Python 3 required" && exit 1)
+	@command -v docker >/dev/null \
+	|| (echo "❌ Docker required" && exit 1)
 	@echo "✓ All prerequisites found"
 	@echo ""
 	@echo "Installing dependencies..."
@@ -177,12 +177,12 @@ Finally, handle the configuration file:
 ```makefile
 setup: ## Set up development environment (run once)
 	@echo "Checking prerequisites..."
-	@command -v node >/dev/null || \
-		(echo "❌ Node.js required. Install from nodejs.org" && exit 1)
-	@command -v python3 >/dev/null || \
-		(echo "❌ Python 3 required" && exit 1)
-	@command -v docker >/dev/null || \
-		(echo "❌ Docker required" && exit 1)
+	@command -v node >/dev/null \
+	|| (echo "❌ Node.js required. Install from nodejs.org" && exit 1)
+	@command -v python3 >/dev/null \
+	|| (echo "❌ Python 3 required" && exit 1)
+	@command -v docker >/dev/null \
+	|| (echo "❌ Docker required" && exit 1)
 	@echo "✓ All prerequisites found"
 	@echo ""
 	@echo "Installing dependencies..."
@@ -519,8 +519,8 @@ Now the Make target can trust the script's validation:
 
 ```makefile
 deploy: ## Deploy to environment (ENVIRONMENT=dev|staging|prod)
-	@test -n "$(ENVIRONMENT)" || \
-		(echo "Usage: make deploy ENVIRONMENT=dev|staging|prod" && exit 1)
+	@test -n "$(ENVIRONMENT)" \
+	|| (echo "Usage: make deploy ENVIRONMENT=dev|staging|prod" && exit 1)
 	@./scripts/deploy.sh $(ENVIRONMENT)
 ```
 
@@ -568,13 +568,13 @@ Now add Make targets that use it:
 
 ```makefile
 deploy: ## Deploy to environment (ENVIRONMENT=dev|staging|prod)
-	@test -n "$(ENVIRONMENT)" || \
-		(echo "Usage: make deploy ENVIRONMENT=dev" && exit 1)
+	@test -n "$(ENVIRONMENT)" \
+	|| (echo "Usage: make deploy ENVIRONMENT=dev" && exit 1)
 	@./scripts/deploy.sh $(ENVIRONMENT)
 
 deploy-debug: ## Deploy with debug output (ENVIRONMENT=dev|staging|prod)
-	@test -n "$(ENVIRONMENT)" || \
-		(echo "Usage: make deploy-debug ENVIRONMENT=dev" && exit 1)
+	@test -n "$(ENVIRONMENT)" \
+	|| (echo "Usage: make deploy-debug ENVIRONMENT=dev" && exit 1)
 	@./scripts/deploy.sh --debug $(ENVIRONMENT)
 ```
 
@@ -594,16 +594,16 @@ Production deployments need extra safety. Add a confirmation step:
 
 ```makefile
 deploy: _pre-deploy-checks ## Deploy to environment (ENVIRONMENT=dev|staging|prod)
-	@test -n "$(ENVIRONMENT)" || \
-		(echo "Usage: make deploy ENVIRONMENT=dev" && exit 1)
+	@test -n "$(ENVIRONMENT)" \
+	|| (echo "Usage: make deploy ENVIRONMENT=dev" && exit 1)
 	@$(MAKE) _confirm-deploy
 	@./scripts/deploy.sh $(ENVIRONMENT)
 	@echo "✓ Deployed to $(ENVIRONMENT)"
 
 _pre-deploy-checks:
 	@echo "Running pre-deployment checks..."
-	@./scripts/run-tests.sh --quiet || \
-		(echo "❌ Tests must pass before deployment" && exit 1)
+	@./scripts/run-tests.sh --quiet \
+	|| (echo "❌ Tests must pass before deployment" && exit 1)
 	@echo "✓ Tests passed"
 
 _confirm-deploy:
@@ -974,8 +974,8 @@ infra-apply: _validate-terraform _confirm-infra-apply ## Apply infrastructure ch
 _validate-terraform:
 	@echo "Validating Terraform configuration..."
 	@cd terraform && terraform validate
-	@cd terraform && terraform fmt -check || \
-		(echo "Run 'make infra-format' to fix formatting" && exit 1)
+	@cd terraform && terraform fmt -check \
+	|| (echo "Run 'make infra-format' to fix formatting" && exit 1)
 	@echo "✓ Terraform valid"
 
 _confirm-infra-apply:
