@@ -134,8 +134,8 @@ test: ## Run all tests
 	npm test
 
 check-kubectl: ## Verify kubectl is configured
-	@kubectl cluster-info >/dev/null || \
-		(echo "kubectl not configured properly" && exit 1)
+	@kubectl cluster-info >/dev/null \
+	|| (echo "kubectl not configured properly" && exit 1)
 
 clean: ## Clean up development environment
 	@echo "Cleaning up..."
@@ -206,12 +206,12 @@ Make targets should provide clear, actionable feedback:
 setup:
 	@echo " Setting up MyApp development environment"
 	@echo "Checking prerequisites..."
-	@command -v node >/dev/null && \
-		echo " Node.js found" || \
-		(echo " Node.js required" && exit 1)
-	@command -v docker >/dev/null && \
-		echo " Docker found" || \
-		(echo " Docker required" && exit 1)
+	@command -v node >/dev/null \
+	&& echo " Node.js found" \
+	|| (echo " Node.js required" && exit 1)
+	@command -v docker >/dev/null \
+	&& echo " Docker found" \
+	|| (echo " Docker required" && exit 1)
 	@echo "Installing dependencies..."
 	npm install --silent
 	@echo " Setup complete! Try 'make dev' to start development."

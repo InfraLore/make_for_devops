@@ -94,13 +94,13 @@ This catches 80% of issues with zero infrastructure:
 ```makefile
 # Validate that your deploy target uses the right variables
 test-deploy-vars:
-	@make -n deploy | grep -q "VERSION=$(VERSION)" || \
-		(echo "VERSION not used in deploy" && exit 1)
+	@make -n deploy | grep -q "VERSION=$(VERSION)" \
+	|| (echo "VERSION not used in deploy" && exit 1)
 
 # Validate dependency order
 test-build-deps:
-	@make -n deploy 2>&1 | grep -q "make.*test" || \
-		(echo "deploy should run test first" && exit 1)
+	@make -n deploy 2>&1 | grep -q "make.*test" \
+	|| (echo "deploy should run test first" && exit 1)
 ```
 
 \newpage
@@ -168,8 +168,8 @@ test-vars: ## Validate critical variables
 # Test variable defaults work
 test-defaults:
 	@echo "ENVIRONMENT defaults to: $(ENVIRONMENT)"
-	@test "$(ENVIRONMENT)" = "development" || \
-		echo "Warning: unexpected default ENVIRONMENT"
+	@test "$(ENVIRONMENT)" = "development" \
+	|| echo "Warning: unexpected default ENVIRONMENT"
 ```
 
 ### 2. Dependency Order
@@ -179,10 +179,10 @@ Ensure targets run in the right order:
 ```makefile
 test-deploy-order: ## Verify deploy runs prerequisites
 	@echo "Testing deployment order..."
-	@make -n deploy | grep -q "make.*build" || \
-		(echo "deploy must build first" && exit 1)
-	@make -n deploy | grep -q "make.*test" || \
-		(echo "deploy must test before deploying" && exit 1)
+	@make -n deploy | grep -q "make.*build" \
+	|| (echo "deploy must build first" && exit 1)
+	@make -n deploy | grep -q "make.*test" \
+	|| (echo "deploy must test before deploying" && exit 1)
 	@echo "✓ Deploy order correct"
 ```
 
@@ -192,10 +192,10 @@ Test that workflows work on different machines:
 
 ```makefile
 test-environment: ## Check environment requirements
-	@command -v docker >/dev/null || \
-		(echo "docker required but not installed" && exit 1)
-	@command -v kubectl >/dev/null || \
-		(echo "kubectl required but not installed" && exit 1)
+	@command -v docker >/dev/null \
+	|| (echo "docker required but not installed" && exit 1)
+	@command -v kubectl >/dev/null \
+	|| (echo "kubectl required but not installed" && exit 1)
 	@echo "✓ Environment requirements met"
 ```
 
@@ -254,12 +254,12 @@ test-vars:
 	@test -n "$(ENVIRONMENT)" || (echo "ENVIRONMENT not set" && exit 1)
 
 test-deploy-order:
-	@make -n deploy 2>&1 | grep -q "make.*test" || \
-		(echo "deploy should run tests" && exit 1)
+	@make -n deploy 2>&1 | grep -q "make.*test" \
+	|| (echo "deploy should run tests" && exit 1)
 
 test-environment:
-	@command -v docker >/dev/null || \
-		(echo "docker not installed" && exit 1)
+	@command -v docker >/dev/null \
+	|| (echo "docker not installed" && exit 1)
 ```
 
 This gives you three levels of testing:
@@ -320,8 +320,8 @@ baseline:
 # Check for regressions
 test-regression:
 	@make -n deploy > test-baselines/deploy-current.txt
-	@diff test-baselines/deploy.txt test-baselines/deploy-current.txt || \
-		echo "Deploy behavior changed - review diff"
+	@diff test-baselines/deploy.txt test-baselines/deploy-current.txt \
+	|| echo "Deploy behavior changed - review diff"
 ```
 
 ### Testing Documentation
@@ -331,10 +331,10 @@ Ensure help stays useful:
 ```makefile
 test-docs: ## Verify documentation is complete
 	@echo "Testing documentation..."
-	@make help | grep -q "build.*test.*deploy" || \
-		echo "Warning: Core targets not documented"
-	@test $(make help | wc -l) -gt 5 || \
-		echo "Warning: Help seems sparse"
+	@make help | grep -q "build.*test.*deploy" \
+	|| echo "Warning: Core targets not documented"
+	@test $(make help | wc -l) -gt 5 \
+	|| echo "Warning: Help seems sparse"
 ```
 
 \newpage

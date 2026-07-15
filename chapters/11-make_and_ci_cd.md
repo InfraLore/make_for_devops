@@ -147,8 +147,8 @@ build-artifacts: ## Generate deployment artifacts
 	@echo "Artifacts in $(ARTIFACTS_DIR)/"
 
 deploy-from-artifacts: ## Deploy from pre-built artifacts
-	@test -d $(ARTIFACTS_DIR) || \
-		(echo "No artifacts found" && exit 1)
+	@test -d $(ARTIFACTS_DIR) \
+	|| (echo "No artifacts found" && exit 1)
 	@./scripts/deploy-artifacts.sh
 ```
 

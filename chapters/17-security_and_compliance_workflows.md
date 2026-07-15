@@ -37,13 +37,13 @@ security-check: ## Run all security scans
 
 security-scan-containers: ## Scan container images
 	@echo "Scanning container images..."
-	@./scripts/scan-containers.sh $(IMAGE_NAME) || \ 
-		(echo "Fix: make security-fix-containers" && exit 1)
+	@./scripts/scan-containers.sh $(IMAGE_NAME) \
+	|| (echo "Fix: make security-fix-containers" && exit 1)
 
 security-scan-code: ## Scan code for vulnerabilities
 	@echo "Scanning code..."
-	@./scripts/scan-code.sh || \
-		(echo "Details: make security-report-code" && exit 1)
+	@./scripts/scan-code.sh \
+	|| (echo "Details: make security-report-code" && exit 1)
 
 security-report-code: ## Detailed code security report
 	@echo "Detailed Code Security Report"
@@ -99,8 +99,8 @@ security-secrets: ## Show secret scanning commands
 
 security-scan-secrets: ## Scan for exposed credentials
 	@echo "Scanning for exposed secrets..."
-	@./scripts/scan-secrets.sh || \
-		echo "Details: make security-secret-details"
+	@./scripts/scan-secrets.sh \
+	|| echo "Details: make security-secret-details"
 
 security-scan-history: ## Scan git history for secrets
 	@echo "Scanning git history..."
@@ -120,8 +120,8 @@ security-infrastructure: ## Show infrastructure security commands
 
 security-scan-terraform: ## Scan Terraform for security issues
 	@echo "Scanning Terraform configurations..."
-	@./scripts/scan-terraform.sh || \
-		echo "Details: make security-terraform-report"
+	@./scripts/scan-terraform.sh \
+	|| echo "Details: make security-terraform-report"
 ```
 
 Notice the pattern: each area has a menu that reveals available commands, and each command suggests next steps.
@@ -197,8 +197,8 @@ Maintaining audit trails for compliance:
 
 ```makefile
 audit-log: ## Log compliance action
-	@test -n "$(ACTION)" || \
-		(echo "Usage: make audit-log ACTION='description'" && exit 1)
+	@test -n "$(ACTION)" \
+	|| (echo "Usage: make audit-log ACTION='description'" && exit 1)
 	@echo "$(date -Iseconds) | $(USER) | $(ACTION)" >> audit-trail.log
 	@echo "Logged: $(ACTION)"
 

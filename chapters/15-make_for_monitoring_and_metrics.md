@@ -502,8 +502,8 @@ monitoring-setup: ## Deploy complete monitoring stack
 
 check-monitoring-prerequisites:
 	@echo "→ Checking prerequisites..."
-	@kubectl get namespace monitoring >/dev/null 2>&1 || \
-	  kubectl create namespace monitoring
+	@kubectl get namespace monitoring >/dev/null 2>&1 \
+	|| kubectl create namespace monitoring
 	@echo "  Prerequisites met"
 
 deploy-prometheus:

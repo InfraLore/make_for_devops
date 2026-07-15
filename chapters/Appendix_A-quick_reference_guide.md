@@ -261,17 +261,17 @@ help-interactive: ## Interactive help menu
 ```makefile
 # Check required tools
 _check-docker:
-	@command -v docker >/dev/null || \
-		(echo "Error: docker required" && exit 1)
+	@command -v docker >/dev/null \
+	|| (echo "Error: docker required" && exit 1)
 
 _check-kubectl:
-	@command -v kubectl >/dev/null || \
-		(echo "Error: kubectl required" && exit 1)
+	@command -v kubectl >/dev/null \
+	|| (echo "Error: kubectl required" && exit 1)
 
 # Check required variables
 _check-version:
-	@test -n "$(VERSION)" || \
-		(echo "Error: VERSION not set" && exit 1)
+	@test -n "$(VERSION)" \
+	|| (echo "Error: VERSION not set" && exit 1)
 
 # Use as prerequisites
 deploy: _check-docker _check-kubectl _check-version
@@ -291,15 +291,15 @@ deploy-prod: ## Deploy to production
 # Typed confirmation
 deploy-prod: ## Deploy to production
 	@echo "PRODUCTION DEPLOYMENT"
-	@echo -n "Type 'production' to confirm: " && read ans && \
-		[ "$$ans" = "production" ]
+	@echo -n "Type 'production' to confirm: " && read ans \
+	&& [ "$$ans" = "production" ]
 	@$(MAKE) _deploy ENVIRONMENT=production
 
 # Service name confirmation
 dangerous-operation:
 	@echo "This will delete $(SERVICE_NAME)"
-	@echo -n "Type service name to confirm: " && read ans && \
-		[ "$$ans" = "$(SERVICE_NAME)" ]
+	@echo -n "Type service name to confirm: " && read ans \
+	&& [ "$$ans" = "$(SERVICE_NAME)" ]
 	@echo "Proceeding with deletion..."
 ```
 
@@ -317,10 +317,10 @@ deploy:
 
 # Use semicolons for multiple commands in same shell
 deploy:
-	cd app && \
-	npm install && \
-	npm run build && \
-	cd ..
+	cd app \
+	&& npm install \
+	&& npm run build \
+	&& cd ..
 
 # Suppress output with @ prefix
 quiet-command:
@@ -375,8 +375,8 @@ optional-step:
 
 # Custom error messages
 deploy:
-	@./deploy.sh || \
-		(echo "Deployment failed. Check logs: make logs" && exit 1)
+	@./deploy.sh \
+	|| (echo "Deployment failed. Check logs: make logs" && exit 1)
 ```
 
 ### Parallel Execution

@@ -91,14 +91,14 @@ apply: require-plan ## Apply infrastructure changes
 	@./scripts/terraform-apply.sh $(ENVIRONMENT)
 
 check-environment:
-	@test -n "$(ENVIRONMENT)" || \
-		(echo "Set ENVIRONMENT=dev|staging|prod" && exit 1)
-	@test -f "environments/$(ENVIRONMENT).tfvars" || \
-		(echo "Config not found for $(ENVIRONMENT)" && exit 1)
+	@test -n "$(ENVIRONMENT)" \
+	|| (echo "Set ENVIRONMENT=dev|staging|prod" && exit 1)
+	@test -f "environments/$(ENVIRONMENT).tfvars" \
+	|| (echo "Config not found for $(ENVIRONMENT)" && exit 1)
 
 require-plan:
-	@test -f "plans/$(ENVIRONMENT).tfplan" || \
-		(echo "Run 'make plan' first" && exit 1)
+	@test -f "plans/$(ENVIRONMENT).tfplan" \
+	|| (echo "Run 'make plan' first" && exit 1)
 ```
 
 Now a new engineer runs `make help` and discovers:
@@ -269,10 +269,10 @@ _safety-checks:
 
 _check-production-requirements:
 	@echo "Checking production requirements..."
-	@test -n "$(CHANGE_TICKET)" || \
-		(echo "Production requires CHANGE_TICKET" && exit 1)
-	@test "$(git symbolic-ref --short HEAD)" = "main" || \
-		(echo "Must deploy from main branch" && exit 1)
+	@test -n "$(CHANGE_TICKET)" \
+	|| (echo "Production requires CHANGE_TICKET" && exit 1)
+	@test "$(git symbolic-ref --short HEAD)" = "main" \
+	|| (echo "Must deploy from main branch" && exit 1)
 	@echo "Production requirements met"
 ```
 

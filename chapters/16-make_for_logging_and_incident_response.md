@@ -232,8 +232,8 @@ Enable safe practice of incident response:
 
 ```makefile
 incident-practice: ## Practice incident response (staging only)
-	@test "$(ENV)" = "staging" || \
-		(echo "Practice only in staging!" && exit 1)
+	@test "$(ENV)" = "staging" \
+	|| (echo "Practice only in staging!" && exit 1)
 	@echo "Incident Response Practice"
 	@echo "=========================="
 	@echo "Available scenarios:"
@@ -296,8 +296,8 @@ incident-api-errors: ## Diagnose high error rate
 
 incident-cache-check: ## Check cache health
 	@echo "Checking cache..."
-	@./scripts/check-cache.sh || \
-		echo "Resolution: make incident-cache-restart"
+	@./scripts/check-cache.sh \
+	|| echo "Resolution: make incident-cache-restart"
 
 incident-cache-restart: ## Restart cache and dependencies
 	@echo "Restart production cache?"

@@ -199,8 +199,8 @@ test-race: ## Test for race conditions
 	@echo "Running targets in parallel 10 times..."
 	@for i in $$(seq 1 10); do \
 		echo "Iteration $$i"; \
-		make -j4 build test > /dev/null 2>&1 || \
-			(echo "FAILED on iteration $$i" && exit 1); \
+		make -j4 build test > /dev/null 2>&1 \
+		|| (echo "FAILED on iteration $$i" && exit 1); \
 	done
 	@echo "No race conditions detected"
 ```
@@ -334,15 +334,15 @@ When a deployment fails in production at 2 AM:
 # Capture state for post-mortem
 incident-snapshot: ## Capture debugging snapshot
 	@mkdir -p incident-$$(date +%Y%m%d-%H%M%S)
-	@cd incident-$$(date +%Y%m%d-%H%M%S) && \
-	echo "Capturing incident snapshot..." && \
-	kubectl get all -n $(NAMESPACE) > k8s-state.txt && \
-	kubectl describe deployment/$(SERVICE_NAME) -n $(NAMESPACE) > deployment.txt && \
-	kubectl logs deployment/$(SERVICE_NAME) -n $(NAMESPACE) --tail=500 > logs.txt && \
-	make debug > make-debug.txt && \
-	env > environment.txt && \
-	git log -1 --pretty=fuller > git-info.txt && \
-	git diff > git-changes.txt
+	@cd incident-$$(date +%Y%m%d-%H%M%S) \
+	&& echo "Capturing incident snapshot..." \
+	&& kubectl get all -n $(NAMESPACE) > k8s-state.txt \
+	&& kubectl describe deployment/$(SERVICE_NAME) -n $(NAMESPACE) > deployment.txt \
+	&& kubectl logs deployment/$(SERVICE_NAME) -n $(NAMESPACE) --tail=500 > logs.txt \
+	&& make debug > make-debug.txt \
+	&& env > environment.txt \
+	&& git log -1 --pretty=fuller > git-info.txt \
+	&& git diff > git-changes.txt
 	@echo "Snapshot captured in incident-*/"
 ```
 
@@ -453,12 +453,12 @@ Yes, test your debugging infrastructure:
 ```makefile
 test-debugging: ## Test debugging tools work
 	@echo "Testing debug infrastructure..."
-	@$(MAKE) debug > /dev/null || \
-		(echo "FAIL: debug target broken" && exit 1)
-	@$(MAKE) -n deploy > /dev/null || \
-		(echo "FAIL: deploy dry-run broken" && exit 1)
-	@$(MAKE) incident-snapshot > /dev/null || \
-		(echo "FAIL: incident-snapshot broken" && exit 1)
+	@$(MAKE) debug > /dev/null \
+	|| (echo "FAIL: debug target broken" && exit 1)
+	@$(MAKE) -n deploy > /dev/null \
+	|| (echo "FAIL: deploy dry-run broken" && exit 1)
+	@$(MAKE) incident-snapshot > /dev/null \
+	|| (echo "FAIL: incident-snapshot broken" && exit 1)
 	@echo "All debugging tools functional"
 ```
 
