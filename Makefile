@@ -63,6 +63,9 @@ MATH_FORMULAS = --webtex
 CONTENT = awk 'FNR==1 && NR!=1 {print "\n\n"}{print}' $(CHAPTERS)
 CONTENT_FILTERS = tee # Use this to add sed filters or other piped commands
 
+# Version for releases (overridden by bump-version.sh)
+VERSION ?= dev
+
 # Path to publish (can be overridden)
 PUBLISH_PATH ?= publish
 
@@ -140,8 +143,9 @@ endef
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx txt \
-	validate check-overflow check-long-lines \
+.PHONY: all book clean epub html pdf docx txt release \
+	validate check-overflow check-long-lines check-widows \
+	typographic-fixes typographic-fixes-check \
 	sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs \
 	diagrams lint lint-markdown lint-markdown-strict vale-suggest vale-error lint-fix \
 	stale-chapters
@@ -165,6 +169,32 @@ clean: ## Remove build directory and all generated files
 	else \
 		echo "Published PDF file not found."; \
 	fi
+
+release: ## Build PDF, EPUB, HTML, tag, and create a GitHub release. Usage: make release [PART=patch]
+	@version=$$(./scripts/bump-version.sh $(PART)); \
+	echo ""; \
+	echo "=========================================="; \
+	echo "  Release summary"; \
+	echo "  Version: v$$version"; \
+	echo "  Builds:  pdf, epub, html"; \
+	echo "  Will tag, push, and create GitHub release"; \
+	echo "=========================================="; \
+	echo ""; \
+	read -p "Proceed with release? [Y/n] " confirm; \
+	case "$$confirm" in \
+		n|N|no|No) echo "Aborted."; exit 1 ;; \
+	esac; \
+	echo "Building release v$$version..."; \
+	$(MAKE) -s pdf epub html VERSION=$$version; \
+	git tag -a "v$$version" -m "Release v$$version"; \
+	git push origin "v$$version"; \
+	gh release create "v$$version" \
+		--title "Make for DevOps v$$version" \
+		--notes "Automated release of Make for DevOps." \
+		$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf \
+		$(BUILD)/epub/$(OUTPUT_FILENAME).epub \
+		$(BUILD)/html/$(OUTPUT_FILENAME).html; \
+	echo "Release v$$version created!"
 
 
 ####################################################################################################
@@ -231,6 +261,15 @@ check-long-lines: ### Check for very long lines in code blocks
 			     }' "$$file"; \
 		fi; \
 	done
+
+check-widows: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Check PDF for widows (single lines orphaned at top of page)
+	@python3 scripts/check-widows.py
+
+typographic-fixes: ## Convert straight quotes/dashes to typographic (curly) equivalents
+	@python3 scripts/typographic-fixes.py
+
+typographic-fixes-check: ## Check for straight quotes/dashes without modifying
+	@python3 scripts/typographic-fixes.py --check
 
 sync-pdf: $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf ## Sync the generated PDF to PUBLISH_PATH
 	@echo ""
@@ -336,6 +375,16 @@ help:  ## Show this help message
 	@printf "\033[1mAvailable targets:\033[0m\n"
 	@echo ""
 	@awk 'BEGIN {FS = ":.*##"; printf ""} /^[a-zA-Z_-]+:.*##/ { printf "  \033[36m%-20s\033[0m %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
+	@echo ""
+	@printf "\033[1mRelease notes:\033[0m\n"
+	@echo ""
+	@echo "  make release              - patch bump, prompts for confirmation"
+	@echo "  make release PART=minor   - minor version bump"
+	@echo "  make release PART=major   - major version bump"
+	@echo ""
+	@echo "  The bump script (scripts/bump-version.sh) handles RC -> stable"
+	@echo "  promotion interactively. Run it standalone to preview the version:"
+	@echo "    $$ ./scripts/bump-version.sh patch"
 	@echo ""
 	@printf "\033[1mConfiguration:\033[0m\n"
 	@echo ""
@@ -471,6 +520,7 @@ $(TMP_METADATA):
 	echo "git_url: $(shell git config --get remote.origin.url | \
 		sed -E 's#git@([^:]+):#\1/#; s#\.git$$##')" >> $(TMP_METADATA)
 	echo "git_date: $(shell git log -1 --format=%cd --date=short)" >> $(TMP_METADATA)
+	echo "version: $(VERSION)" >> $(TMP_METADATA)
 
 epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format (warning, not functional)
 
