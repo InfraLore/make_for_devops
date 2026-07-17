@@ -144,7 +144,7 @@ endef
 ####################################################################################################
 
 .PHONY: all book clean epub html pdf docx txt release \
-	validate check-overflow check-long-lines check-widows \
+	validate check-overflow check-long-lines check-widows install-fonts \
 	typographic-fixes typographic-fixes-check \
 	sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs \
 	diagrams lint lint-markdown lint-markdown-strict vale-suggest vale-error lint-fix \
@@ -213,6 +213,9 @@ validate: ### Validate chapter contents for forbidden words
 	else \
 		echo "Validation passed."; \
 	fi
+
+install-fonts: ## Verify required fonts; install Merriweather if missing
+	@python3 scripts/install-fonts.py
 
 check-pdf-prereqs: ## Check if PDF generation prerequisites are available
 	@echo "Checking PDF generation prerequisites..."

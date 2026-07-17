@@ -4,6 +4,8 @@
 
 [![Cover](images/cover.png)](#)
 
+**📖 [Read the latest PDF and EPUB builds](https://github.com/InfraLore/make_for_devops/actions/workflows/ci.yml?query=branch%3Amain)** — download the most recent `book-builds` artifact from the Actions tab.
+
 ---
 
 ## What is this?
@@ -12,7 +14,7 @@
 
 This repo holds:
 
-- Draft chapters and plan for "Make for DevOps"
+- Draft chapters for "Make for DevOps"
 - All supporting material, references, and research
 - Pandoc/Makefile-based build system for fast PDF, HTML, and EPUB export
 - A Devbox dev environment configuration
@@ -23,16 +25,10 @@ This repo holds:
 
 DevOps teams face a persistent challenge with undocumented system expertise--the practical details of how systems work and the reasoning behind design decisions often remain locked in informal channels, scattered across temporary chat logs and outdated documentation. Most books and tools treat Make as only a build tool for code; **we show how it can be the backbone of workflow documentation, discoverability, and team onboarding**.
 
-See [proposal.md](proposal.md) and [plan.md](plan.md) for:
-- Audience and technical level
-- Book structure, competitive analysis, and research
-- Detailed writing plan and annotated references
-
 ---
 
 ## Status
 
-- 📝 Draft in progress: see [plan.md](plan.md) for writing schedule and chapter statuses
 - 📚 Goal: 400–500 pages, 200+ code samples, released 2026
 - 💡 Open to feedback! Open an issue to discuss DevOps knowledge management, Make workflows, or suggest resources
 
@@ -40,9 +36,7 @@ See [proposal.md](proposal.md) and [plan.md](plan.md) for:
 
 ## Who is this for?
 
-See full details in [proposal.md](proposal.md); a brief version:
-
-- **DevOps, SRE, Platform Engineers** (2–5 years’ experience)
+- **DevOps, SRE, Platform Engineers** (2–5 years' experience)
 - Teams scaling infra and onboarding, using or interested in Make beyond C/C++ builds
 - Anyone facing the "Institutional Knowledge" crisis or using/maintaining complex automation workflows
 
@@ -116,10 +110,8 @@ my-book/
 |- build/             # Output (PDF, HTML, EPUB, DOCX, etc)
 |- chapters/          # Book content (per-chapter markdown)
 |- images/            # Figures and diagrams
-|- plan.md            # Writing plan, research, sources, TODO
 |- metadata.yml       # Book metadata
 |- Makefile           # Build instructions
-|- proposal.md        # Formal book proposal, audience research
 |- README.md          # You're here!
 ```
 
@@ -131,7 +123,7 @@ We are explicitly researching the **role of automation (Makefiles, pipelines) in
 - Can automation *preserve* team know-how?
 - Or does it bury context and rationale under inscrutable scripts?
 
-This book covers not only how to use Make, but why it matters for team productivity, onboarding, and reliable operations. See [plan.md](plan.md) for deep-dive research, industry and academic citations, and our writing plan.
+This book covers not only how to use Make, but why it matters for team productivity, onboarding, and reliable operations.
 
 ---
 
@@ -156,9 +148,6 @@ This book is licensed under [CC0 1.0 Universal](https://creativecommons.org/publ
 
 ## References and Further Reading
 
-- [Proposal & audience definition](proposal.md)
-- [Detailed writing plan, research, blog/article links](plan.md)
 - [Pandoc Manual](http://pandoc.org/MANUAL.html)
 - [Official GNU Make Manual](https://www.gnu.org/software/make/manual/)
 - [Managaing Projects with GNU Make (O'Reilly)](https://learning.oreilly.com/library/view/managing-projects-with/0596006101/pt01.html)
-- Academic/industry sources: see bottom of [plan.md](plan.md)
