@@ -3,3 +3,4 @@ build/
 .vale/styles/
 .envrc
 publish/
+.venv/
