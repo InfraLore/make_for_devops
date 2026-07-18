@@ -364,6 +364,7 @@ Only add advanced help systems when:
 
 For most teams, the standard help pattern is sufficient.
 
+\needspace{4\baselineskip}
 ## A Complete Practical Example
 
 Here's what most teams actually need:
@@ -581,6 +582,7 @@ deploy:## Deploy application
 deploy: ## Deploy application
 ```
 
+\needspace{6\baselineskip}
 ## Key Takeaways
 
 Effective target organization is about discoverability and matching how your

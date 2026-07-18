@@ -585,8 +585,7 @@ NAMESPACE ?= $(ENVIRONMENT)
 # Override via environment or command line
 # make deploy ENVIRONMENT=prod REPLICAS=10
 ```
-\pagebreak
-
+\needspace{4\baselineskip}
 ## Command-Line Usage
 
 ### Essential Flags

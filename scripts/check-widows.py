@@ -100,6 +100,27 @@ def looks_like_index(page_text):
     return entry_count >= len(lines) // 2
 
 
+def looks_like_frontmatter(page_text, page_num):
+    """Heuristic: frontmatter includes TOC, foreword, roman-numeral pages."""
+    # Roman numeral pages (typically first ~20 pages)
+    if page_num < 20:
+        lines = list(content_lines(page_text))
+        # Check for CONTENTS header
+        for line in lines[:3]:
+            if "CONTENTS" in line.upper():
+                return True
+        # Check for Roman numeral page numbers
+        first = first_content_line(page_text)
+        if re.match(r"^[ivxlcdm]+$", first.lower()):
+            return True
+    # Check for FOREWORD header
+    lines = list(content_lines(page_text))
+    for line in lines[:3]:
+        if "FOREWORD" in line.upper():
+            return True
+    return False
+
+
 def show_context(page_text, max_lines=3):
     """Return the first few content lines for context display."""
     lines = list(content_lines(page_text))
@@ -121,6 +142,7 @@ def main():
     skipped_table = 0
     skipped_index = 0
     skipped_pattern = 0
+    skipped_frontmatter = 0
 
     for page_num, page_text in extract_pages(pdf):
         first = first_content_line(page_text)
@@ -146,6 +168,9 @@ def main():
         if looks_like_index(page_text):
             skipped_index += 1
             continue
+        if looks_like_frontmatter(page_text, page_num):
+            skipped_frontmatter += 1
+            continue
 
         # -- looks like a real widow --
         widows.append((page_num, first, show_context(page_text)))
@@ -163,6 +188,8 @@ def main():
 
     # Report skip statistics
     parts = []
+    if skipped_frontmatter:
+        parts.append(f"{skipped_frontmatter} frontmatter pages skipped")
     if skipped_table:
         parts.append(f"{skipped_table} table pages skipped")
     if skipped_index:

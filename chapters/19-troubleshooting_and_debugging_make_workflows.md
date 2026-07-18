@@ -32,8 +32,7 @@ Execution" section before proceeding here. \end{calloutbox}
 
 ![Make's Execution Model](images/chapter19.png)
 
-\pagebreak
-
+\needspace{6\baselineskip}
 ## Understanding Make's Execution Model in Depth
 
 Most advanced Make debugging requires understanding what happens between when

@@ -358,6 +358,7 @@ That's it! For all available commands, run `make help`.
   frontend
 - Press Ctrl+C to stop all services
 
+\needspace{4\baselineskip}
 ## Manual Setup
 
 If you prefer manual setup, see [docs/manual-setup.md](docs/manual-setup.md).

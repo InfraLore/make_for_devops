@@ -756,4 +756,5 @@ When working with AI on Makefiles:
 
 8. **Consider your team** - What works for a solo developer might not work for a large team
 
+\needspace{6\baselineskip}
 Remember: These prompts encode best practices from this book, but AI is a tool, not a replacement for understanding. Use AI to accelerate your work, but maintain accountability for the results.

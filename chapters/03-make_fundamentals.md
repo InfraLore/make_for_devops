@@ -634,8 +634,7 @@ Note the critical design choice: **deploy depends on test**, which depends on
 build. This dependency chain makes it impossible to accidentally deploy untested
 code. The workflow itself enforces good practices.
 
-\newpage
-
+\needspace{6\baselineskip}
 ## Key Takeaways
 
 Make's syntax might seem intimidating at first, especially if you're coming from
