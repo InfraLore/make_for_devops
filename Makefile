@@ -557,7 +557,7 @@ vale-error: ## Look for errors detected by Vale prose linting
 # File builders
 ####################################################################################################
 
-$(TMP_METADATA):
+$(TMP_METADATA): $(MAKEFILE)
 	$(MKDIR_CMD) $(BUILD)
 	echo "git_sha: $(shell git rev-parse --short HEAD)" > $(TMP_METADATA)
 	echo "git_url: $(shell git config --get remote.origin.url | \
