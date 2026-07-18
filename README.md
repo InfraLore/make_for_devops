@@ -6,6 +6,8 @@
 
 **📖 [Read the latest PDF and EPUB builds](https://github.com/InfraLore/make_for_devops/actions/workflows/ci.yml?query=branch%3Amain)** — download the most recent `book-builds` artifact from the Actions tab.
 
+**📦 [Releases](https://github.com/InfraLore/make_for_devops/releases)** — tagged release candidates with PDF, EPUB, and HTML artifacts.
+
 ---
 
 ## What is this?
