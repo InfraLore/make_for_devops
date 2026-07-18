@@ -143,7 +143,7 @@ endef
 # Basic actions
 ####################################################################################################
 
-.PHONY: all book clean epub html pdf docx txt release \
+.PHONY: all book clean epub html pdf docx txt rc release \
 	validate check-overflow check-long-lines check-widows install-fonts \
 	typographic-fixes typographic-fixes-check \
 	sync-pdf publish stats find_bullets find_blank_pages blank_pages_report check-pdf-prereqs \
@@ -169,6 +169,45 @@ clean: ## Remove build directory and all generated files
 	else \
 		echo "Published PDF file not found."; \
 	fi
+
+rc: ## Tag a release candidate and create a GitHub pre-release
+	@latest_rc=$$(git tag --list 'v*-rc*' \
+		--sort=-version:refname | head -1); \
+	if [ -z "$$latest_rc" ]; then \
+		VERSION="1.0.0-rc1"; \
+	else \
+		BASE=$$(echo "$$latest_rc" \
+			| sed 's/-rc[0-9]*$$//'); \
+		NUM=$$(echo "$$latest_rc" \
+			| sed 's/.*-rc//'); \
+		NEXT=$$((NUM + 1)); \
+		VERSION="$$BASE-rc$$NEXT"; \
+	fi; \
+	echo ""; \
+	echo "=========================================="; \
+	echo "  Release candidate"; \
+	echo "  Version: v$$VERSION"; \
+	echo "  Builds:  pdf, epub, html"; \
+	echo "  Will tag, push, create GitHub pre-release"; \
+	echo "=========================================="; \
+	echo ""; \
+	read -p "Proceed? [Y/n] " confirm; \
+	case "$$confirm" in \
+		n|N|no|No) echo "Aborted."; exit 1 ;; \
+	esac; \
+	echo "Building RC v$$VERSION..."; \
+	$(MAKE) -s pdf epub html VERSION=$$VERSION; \
+	git tag -a "v$$VERSION" \
+		-m "Release candidate v$$VERSION"; \
+	git push origin "v$$VERSION"; \
+	gh release create "v$$VERSION" \
+		--title "Make for DevOps v$$VERSION" \
+		--notes "Release candidate of Make for DevOps." \
+		--prerelease \
+		$(BUILD)/pdf/$(OUTPUT_FILENAME).pdf \
+		$(BUILD)/epub/$(OUTPUT_FILENAME).epub \
+		$(BUILD)/html/$(OUTPUT_FILENAME).html; \
+	echo "RC v$$VERSION created!"
 
 release: ## Build PDF, EPUB, HTML, tag, and create a GitHub release. Usage: make release [PART=patch]
 	@version=$$(./scripts/bump-version.sh $(PART)); \
@@ -381,6 +420,7 @@ help:  ## Show this help message
 	@echo ""
 	@printf "\033[1mRelease notes:\033[0m\n"
 	@echo ""
+	@echo "  make rc                   - tag and publish a release candidate"
 	@echo "  make release              - patch bump, prompts for confirmation"
 	@echo "  make release PART=minor   - minor version bump"
 	@echo "  make release PART=major   - major version bump"

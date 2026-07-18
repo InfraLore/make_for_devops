@@ -7,7 +7,7 @@ PART="${1:-patch}"
 LATEST=$(git tag --list 'v*' --sort=-version:refname | head -1)
 
 if [ -z "$LATEST" ]; then
-  echo "3.0.0"
+  echo "1.0.0"
   exit 0
 fi
 
