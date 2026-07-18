@@ -176,9 +176,10 @@ rc: ## Tag a release candidate and create a GitHub pre-release
 	if [ -z "$$latest_rc" ]; then \
 		VERSION="1.0.0-rc1"; \
 	else \
-		BASE=$$(echo "$$latest_rc" \
+		RC_TAG=$${latest_rc#v}; \
+		BASE=$$(echo "$$RC_TAG" \
 			| sed 's/-rc[0-9]*$$//'); \
-		NUM=$$(echo "$$latest_rc" \
+		NUM=$$(echo "$$RC_TAG" \
 			| sed 's/.*-rc//'); \
 		NEXT=$$((NUM + 1)); \
 		VERSION="$$BASE-rc$$NEXT"; \
