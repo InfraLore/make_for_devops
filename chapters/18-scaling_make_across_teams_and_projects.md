@@ -147,8 +147,7 @@ help: ## Show available commands
 		{printf "  %-20s %s\n", $$1, $$2}'
 ```
 
-\pagebreak
-
+\needspace{4\baselineskip}
 ## Creating Template Projects
 
 Templates help teams start with good patterns:
@@ -386,4 +385,5 @@ Most importantly, scaling Make preserves what made it successful: discoverabilit
 
 The pattern is consistent: provide shared building blocks, establish discoverable conventions, let teams compose their own workflows. Standards emerge from shared practice, not central decree. Teams learn from each other's Makefiles, adopt patterns that work, and ignore patterns that don't. Knowledge spreads through discovery and proven value, not through policy documents.
 
+\needspace{6\baselineskip}
 In the final chapter, we'll explore troubleshooting and debugging Make workflows, equipping you with the skills to diagnose issues, optimize performance, and help others succeed with Make-based workflows.

@@ -200,6 +200,7 @@ test-security: ## Security testing
 	@echo "Security tests passed"
 ```
 
+\needspace{6\baselineskip}
 Security becomes part of the standard workflow, not an afterthought.
 
 ## Practical Example: Pipeline-Friendly Targets

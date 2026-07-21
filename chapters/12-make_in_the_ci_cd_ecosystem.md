@@ -20,6 +20,7 @@ integration patterns for popular CI/CD systems, and techniques for packaging
 artifacts and implementing GitOps workflows—all while maintaining the
 consistency and discoverability that Make provides.
 
+\needspace{6\baselineskip}
 ## The Performance Imperative
 
 Before diving into specific optimizations, let's understand why pipeline
