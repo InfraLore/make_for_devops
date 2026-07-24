@@ -79,7 +79,8 @@ PUBLISH_PATH ?= publish
 # FILTER_ARGS = --filter pandoc-crossref
 
 # use the codeblock-border.lua filter to add borders to code blocks
-FILTER_ARGS = --lua-filter=codeblock-border.lua
+# (applied only to PDF via PDF_ARGS; raw LaTeX breaks EPUB output)
+FILTER_ARGS =
 
 # Combined arguments
 
@@ -92,7 +93,7 @@ PANDOC_COMMAND = pandoc
 DOCX_ARGS = --standalone --reference-doc templates/docx.docx
 EPUB_ARGS = --template templates/epub.html --epub-cover-image $(COVER_IMAGE)
 HTML_ARGS = --template templates/html.html --standalone --to html5
-PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex --no-highlight --quiet
+PDF_ARGS = --template templates/pdf.latex --pdf-engine xelatex --no-highlight --quiet --lua-filter=codeblock-border.lua
 TXT_ARGS = --to plain --wrap=auto --preserve-tabs --standalone
 
 # Per-format file dependencies
