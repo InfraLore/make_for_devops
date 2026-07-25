@@ -456,6 +456,10 @@ $endif$
       {\LatoFont\large \@author \par} % author
       \vskip 0.5em
     $endif$
+    $for(creator)$
+      {\LatoFont\large $creator.role$: $creator.text$ \par}
+      \vskip 0.25em
+    $endfor$
     $if(date)$
       {\LatoFont\large \@date \par} % date
     $endif$
