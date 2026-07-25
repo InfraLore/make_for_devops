@@ -4,9 +4,9 @@
 
 [![Cover](images/cover.png)](#)
 
-**📖 [Read the latest PDF and EPUB builds](https://github.com/InfraLore/make_for_devops/actions/workflows/ci.yml?query=branch%3Amain)** — download the most recent `book-builds` artifact from the Actions tab.
+**📖 [Read the book online](https://infralore.github.io/make_for_devops/)** — hosted on GitHub Pages with the latest HTML build.
 
-**📦 [Releases](https://github.com/InfraLore/make_for_devops/releases)** — tagged release candidates with PDF, EPUB, and HTML artifacts.
+**📦 [Releases](https://github.com/InfraLore/make_for_devops/releases)** — tagged releases with PDF, EPUB, and HTML artifacts.
 
 ---
 
