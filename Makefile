@@ -124,17 +124,15 @@ ECHO_BUILT = @echo "$@ was built" & echo
 
 # Progress bar function - shows countdown blocks that disappear over time
 define PROGRESS_BAR
-	@printf "$(1): ▓▓▓▓▓▓"
 	@($(2)) & \
 	PID=$$!; \
-	blocks="▓▓▓▓▓▓"; \
+	blocks="▓▓▓▓▓▓▓▓▓▓"; \
 	while ps $$PID > /dev/null 2>&1; do \
-		printf "\r"; \
-		printf "$(1): $$blocks"; \
+		printf "\r$(1): $$blocks "; \
+		sleep 3; \
 		if [ "$${#blocks}" -gt 0 ]; then \
 			blocks="$${blocks%▓}"; \
 		fi; \
-		sleep 3; \
 	done; \
 	wait $$PID; \
 	printf "\r$(1): ✅          \n"
@@ -606,7 +604,7 @@ $(BUILD)/html/$(OUTPUT_FILENAME).html:	$(HTML_DEPENDENCIES) $(TMP_METADATA)
 $(BUILD)/pdf/$(OUTPUT_FILENAME).pdf:	$(PDF_DEPENDENCIES) $(TMP_METADATA)
 	$(ECHO_BUILDING)
 	$(MKDIR_CMD) $(BUILD)/pdf
-	$(call PROGRESS_BAR,Generating PDF (about 24 seconds),$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(PDF_ARGS) -o $@)
+	$(call PROGRESS_BAR,Generating PDF (about 30 seconds),$(CONTENT) | $(CONTENT_FILTERS) | $(PANDOC_COMMAND) $(ARGS) $(PDF_ARGS) -o $@)
 	$(ECHO_BUILT)
 
 $(BUILD)/docx/$(OUTPUT_FILENAME).docx:	$(DOCX_DEPENDENCIES)
