@@ -101,7 +101,7 @@ TXT_ARGS = --to plain --wrap=auto --preserve-tabs --standalone
 BASE_DEPENDENCIES = $(MAKEFILE) $(CHAPTERS) $(METADATA) $(IMAGES) $(TEMPLATES)
 DOCX_DEPENDENCIES = $(BASE_DEPENDENCIES)
 EPUB_DEPENDENCIES = $(BASE_DEPENDENCIES)
-HTML_DEPENDENCIES = $(BASE_DEPENDENCIES)
+HTML_DEPENDENCIES = $(BASE_DEPENDENCIES) $(LANDING_PAGE_DEP)
 PDF_DEPENDENCIES = $(BASE_DEPENDENCIES)
 TXT_DEPENDENCIES = $(BASE_DEPENDENCIES)
 
@@ -493,6 +493,12 @@ lint-fix: ## Auto-fix markdown issues where possible
 			pymarkdown scan "$$file" --fix || true; \
 		fi; \
 	done
+
+pages/index.html: metadata.yml templates/landing-page.html scripts/generate-landing-page.py ## Generate landing page from book metadata
+	@python3 scripts/generate-landing-page.py
+	@echo "✅ Landing page generated from metadata.yml"
+
+LANDING_PAGE_DEP = pages/index.html
 
 lint: lint-markdown check-overflow check-long-lines ## Run all linting checks
 	@echo "✅ All linting completed"

@@ -3,3 +3,4 @@ pdf2image
 Pillow
 numpy
 pymarkdownlnt
+pyyaml
