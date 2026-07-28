@@ -171,7 +171,7 @@ clean: ## Remove build directory and all generated files
 		echo "Published PDF file not found."; \
 	fi
 
-rc: ## Tag a release candidate and create a GitHub pre-release
+rc: ## Tag a release candidate and create a pre-release
 	@latest_rc=$$(git tag --list 'v*-rc*' \
 		--sort=-version:refname | head -1); \
 	if [ -z "$$latest_rc" ]; then \
@@ -198,7 +198,8 @@ rc: ## Tag a release candidate and create a GitHub pre-release
 		n|N|no|No) echo "Aborted."; exit 1 ;; \
 	esac; \
 	echo "Building RC v$$VERSION..."; \
-	$(MAKE) -s pdf epub html VERSION=$$VERSION; \
+	$(MAKE) -s pdf epub html VERSION=$$VERSION || { \
+		echo "Build failed. Aborting RC."; exit 1; }; \
 	git tag -a "v$$VERSION" \
 		-m "Release candidate v$$VERSION"; \
 	git push origin "v$$VERSION"; \
@@ -211,14 +212,14 @@ rc: ## Tag a release candidate and create a GitHub pre-release
 		$(BUILD)/html/$(OUTPUT_FILENAME).html; \
 	echo "RC v$$VERSION created!"
 
-release: ## Build PDF, EPUB, HTML, tag, and create a GitHub release. Usage: make release [PART=patch]
+release: ## Build, tag, and publish a GitHub release
 	@version=$$(./scripts/bump-version.sh $(PART)); \
 	echo ""; \
 	echo "=========================================="; \
 	echo "  Release summary"; \
 	echo "  Version: v$$version"; \
 	echo "  Builds:  pdf, epub, html"; \
-	echo "  Will tag, push, and create GitHub release"; \
+	echo "  Will tag, push, create GitHub release"; \
 	echo "=========================================="; \
 	echo ""; \
 	read -p "Proceed with release? [Y/n] " confirm; \
@@ -226,7 +227,8 @@ release: ## Build PDF, EPUB, HTML, tag, and create a GitHub release. Usage: make
 		n|N|no|No) echo "Aborted."; exit 1 ;; \
 	esac; \
 	echo "Building release v$$version..."; \
-	$(MAKE) -s pdf epub html VERSION=$$version; \
+	$(MAKE) -s pdf epub html VERSION=$$version || { \
+		echo "Build failed. Aborting release."; exit 1; }; \
 	git tag -a "v$$version" -m "Release v$$version"; \
 	git push origin "v$$version"; \
 	gh release create "v$$version" \
@@ -423,12 +425,12 @@ help:  ## Show this help message
 	@printf "\033[1mRelease notes:\033[0m\n"
 	@echo ""
 	@echo "  make rc                   - tag and publish a release candidate"
-	@echo "  make release              - patch bump, prompts for confirmation"
+	@echo "  make release              - patch bump + confirm"
 	@echo "  make release PART=minor   - minor version bump"
 	@echo "  make release PART=major   - major version bump"
 	@echo ""
-	@echo "  The bump script (scripts/bump-version.sh) handles RC -> stable"
-	@echo "  promotion interactively. Run it standalone to preview the version:"
+	@echo "  The bump script handles RC -> stable interactively."
+	@echo "  Run it standalone to preview the version:"
 	@echo "    $$ ./scripts/bump-version.sh patch"
 	@echo ""
 	@printf "\033[1mConfiguration:\033[0m\n"
