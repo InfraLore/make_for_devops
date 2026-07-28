@@ -124,10 +124,10 @@ ECHO_BUILT = @echo "$@ was built" & echo
 
 # Progress bar function - shows countdown blocks that disappear over time
 define PROGRESS_BAR
-	@printf "$(1): ▓▓▓▓▓▓"
+	@printf "$(1): ▓▓▓▓▓▓▓▓▓▓"
 	@($(2)) & \
 	PID=$$!; \
-	blocks="▓▓▓▓▓▓"; \
+	blocks="▓▓▓▓▓▓▓▓▓▓"; \
 	while ps $$PID > /dev/null 2>&1; do \
 		printf "\r"; \
 		printf "$(1): $$blocks"; \
