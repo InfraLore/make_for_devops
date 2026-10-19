@@ -238,6 +238,120 @@ _do-deploy:
 The dependency chain enforces proper workflow ordering. AI agents must go
 through the front door.
 
+### Failure Modes
+
+Guardrails matter because executable knowledge fails differently than
+written knowledge. A stale README misleads you. A stale Makefile *acts*.
+Three failure modes are particular to this kind of documentation, and
+each one gets worse when an AI agent is the one reading it.
+
+#### Green Isn't Correct
+
+A target can `exit 0` and still do the wrong thing. Humans and AI agents
+both trust a green result more than they'd trust a paragraph of prose, and
+agents in particular treat tool success as ground truth.
+
+```makefile
+test: ## Run the test suite
+	@pytest tests/ | tee test.log
+
+validate: lint test ## Run all validations
+	@echo "✓ All validations passed"
+```
+
+When a test fails, `pytest` exits non-zero, but the pipeline's exit status
+belongs to `tee`, which succeeded. Make sees success, `validate` prints
+its checkmark, and everyone moves on. The same thing happens with a stray
+`|| true` added to quiet a flaky test, or a `-` prefix that tells Make to
+ignore errors.
+
+The fix is to make failure impossible to swallow:
+
+```makefile
+SHELL := /bin/bash
+.SHELLFLAGS := -eu -o pipefail -c
+```
+
+Treat an exit code as a claim, not proof. When you review a Makefile, look
+for anything that can turn a failure into a success.
+
+#### Doc Changes Inherit Code's Blast Radius
+
+Fixing a typo in a README can't break production. Fixing a typo in a
+Makefile can, because the Makefile is both the interface and the
+implementation. There is no separate "docs only" change.
+
+```makefile
+BUILD_DIR := build
+
+clean: ## Remove build artifacts
+	@rm -rf $(BUILD_DIR)/*
+```
+
+Suppose the variable was originally misspelled as `BULID_DIR`. Someone
+fixes the definition, which looks like a harmless cleanup, but misses one
+of the two places it's used. `$(BUILD_DIR)` now expands to nothing in the
+other target, and `rm -rf $(BUILD_DIR)/*` becomes `rm -rf /*`.
+On a modern system, file permissions and protections like macOS's System
+Integrity Protection will stop most of the damage, but the same slip
+aimed at a directory you *do* own gets no such safety net.
+
+Review discipline has to match the risk. Treat Makefile changes as code
+changes, whatever the diff looks like. Require review on them, and run
+`make -n` on the targets involved, because the dry run would have shown
+that `rm` command before it ever ran.
+
+#### Discoverability Without Friction Is a Footgun
+
+`make help` is a feature we've praised throughout this book, but it lists
+`reset-db` right next to `lint`. A human sees that target and hesitates.
+An agent sees a documented capability. Unless hesitation is built into the
+target, there isn't any.
+
+The mitigation is the set of Safety and Trust principles from Makefile
+Sage:
+
+- **`help` should always be safe to run.** Discovery must never have side
+  effects.
+- **Confirmation should scale to blast radius.** Read-only targets need
+  none, and destructive ones need real intent.
+- **Destructive actions must be clearly signaled.** In the name, in the
+  help text, and in the output.
+- **Never assume intent from target name alone.** A target called
+  `reset-db` should check which database it's about to reset.
+
+```makefile
+reset-db: ## [DESTRUCTIVE] Drop and recreate $(DB_NAME)
+	@[ "$(ENV)" != "production" ] \
+		|| { echo "Refusing to run in production"; exit 1; }
+	@echo "This will DELETE all data in $(DB_NAME) ($(ENV))."
+	@read -p "Type the database name to confirm: " ans; \
+		[ "$$ans" = "$(DB_NAME)" ] || { echo "Aborted."; exit 1; }
+	@dropdb $(DB_NAME) && createdb $(DB_NAME)
+```
+
+Typing the database name makes the confirmation specific to the action, so
+nobody can approve it on muscle memory. Friction like this slows down a
+determined caller but won't stop one, so pair it with real permissions.
+What it does is make the dangerous path an explicit choice instead of the
+default one.
+
+#### Keeping Perspective
+
+None of this is a reason to back away from Make. These are possibilities,
+not guarantees, and every alternative has its own version of them. A shell
+script can swallow an exit code just as easily, and a CI config can change
+production behavior with a one-character edit. Most Makefiles run for
+years without anything like this happening.
+
+The goal of naming failure modes isn't to make you distrust executable
+knowledge. It's to keep your wits about you while you use it. The
+practices that guard against these failures are cheap: strict shell flags,
+review on Makefile changes, a habit of running `make -n`, and
+confirmation that scales with the stakes. You're also never relying on
+Make alone. Permissions, backups, protected branches, and your operating
+system all sit behind it.
+
 ### What This Means for Make's Future
 
 AI tools don't threaten Make's relevance—they enhance it. As AI agents become

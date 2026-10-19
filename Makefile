@@ -573,7 +573,7 @@ $(TMP_METADATA): $(MAKEFILE)
 	echo "git_date: $(shell git log -1 --format=%cd --date=short)" >> $(TMP_METADATA)
 	echo "version: $(VERSION)" >> $(TMP_METADATA)
 
-epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format (warning, not functional)
+epub:	validate $(BUILD)/epub/$(OUTPUT_FILENAME).epub ## Generate EPUB format
 
 html:	validate $(BUILD)/html/$(OUTPUT_FILENAME).html ## Generate HTML format
 
